@@ -1,0 +1,11 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Heart, MessageCircle } from "lucide-react";
+import Image from "next/image";
+
+const replies = ["you're actually way nicer than people think 😂", "I had a crush on you first year", "smart, funny, chaotic", "you disappear for 3 days then return like nothing happened 💀"];
+
+export function HumanMoment() {
+  return <section className="human-moment section-band"><div className="human-moment__heading"><p className="eyebrow">the people behind the questions</p><h2>REAL PEOPLE.<br /><em>UNFILTERED ANSWERS.</em></h2><p className="section-intro">The questions are anonymous. The reactions are very real.</p></div><div className="human-moment__field"><div className="human-moment__heart">♡</div>{replies.map((reply, index) => <motion.div key={reply} className={`human-reply human-reply--${index + 1}`} animate={{ y: [0, index % 2 ? 9 : -9, 0], rotate: [index - 2, index - 1, index - 2] }} transition={{ duration: 7 + index, repeat: Infinity, ease: "easeInOut" }}><span>{reply}</span><Heart size={15} fill="currentColor" /></motion.div>)}<motion.div className="human-portrait human-portrait--one" whileHover={{ scale: 1.03, rotate: -4 }}><Image src="/images/people/person-01.jpg" alt="Young adult portrait for a public Rate Me preview" fill sizes="300px" /><span>@maya / rate me</span></motion.div><motion.div className="human-portrait human-portrait--two" whileHover={{ scale: 1.03, rotate: 5 }}><Image src="/images/people/friends-01.jpg" alt="Adult friends for a public Ask Me Anything preview" fill sizes="360px" /><span>@crispy / AMA</span></motion.div><motion.div className="human-portrait human-portrait--three" whileHover={{ scale: 1.03, rotate: -2 }}><Image src="/images/people/person-02.jpg" alt="Young adult portrait for a public interaction preview" fill sizes="190px" /><span>@jo / honest opinion</span></motion.div><motion.div className="human-portrait human-portrait--four" whileHover={{ scale: 1.03, rotate: 3 }}><Image src="/images/people/person-03.jpg" alt="Young adult portrait for a public interaction preview" fill sizes="190px" /><span>@lena / describe me</span></motion.div><div className="human-moment__badge"><MessageCircle size={16} /> public demo / social energy</div></div></section>;
+}

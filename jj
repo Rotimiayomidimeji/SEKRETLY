@@ -1,0 +1,1244 @@
+SEKRETLY — PHASE 1.2
+MOBILE-FIRST GEN-Z VISUAL REFORMATION
+
+IMPORTANT:
+This is NOT a small CSS cleanup.
+This is NOT a spacing patch.
+This is NOT "make the current page responsive."
+
+The current implementation works technically, but the visual direction is wrong.
+
+I have reviewed the current desktop and mobile implementation.
+
+The current homepage feels:
+- too serious
+- too corporate/editorial
+- too structured
+- too restrained
+- too monochromatic
+- too grid-based
+- too dependent on uppercase grotesk typography
+- too much like a creative-agency portfolio
+- not enough like a social product young people would actually share
+
+The mobile version is especially unacceptable.
+
+DO NOT preserve the current visual composition just because it already exists.
+
+PRESERVE:
+- useful component architecture
+- working interactions
+- routing
+- accessibility foundations
+- demo functionality
+- business/product concepts
+
+REBUILD:
+- visual identity
+- typography system
+- mobile composition
+- section geometry
+- colour system
+- interaction cards
+- spacing rhythm
+- movement language
+- 3D treatment
+- responsive behavior
+
+The target is:
+
+A LOUD, ADDICTIVE, PLAYFUL, SLIGHTLY CHAOTIC,
+MOBILE-FIRST SOCIAL EXPERIENCE.
+
+Think:
+
+social app
+× internet culture
+× Y2K/neo-digital influence
+× tactile 3D
+× expressive editorial typography
+× sticker culture
+× Gen-Z maximalism
+× premium motion design
+
+BUT:
+
+Do not clone NGL.
+Do not clone TikTok.
+Do not clone BeReal.
+Do not clone Spotify.
+Do not clone any reference.
+
+SEKRETLY needs its own visual identity.
+
+==================================================
+01 — MOBILE IS NOW THE PRIMARY DESIGN
+==================================================
+
+This is a MOBILE WEB APPLICATION first.
+
+Stop treating mobile as a compressed desktop layout.
+
+Design every major homepage section at:
+
+390 × 844
+
+FIRST.
+
+Then validate:
+320
+360
+375
+390
+412
+430
+
+Only AFTER the mobile composition works should it expand to:
+
+768
+1024
+1280
+1440
+1920.
+
+Desktop should be an expansion of the mobile art direction.
+
+Not the reverse.
+
+At <= 767px:
+
+Do NOT simply shrink:
+- desktop headlines
+- desktop grids
+- desktop 3D scenes
+- desktop card layouts
+- desktop spacing
+
+Create genuinely different compositions where necessary.
+
+==================================================
+02 — NEW BRAND ATTITUDE
+==================================================
+
+Sekretly should feel like:
+
+"this looks fun, what is this?"
+
+before it feels like:
+
+"this is a professionally designed website."
+
+The product deals with:
+
+curiosity
+secrets
+crushes
+opinions
+confessions
+chaos
+friendships
+dating
+questions
+reactions
+sharing
+
+The interface should visually express those emotions.
+
+Allow controlled visual mischief:
+
+- stickers
+- scribbles
+- arrows
+- circles
+- underlines
+- stamps
+- handwritten annotations
+- taped notes
+- floating reactions
+- emoji-like 3D objects
+- doodles
+- tilted labels
+- distorted type
+- oversized punctuation
+- irregular shapes
+- unexpected overlaps
+- tiny pieces of internet slang/microcopy
+
+But keep primary navigation and important actions obvious.
+
+This is CONTROLLED MAXIMALISM.
+
+Not random clutter.
+
+==================================================
+03 — THROW OUT THE CURRENT COLOUR RESTRAINT
+==================================================
+
+The current page is too close to:
+
+black + muted purple + grey.
+
+It looks dead.
+
+Create a much richer SEKRETLY palette.
+
+CORE FOUNDATION:
+
+Ink Black
+#08070B
+
+Deep Wine
+#250615
+
+Black Cherry
+#3A071E
+
+Dark Plum
+#260B38
+
+These create the dark mysterious base.
+
+PRIMARY ENERGY:
+
+Sekret Pink
+#FF3B8D
+
+Electric Violet
+#A855FF
+
+Ultraviolet
+#7B3CFF
+
+Electric Blue
+#3D7BFF
+
+Cyan Pop
+#20E7FF
+
+SECONDARY / CHAOS ACCENTS:
+
+Acid Lime
+#C7FF38
+
+Hot Coral
+#FF624D
+
+Sun Yellow
+#FFD83D
+
+Soft Lavender
+#DCC4FF
+
+Paper White
+#FFF8F2
+
+These are NOT all used simultaneously in every section.
+
+Create section-specific colour worlds.
+
+For example:
+
+Hero:
+black cherry + hot pink + violet + electric blue
+
+Curiosity:
+purple + cyan + acid lime accents
+
+Demo:
+deep wine + lavender + coral
+
+Share:
+electric blue + pink + yellow
+
+Explore:
+mixed saturated interaction identities
+
+Safety:
+deep forest-black + mint/cyan
+
+Final CTA:
+full wine/pink/violet intensity
+
+Use saturated radial light, blurred colour fields,
+mesh gradients and luminous edges.
+
+Black should anchor the experience.
+
+Colour should feel like LIGHT entering darkness.
+
+Do NOT make every card dark purple.
+
+Each interaction type needs a recognizable colour identity.
+
+==================================================
+04 — TYPOGRAPHY IS CURRENTLY ONE OF THE BIGGEST PROBLEMS
+==================================================
+
+The current typography feels:
+
+too uppercase
+too geometric
+too serious
+too repetitive
+too "design portfolio"
+
+REPLACE THE ONE-FONT FEELING.
+
+Create a 3-VOICE TYPOGRAPHIC SYSTEM.
+
+VOICE A — PRIMARY DISPLAY
+
+Used for major emotional statements.
+
+Choose an expressive, heavy display face that feels:
+- chunky
+- youthful
+- slightly weird
+- high personality
+- extremely readable
+
+Research appropriate Google Fonts / legally usable web fonts.
+
+Candidates worth testing include:
+- Bricolage Grotesque
+- Archivo Black
+- Bowlby One
+- Space Grotesk variable treatments
+- Syne
+- Climate Crisis ONLY for occasional decorative words
+- Archivo Expanded / similar wide display treatment
+
+Do NOT blindly install all of these.
+
+Test and select the best pairing.
+
+VOICE B — HUMAN / CHAOTIC ACCENT
+
+Used sparingly for:
+
+"be honest"
+"no pressure"
+"spill it"
+"👀"
+"wait..."
+"really?"
+"anonymous btw"
+"don't overthink it"
+
+Use a handwritten, marker, italic or playful secondary face.
+
+It must remain readable.
+
+VOICE C — UI / BODY
+
+Clean modern sans-serif.
+
+Use for:
+buttons
+body copy
+forms
+navigation
+metadata.
+
+==================================================
+05 — TYPOGRAPHIC COMPOSITION
+==================================================
+
+Stop making every heading:
+
+ALL
+CAPS
+STACKED
+LIKE
+THIS.
+
+Mix:
+
+lowercase
+Title Case
+UPPERCASE
+italic
+handwritten
+outlined
+stretched
+compressed
+rotated
+highlighted
+circled
+underlined.
+
+Example hero composition:
+
+say it.
+
+STAY
+unknown.
+
+with "unknown." becoming the visual event.
+
+OR another composition with equivalent energy.
+
+Words can overlap slightly.
+
+One word can be enormous.
+
+A handwritten annotation can cross another word.
+
+A 3D emoji can partially cover a letter.
+
+Text should sometimes become the artwork.
+
+MOBILE:
+
+Major headings should generally occupy approximately
+70–95% of viewport width.
+
+Use responsive clamp() values.
+
+The current tiny mobile typography is unacceptable.
+
+Body copy also needs to be comfortably readable.
+
+Do not make supporting text microscopic just because
+the headline is large.
+
+==================================================
+06 — COMPLETELY RECOMPOSE THE MOBILE HERO
+==================================================
+
+Current mobile hero feels like desktop squeezed into a phone.
+
+Delete that composition.
+
+Build a mobile-specific hero.
+
+Target:
+390 × 844.
+
+The first viewport should feel nearly poster-like.
+
+Possible hierarchy:
+
+small playful SEKRETLY brand header
+
+then huge:
+
+say it.
+
+STAY
+unknown.
+
+Then:
+
+"ask what people really think 👀"
+
+Then the primary CTA.
+
+BUT integrate the visual elements THROUGH the typography.
+
+Examples:
+
+- glossy 3D eye peeking around "unknown"
+- inflated heart behind part of headline
+- small floating confession sticker
+- rotating 🤫 object
+- glass speech bubble
+- message sticker crossing edge of screen
+
+Use intentional cropping.
+
+Objects MAY leave the viewport.
+
+That's good.
+
+Do not put every object safely inside a rectangle.
+
+CTA:
+
+START A SEKRET
+
+should feel physical and satisfying.
+
+Large.
+Thumb friendly.
+Spring response.
+Press depth.
+
+Secondary action:
+just browsing? → explore
+
+Use casual microcopy.
+
+==================================================
+07 — MOBILE NAVIGATION
+==================================================
+
+Current mobile hamburger is too conventional.
+
+Create a compact floating mobile header.
+
+Brand left.
+
+Animated menu object right.
+
+On tap:
+
+open a full-screen expressive navigation layer.
+
+Not a generic drawer.
+
+Links can enter at different offsets:
+
+Explore
+How it works
+Safety
+Stories
+
+Large typography.
+
+Include:
+START A SEKRET
+
+Background should animate through SEKRETLY colour fields.
+
+The menu itself should feel like part of the brand.
+
+==================================================
+08 — STOP MAKING SECTIONS HUGE EMPTY CANVASES
+==================================================
+
+The screenshots show excessive empty vertical space.
+
+This is especially bad on mobile.
+
+Create a tighter rhythm.
+
+Sections should vary intentionally:
+
+some:
+80–100svh
+
+some:
+content-height
+
+some:
+sticky storytelling
+
+some:
+horizontal swipe rails
+
+some:
+full-bleed
+
+some:
+short transition moments.
+
+Do NOT assign enormous min-heights everywhere.
+
+Every 100–150 vertical pixels should contain either:
+
+- meaningful typography
+- motion
+- interaction
+- artwork
+- navigation cue
+- transition
+
+unless negative space is deliberately being used for drama.
+
+==================================================
+09 — CURIOSITY UNIVERSE: REBUILD COMPLETELY
+==================================================
+
+Current desktop cards still look like product cards.
+
+Current mobile treatment is unacceptable.
+
+On MOBILE:
+
+turn this into a native-feeling SWIPEABLE interaction rail.
+
+Header:
+
+so...
+what are we
+asking today? 👀
+
+or equivalent casual language.
+
+Below:
+
+large interaction cards approximately:
+
+82–88vw width.
+
+Next card MUST visibly peek from the right.
+
+Use:
+
+overflow-x: auto
+scroll-snap-type: x mandatory
+scroll-snap-align: center/start
+touch momentum scrolling
+
+Hide ugly scrollbar visually without disabling scrolling.
+
+Each interaction should feel completely different.
+
+CONFESSION:
+hot pink/red
+3D sealed envelope
+"spill it."
+
+HONEST OPINION:
+electric blue/cyan
+3D eye
+"don't lie tho 👀"
+
+RATE ME:
+yellow/violet
+inflated star
+"be brutal."
+
+AMA:
+acid lime/black
+question-mark sculpture
+"ask anything."
+
+WHO SHOULD I DATE:
+coral/pink
+split glossy heart
+
+DESCRIBE ME:
+violet/cyan
+letter blocks
+
+HOT TAKES:
+orange/pink
+inflated flame
+
+TRUTH OR DARE:
+lime/purple
+3D translucent dice.
+
+Cards should not be identical rectangles with changed icons.
+
+Vary:
+shape
+colour
+object placement
+type placement
+rotation
+decorations.
+
+On swipe:
+object rotates slightly.
+background responds.
+progress indicator updates.
+
+Include a playful:
+swipe → 
+
+hint.
+
+DESKTOP can use an asymmetric spatial layout,
+but preserve these individual visual identities.
+
+==================================================
+10 — SECTION TRANSITIONS
+==================================================
+
+Current page feels like:
+
+section
+section
+section
+section.
+
+Change that.
+
+Sections should bleed into one another.
+
+Examples:
+
+A giant word from section A scrolls behind section B.
+
+A 3D object travels between sections.
+
+Background colour morphs.
+
+A message card thrown from one section lands in another.
+
+An envelope opens and reveals the next heading.
+
+A curved arrow leads downward.
+
+Scrolling should feel like progressing through one
+continuous social story.
+
+==================================================
+11 — LIVE DEMO: MAKE IT FEEL LIKE A REAL SOCIAL POST
+==================================================
+
+The current phone UI is too formal.
+
+Rebuild it.
+
+Instead of giant dead space + conventional phone mockup,
+make the phone/interface invade the composition.
+
+Mobile:
+the demo can become nearly full-screen.
+
+@crispy
+
+honest opinion
+
+"what do you actually think about me?"
+
+Textarea should feel inviting.
+
+Placeholder:
+go on... 👀
+
+Primary:
+send it anonymously
+
+Use animated character count subtly.
+
+While typing:
+surrounding visual environment reacts slightly.
+
+On send:
+
+button compresses
+message becomes physical bubble
+bubble shoots away
+screen flashes/morphs
+success object appears.
+
+Then:
+
+sent 🤫
+
+"crispy has no idea who sent that."
+
+Actions:
+send another
+make mine
+keep snooping →
+
+No backend yet.
+
+==================================================
+12 — "HOW IT WORKS" SHOULD NOT LOOK LIKE A BUSINESS PROCESS
+==================================================
+
+Current:
+
+01 Create
+02 Share
+03 Receive
+04 React
+
+is too corporate.
+
+Keep the logic.
+Change the presentation.
+
+Make it feel like a social story:
+
+1.
+make something messy
+
+2.
+drop the link 👀
+
+3.
+watch the chaos arrive
+
+4.
+react / reply / expose it 😂
+
+5.
+share the best ones
+
+Mobile:
+
+Create vertically stacked scenes with
+horizontal mini swipe moments.
+
+WhatsApp-style share card enters from side.
+
+Inbox card falls into screen.
+
+Response card flips.
+
+Share-story card expands full screen.
+
+Use curved arrows / doodle paths between stages.
+
+==================================================
+13 — SHARE STUDIO SHOULD LOOK LIKE SOCIAL CONTENT
+==================================================
+
+Create a dramatic 9:16 story canvas.
+
+The response itself should be huge.
+
+Example:
+
+"you're actually
+way nicer than
+people think 😂"
+
+Themes should radically change the visual:
+
+LIQUID WINE
+ELECTRIC
+CHROME
+ACID
+MIDNIGHT
+SOFT CHAOS
+
+On mobile:
+theme selector = horizontal swipe rail.
+
+Changing theme should animate:
+background
+font treatment
+3D object
+stickers
+gradient
+texture.
+
+==================================================
+14 — MESSAGE REVEAL
+==================================================
+
+Current reveal section has far too much empty space.
+
+Rebuild.
+
+Make the sealed Sekret HUGE.
+
+Mobile:
+it can occupy 60–70vw.
+
+Animate:
+float
+breathe
+subtle rotate.
+
+Text:
+
+hold it...
+don't be scared 👀
+
+User holds.
+
+Progress wraps around object.
+
+At 100%:
+seal tears/open
+haptic-like visual pulse
+message springs forward.
+
+"I had a crush on you first year 😭"
+
+Reaction objects explode subtly around it.
+
+Then:
+❤️ 😂 👀 😭
+
+reply
+share
+next sekret
+
+==================================================
+15 — EXPLORE PREVIEW
+==================================================
+
+Make this feel like entertainment.
+
+NOT:
+a collection of feature cards.
+
+Mobile:
+mixed feed.
+
+Some posts full width.
+Some swipeable.
+Some colourful.
+Some primarily typography.
+Some primarily 3D.
+Some profile driven.
+
+Example:
+
+🔥 HOT TAKE
+
+"relationships should survive
+without texting every day."
+
+1.8k reactions
+
+Then:
+
+WHO SHOULD I DATE?
+two playful candidate placeholders
+
+Then:
+
+CONFESSION
+
+"I told everyone I was over them.
+I lied."
+
+Then:
+clearly labelled AdSurface.
+
+Then:
+RATE ME.
+
+The feed should feel alive enough that a user
+understands why they might browse even when nobody
+sent them a direct link.
+
+==================================================
+16 — MICROCOPY MUST BECOME YOUNGER
+==================================================
+
+Current copy is too polished.
+
+Sekretly can speak naturally.
+
+Examples of the VOICE:
+
+"be honest. like actually honest."
+
+"spill it 👀"
+
+"okay this one is messy."
+
+"someone has something to say..."
+
+"don't overthink it."
+
+"sent 🤫"
+
+"your turn."
+
+"who said THAT? 😭"
+
+"open it if you're brave."
+
+"no names. just vibes."
+
+"make yours."
+
+"keep snooping."
+
+Do not force slang into every sentence.
+
+Use it strategically.
+
+Avoid sounding like a corporation pretending to be Gen Z.
+
+==================================================
+17 — 3D MUST BECOME VISIBLE
+==================================================
+
+The current screenshots do not communicate the level of
+3D presence requested.
+
+Create a reusable visual object system.
+
+Hero:
+REAL React Three Fiber scene if performant.
+
+Interaction cards:
+prefer optimized rendered assets/CSS dimensional objects
+unless live 3D materially improves them.
+
+Potential objects:
+
+eye
+inflated heart
+sealed envelope
+flame
+dice
+star
+speech bubble
+broken heart
+question mark
+phone
+padlock
+lips
+sparkles.
+
+Materials:
+
+glossy plastic
+translucent glass
+chrome
+inflated rubber
+jelly
+liquid.
+
+Lighting:
+wine/pink/blue environment.
+
+Objects should cast convincing soft shadows/glows.
+
+Do NOT build 10 simultaneous WebGL canvases.
+
+==================================================
+18 — MOBILE MOTION LANGUAGE
+==================================================
+
+Desktop hover cannot be the primary interaction model.
+
+Mobile motion must respond to:
+
+SWIPE
+TAP
+HOLD
+DRAG
+SCROLL.
+
+Implement:
+
+swipeable rails
+drag resistance
+spring snapping
+hold-to-reveal
+press depth
+scroll-linked rotation
+sticky moments
+parallax
+object drift
+animated theme switching.
+
+Do NOT hijack normal vertical scrolling.
+
+For horizontal sections:
+make direction obvious through:
+- peeking next card
+- swipe arrow
+- pagination/progress
+- partial offscreen content.
+
+==================================================
+19 — DESKTOP ALSO NEEDS MORE ENERGY
+==================================================
+
+After mobile is correct, upgrade desktop.
+
+Current desktop has too much centered/structured
+portfolio-style composition.
+
+Introduce:
+
+asymmetry
+cropped objects
+larger colour fields
+overlapping typography
+variable section widths
+horizontal movement
+cursor-responsive depth
+huge decorative words
+sticker elements
+3D objects leaving containers.
+
+Do not sacrifice usability.
+
+==================================================
+20 — DETAILS / TEXTURES
+==================================================
+
+Add subtle texture to prevent the site feeling synthetic.
+
+Possible treatments:
+
+fine grain
+noise
+halftone dots
+scribbled arrows
+marker circles
+sticker outlines
+paper scraps
+blurred light leaks
+tiny stars
+chrome highlights.
+
+Keep textures lightweight.
+
+Use CSS/SVG where possible.
+
+==================================================
+21 — ACCESSIBILITY + PERFORMANCE
+==================================================
+
+LOUD DOES NOT MEAN INACCESSIBLE.
+
+Maintain:
+WCAG-conscious text contrast
+keyboard navigation
+focus-visible
+semantic headings
+aria labels
+minimum touch targets
+reduced-motion mode.
+
+For reduced-motion:
+replace large motion sequences with static compositions.
+
+Performance:
+
+avoid excessive WebGL
+lazy-load expensive scenes
+dynamic import R3F
+pause animation offscreen
+use transform/opacity animations
+avoid layout thrashing
+optimize assets
+avoid giant video backgrounds.
+
+==================================================
+22 — CRITICAL QA
+==================================================
+
+Actually inspect the page at:
+
+320 × 568
+360 × 800
+375 × 812
+390 × 844
+412 × 915
+430 × 932
+768 × 1024
+1280 × 720
+1440 × 900
+1920 × 1080
+
+Specifically check:
+
+- headline clipping
+- text collisions
+- card clipping
+- huge dead spaces
+- horizontal page overflow
+- nav overlap
+- unreadably small text
+- CTA placement
+- touch targets
+- sticky sections
+- horizontal rails
+- 3D overflow
+- scroll traps.
+
+The DOCUMENT BODY itself must not accidentally overflow
+horizontally.
+
+Horizontal overflow is allowed ONLY inside explicitly
+designed swipe rails.
+
+==================================================
+23 — DO NOT
+==================================================
+
+DO NOT:
+- simply increase current font sizes
+- simply brighten existing purple
+- keep current card grid and call it a redesign
+- make everything uppercase
+- make every card wine/purple
+- make every section 100vh
+- create giant empty gaps
+- create another corporate landing page
+- use identical rounded rectangles everywhere
+- make mobile a scaled desktop
+- use random animations without narrative purpose
+- introduce broken dependencies
+- touch backend/database functionality unnecessarily.
+
+==================================================
+24 — IMPLEMENTATION ORDER
+==================================================
+
+Work in this exact order:
+
+1. audit current homepage components/styles
+2. create new colour/token system
+3. establish new typography pairing
+4. rebuild mobile hero at 390px
+5. rebuild mobile navigation
+6. rebuild mobile curiosity rail
+7. rebuild mobile live demo
+8. rebuild mobile viral journey
+9. rebuild mobile reveal interaction
+10. rebuild mobile share preview
+11. rebuild mobile explore preview
+12. rebuild remaining mobile sections
+13. create continuous transitions
+14. expand design intelligently to tablet
+15. expand design to desktop
+16. optimize motion/3D
+17. accessibility pass
+18. responsive QA
+19. lint
+20. build
+
+Do not proceed to auth/onboarding/backend.
+
+This task is still HOMEPAGE VISUAL IDENTITY.
+
+==================================================
+25 — SUCCESS TEST
+==================================================
+
+When I open this at 390px wide I should NOT think:
+
+"responsive website."
+
+I should think:
+
+"this feels like an actual social app."
+
+When I scroll, each screen should contain something
+worth looking at, touching, swiping or reacting to.
+
+When I reach desktop, it should feel like that same
+brand was given more room to breathe — not like an
+unrelated desktop website.
+
+The experience should feel young without being childish,
+chaotic without being unusable, colourful without being
+cheap, and experimental without losing clarity.
+
+IMPLEMENT THIS.
+
+Do not reply with a design proposal only.
+
+Modify the actual files.
+
+After implementation run the existing project's
+appropriate lint/type/build checks.
+
+Fix errors introduced by this work.
+
+Then report:
+
+- typography selected and why
+- final palette/tokens
+- mobile-specific layouts created
+- horizontal swipe sections created
+- 3D implementation used
+- animation system
+- components replaced
+- components preserved
+- accessibility considerations
+- performance considerations
+- lint/type/build results
+- remaining asset limitations

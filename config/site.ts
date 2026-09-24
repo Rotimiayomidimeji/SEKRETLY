@@ -1,0 +1,1 @@
+export const siteConfig = { name: "SEKRETLY", tagline: "Say it. Stay unknown.", description: "A premium anonymous social space for honest prompts, secret thoughts, and real reactions.", url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000" };

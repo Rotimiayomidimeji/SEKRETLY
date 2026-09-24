@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InteractionStatus { DRAFT ACTIVE ARCHIVED }
+enum MessageVisibility { PRIVATE PUBLIC }
+enum NotificationType { MESSAGE REPLY REACTION FOLLOW SYSTEM }
+enum ReportReason { HARASSMENT SPAM HATE SELF_HARM OTHER }
+enum AnalyticsEventType { PAGE_VIEW PROFILE_VIEW INTERACTION_VIEW INTERACTION_STARTED INTERACTION_SUBMITTED SIGNUP_STARTED SIGNUP_COMPLETED INTERACTION_CREATED LINK_SHARED SHARE_CARD_CREATED MESSAGE_OPENED REPLY_CREATED EXPLORE_OPENED NOTIFICATION_OPENED }
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  name String?
+  image String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile Profile?
+  interactions Interaction[]
+  messages Message[] @relation("RecipientMessages")
+  replies Reply[]
+  reactions Reaction[]
+  notifications Notification[]
+  reports Report[]
+  blocksMade Block[] @relation("Blocker")
+  blocksReceived Block[] @relation("Blocked")
+  analyticsEvents AnalyticsEvent[]
+}
+
+model Profile {
+  id String @id @default(cuid())
+  userId String @unique
+  username String @unique
+  displayName String
+  bio String?
+  avatarUrl String?
+  isPublic Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Interaction {
+  id String @id @default(cuid())
+  ownerId String
+  typeSlug String
+  title String
+  prompt String
+  slug String @unique
+  status InteractionStatus @default(DRAFT)
+  allowAnonymous Boolean @default(true)
+  allowPublicResponses Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  messages Message[]
+  analyticsEvents AnalyticsEvent[]
+}
+
+model Message {
+  id String @id @default(cuid())
+  interactionId String
+  recipientId String
+  body String
+  visibility MessageVisibility @default(PRIVATE)
+  isRead Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  interaction Interaction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+  recipient User @relation("RecipientMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  replies Reply[]
+  reactions Reaction[]
+  reports Report[]
+}
+
+model Reply {
+  id String @id @default(cuid())
+  messageId String
+  authorId String?
+  body String
+  isAnonymous Boolean @default(true)
+  createdAt DateTime @default(now())
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model Reaction {
+  id String @id @default(cuid())
+  messageId String
+  userId String?
+  kind String
+  createdAt DateTime @default(now())
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@unique([messageId, userId, kind])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type NotificationType
+  title String
+  body String
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id String @id @default(cuid())
+  reporterId String
+  messageId String?
+  reason ReportReason
+  details String?
+  createdAt DateTime @default(now())
+  reporter User @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  message Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+}
+
+model Block {
+  id String @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  @@unique([blockerId, blockedId])
+}
+
+model AnalyticsEvent {
+  id String @id @default(cuid())
+  userId String?
+  interactionId String?
+  type AnalyticsEventType
+  properties Json?
+  createdAt DateTime @default(now())
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  interaction Interaction? @relation(fields: [interactionId], references: [id], onDelete: SetNull)
+}

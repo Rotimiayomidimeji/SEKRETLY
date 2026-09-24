@@ -1,0 +1,1 @@
+Image slots for future public discovery cards. Add licensed local portrait/lifestyle assets here for Rate Me, AMA, Who Should I Date, and creator previews. No external hotlinks are used by the homepage.
