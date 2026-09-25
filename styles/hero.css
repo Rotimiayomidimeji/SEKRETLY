@@ -1,0 +1,1452 @@
+/* ============================================================
+
+   SEKRETLY HERO
+
+   Final single-artwork implementation
+
+   ============================================================ */
+
+.sekret-hero {
+
+  position: relative;
+
+  isolation: isolate;
+
+  width: 100%;
+
+  min-height: max(760px, 100svh);
+
+  display: grid;
+
+  grid-template-columns:
+
+    minmax(400px, 0.82fr)
+
+    minmax(620px, 1.18fr);
+
+  align-items: center;
+
+  overflow: hidden;
+
+  padding:
+
+    110px
+
+    max(26px, calc((100vw - 1460px) / 2))
+
+    58px;
+
+  background: #08060b;
+
+  perspective: 1400px;
+
+}
+
+/* ============================================================
+
+   BACKGROUND
+
+   ============================================================ */
+
+.sekret-hero__background {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -5;
+
+  overflow: hidden;
+
+  background:
+
+    radial-gradient(
+
+      circle at 67% 53%,
+
+      rgba(234, 21, 132, 0.22),
+
+      transparent 31%
+
+    ),
+
+    radial-gradient(
+
+      circle at 87% 25%,
+
+      rgba(117, 59, 255, 0.18),
+
+      transparent 28%
+
+    ),
+
+    radial-gradient(
+
+      circle at 17% 76%,
+
+      rgba(115, 10, 60, 0.18),
+
+      transparent 36%
+
+    ),
+
+    linear-gradient(
+
+      112deg,
+
+      #08070b 0%,
+
+      #0c0710 43%,
+
+      #130611 72%,
+
+      #08070b 100%
+
+    );
+
+}
+
+.sekret-hero__glow {
+
+  position: absolute;
+
+  border-radius: 999px;
+
+  filter: blur(115px);
+
+  pointer-events: none;
+
+}
+
+.sekret-hero__glow--pink {
+
+  width: 600px;
+
+  height: 600px;
+
+  right: 16%;
+
+  bottom: -28%;
+
+  background: rgba(255, 31, 137, 0.2);
+
+}
+
+.sekret-hero__glow--purple {
+
+  width: 470px;
+
+  height: 470px;
+
+  right: -10%;
+
+  top: 0;
+
+  background: rgba(105, 60, 255, 0.14);
+
+}
+
+.sekret-hero__grid {
+
+  position: absolute;
+
+  inset: 0;
+
+  opacity: 0.11;
+
+  background-image:
+
+    linear-gradient(
+
+      rgba(255,255,255,.035) 1px,
+
+      transparent 1px
+
+    ),
+
+    linear-gradient(
+
+      90deg,
+
+      rgba(255,255,255,.035) 1px,
+
+      transparent 1px
+
+    );
+
+  background-size: 72px 72px;
+
+  mask-image:
+
+    linear-gradient(
+
+      to bottom,
+
+      black,
+
+      rgba(0,0,0,.6) 65%,
+
+      transparent
+
+    );
+
+}
+
+.sekret-hero__vignette {
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+
+    linear-gradient(
+
+      90deg,
+
+      rgba(5,4,7,.45) 0%,
+
+      transparent 40%,
+
+      transparent 75%,
+
+      rgba(5,4,7,.18) 100%
+
+    );
+
+  pointer-events: none;
+
+}
+
+/* ============================================================
+
+   COPY
+
+   ============================================================ */
+
+.sekret-hero__copy {
+
+  position: relative;
+
+  z-index: 20;
+
+  width: min(100%, 610px);
+
+}
+
+.sekret-hero__eyebrow {
+
+  position: relative;
+
+  width: max-content;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 24px;
+
+  padding: 9px 14px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255,255,255,.14);
+
+  border-radius: 999px;
+
+  background:
+
+    linear-gradient(
+
+      100deg,
+
+      rgba(255,255,255,.06),
+
+      rgba(255,255,255,.025)
+
+    );
+
+  backdrop-filter: blur(16px);
+
+  color: rgba(255,255,255,.67);
+
+  font-size: 9px;
+
+  font-weight: 850;
+
+  letter-spacing: .14em;
+
+}
+
+.sekret-hero__eyebrow::after {
+
+  content: "";
+
+  position: absolute;
+
+  width: 80px;
+
+  height: 100%;
+
+  left: -100px;
+
+  top: 0;
+
+  transform: skewX(-22deg);
+
+  background:
+
+    linear-gradient(
+
+      90deg,
+
+      transparent,
+
+      rgba(255,255,255,.13),
+
+      transparent
+
+    );
+
+  animation:
+
+    sekretEyebrowSweep 5.5s ease-in-out infinite;
+
+}
+
+@keyframes sekretEyebrowSweep {
+
+  0%,
+
+  68% {
+
+    left: -100px;
+
+  }
+
+  100% {
+
+    left: calc(100% + 100px);
+
+  }
+
+}
+
+.sekret-hero__eyebrow i {
+
+  color: rgba(255,255,255,.24);
+
+  font-style: normal;
+
+}
+
+.sekret-hero__eyebrow-dot {
+
+  width: 7px;
+
+  height: 7px;
+
+  flex: 0 0 auto;
+
+  border-radius: 50%;
+
+  background: #ff3192;
+
+  box-shadow:
+
+    0 0 0 0 rgba(255,49,146,.45);
+
+  animation:
+
+    sekretLivePulse 2.2s ease-out infinite;
+
+}
+
+@keyframes sekretLivePulse {
+
+  0% {
+
+    box-shadow:
+
+      0 0 0 0 rgba(255,49,146,.45);
+
+  }
+
+  70% {
+
+    box-shadow:
+
+      0 0 0 8px rgba(255,49,146,0);
+
+  }
+
+  100% {
+
+    box-shadow:
+
+      0 0 0 0 rgba(255,49,146,0);
+
+  }
+
+}
+
+/* HEADLINE */
+
+.sekret-hero h1 {
+
+  position: relative;
+
+  z-index: 4;
+
+  display: flex;
+
+  flex-direction: column;
+
+  margin: 0;
+
+  font-size:
+
+    clamp(5.1rem, 7.25vw, 7.55rem);
+
+  font-weight: 950;
+
+  line-height: .77;
+
+  letter-spacing: -.075em;
+
+  text-wrap: balance;
+
+}
+
+.sekret-hero h1 > span {
+
+  display: block;
+
+  width: max-content;
+
+}
+
+.sekret-hero__title-white {
+
+  color: #faf7fa;
+
+  text-shadow:
+
+    0 12px 45px rgba(0,0,0,.22);
+
+}
+
+.sekret-hero__title-pink {
+
+  position: relative;
+
+  color: #ff3192;
+
+  text-shadow:
+
+    0 0 32px rgba(255,49,146,.12);
+
+}
+
+.sekret-hero__scribble {
+
+  position: absolute;
+
+  left: 4%;
+
+  right: -7%;
+
+  bottom: -9px;
+
+  height: 11px;
+
+  transform: rotate(-3deg);
+
+  border-top:
+
+    3px solid #ff3192;
+
+  border-radius: 50%;
+
+  filter:
+
+    drop-shadow(
+
+      0 0 7px rgba(255,49,146,.42)
+
+    );
+
+  transform-origin: left center;
+
+  animation:
+
+    sekretScribble 1.1s
+
+    cubic-bezier(.16,1,.3,1)
+
+    .75s both;
+
+}
+
+@keyframes sekretScribble {
+
+  from {
+
+    scale: 0 1;
+
+    opacity: 0;
+
+  }
+
+  to {
+
+    scale: 1 1;
+
+    opacity: 1;
+
+  }
+
+}
+
+/* DESCRIPTION */
+
+.sekret-hero__description {
+
+  width: min(100%, 500px);
+
+  margin: 31px 0 0;
+
+  color: rgba(241,234,242,.72);
+
+  font-size:
+
+    clamp(1rem, 1.2vw, 1.13rem);
+
+  line-height: 1.65;
+
+}
+
+/* ============================================================
+
+   CTA
+
+   ============================================================ */
+
+.sekret-hero__actions {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 27px;
+
+}
+
+.sekret-hero__primary,
+
+.sekret-hero__secondary {
+
+  position: relative;
+
+  min-height: 56px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 0 25px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+
+  font-weight: 850;
+
+  transition:
+
+    transform .3s cubic-bezier(.2,.8,.2,1),
+
+    border-color .3s ease,
+
+    background .3s ease,
+
+    box-shadow .3s ease;
+
+}
+
+.sekret-hero__primary {
+
+  border:
+
+    1px solid rgba(255,255,255,.18);
+
+  background:
+
+    linear-gradient(
+
+      110deg,
+
+      #ff2d91,
+
+      #bc3fff 54%,
+
+      #6e54ff
+
+    );
+
+  color: white;
+
+  box-shadow:
+
+    0 15px 42px rgba(223,35,142,.28),
+
+    inset 0 1px 0 rgba(255,255,255,.28);
+
+}
+
+.sekret-hero__primary:hover {
+
+  transform: translateY(-3px) scale(1.015);
+
+  box-shadow:
+
+    0 21px 55px rgba(223,35,142,.37),
+
+    inset 0 1px 0 rgba(255,255,255,.34);
+
+}
+
+.sekret-hero__primary svg {
+
+  transition:
+
+    transform .3s cubic-bezier(.2,.8,.2,1);
+
+}
+
+.sekret-hero__primary:hover svg {
+
+  transform:
+
+    translate(3px,-3px)
+
+    rotate(4deg);
+
+}
+
+.sekret-hero__button-shine {
+
+  position: absolute;
+
+  top: -40%;
+
+  left: -45%;
+
+  width: 35%;
+
+  height: 180%;
+
+  transform:
+
+    rotate(18deg);
+
+  background:
+
+    linear-gradient(
+
+      90deg,
+
+      transparent,
+
+      rgba(255,255,255,.35),
+
+      transparent
+
+    );
+
+  transition:
+
+    left .7s cubic-bezier(.16,1,.3,1);
+
+}
+
+.sekret-hero__primary:hover
+
+.sekret-hero__button-shine {
+
+  left: 125%;
+
+}
+
+.sekret-hero__secondary {
+
+  border:
+
+    1px solid rgba(255,255,255,.16);
+
+  background:
+
+    rgba(255,255,255,.035);
+
+  color: white;
+
+  backdrop-filter: blur(14px);
+
+}
+
+.sekret-hero__secondary:hover {
+
+  transform: translateY(-3px);
+
+  border-color:
+
+    rgba(255,255,255,.31);
+
+  background:
+
+    rgba(255,255,255,.07);
+
+}
+
+.sekret-hero__secondary svg {
+
+  transition:
+
+    transform .25s ease;
+
+}
+
+.sekret-hero__secondary:hover svg {
+
+  transform: translateX(4px);
+
+}
+
+/* ============================================================
+
+   MICRO PROOF
+
+   ============================================================ */
+
+.sekret-hero__microproof {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-top: 25px;
+
+}
+
+.sekret-hero__avatars {
+
+  display: flex;
+
+}
+
+.sekret-hero__avatars span {
+
+  width: 31px;
+
+  height: 31px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin-left: -7px;
+
+  border:
+
+    2px solid #0b080d;
+
+  border-radius: 50%;
+
+  background:
+
+    linear-gradient(
+
+      145deg,
+
+      #3c2546,
+
+      #111019
+
+    );
+
+  color: white;
+
+  font-size: 9px;
+
+  font-weight: 850;
+
+  box-shadow:
+
+    0 8px 20px rgba(0,0,0,.18);
+
+  transition:
+
+    transform .25s ease;
+
+}
+
+.sekret-hero__avatars span:first-child {
+
+  margin-left: 0;
+
+}
+
+.sekret-hero__avatars span:nth-child(2) {
+
+  background:
+
+    linear-gradient(
+
+      145deg,
+
+      #153f61,
+
+      #10121a
+
+    );
+
+}
+
+.sekret-hero__avatars span:nth-child(3) {
+
+  background:
+
+    linear-gradient(
+
+      145deg,
+
+      #7b243e,
+
+      #171016
+
+    );
+
+}
+
+.sekret-hero__avatars span:last-child {
+
+  background: #ff3192;
+
+}
+
+.sekret-hero__microproof:hover
+
+.sekret-hero__avatars span:nth-child(1) {
+
+  transform:
+
+    translateY(-3px)
+
+    rotate(-5deg);
+
+}
+
+.sekret-hero__microproof:hover
+
+.sekret-hero__avatars span:nth-child(2) {
+
+  transform:
+
+    translateY(-5px);
+
+}
+
+.sekret-hero__microproof:hover
+
+.sekret-hero__avatars span:nth-child(3) {
+
+  transform:
+
+    translateY(-3px)
+
+    rotate(5deg);
+
+}
+
+.sekret-hero__proof-copy {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+}
+
+.sekret-hero__proof-copy strong {
+
+  color:
+
+    rgba(255,255,255,.88);
+
+  font-size: 11px;
+
+}
+
+.sekret-hero__proof-copy small {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color:
+
+    rgba(255,255,255,.43);
+
+  font-size: 9px;
+
+}
+
+/* ============================================================
+
+   ART
+
+   ============================================================ */
+
+.sekret-hero__art-stage {
+
+  position: absolute;
+
+  z-index: 10;
+
+  right: max(-25px, calc((100vw - 1560px) / 2));
+
+  bottom: 0;
+
+  width: min(72vw, 1100px);
+
+  height: calc(100% - 75px);
+
+  pointer-events: none;
+
+}
+
+.sekret-hero__art-canvas {
+
+  position: absolute;
+
+  inset: 0;
+
+}
+
+.sekret-hero__art-image {
+
+  object-fit: contain;
+
+  object-position: right bottom;
+
+  filter:
+
+    drop-shadow(0 38px 55px rgba(0,0,0,.48))
+
+    drop-shadow(0 0 34px rgba(255,32,139,.12));
+
+}
+
+.sekret-hero__art-halo {
+
+  position: absolute;
+
+  z-index: -1;
+
+  left: 24%;
+
+  top: 22%;
+
+  width: 57%;
+
+  height: 60%;
+
+  border-radius: 50%;
+
+  background:
+
+    radial-gradient(
+
+      circle,
+
+      rgba(244,31,142,.24),
+
+      rgba(132,47,255,.08) 48%,
+
+      transparent 72%
+
+    );
+
+  filter: blur(75px);
+
+  animation:
+
+    sekretHalo 5s ease-in-out infinite;
+
+}
+
+@keyframes sekretHalo {
+
+  0%,
+
+  100% {
+
+    opacity: .72;
+
+    transform: scale(.96);
+
+  }
+
+  50% {
+
+    opacity: 1;
+
+    transform: scale(1.05);
+
+  }
+
+}
+
+/* Tiny floating UI details */
+
+.sekret-hero__status {
+
+  position: absolute;
+
+  z-index: 12;
+
+  top: 21%;
+
+  right: 5%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 8px 10px;
+
+  border:
+
+    1px solid rgba(255,255,255,.13);
+
+  border-radius: 999px;
+
+  background:
+
+    rgba(10,7,13,.66);
+
+  backdrop-filter: blur(16px);
+
+  color:
+
+    rgba(255,255,255,.58);
+
+  font-size: 7px;
+
+  font-weight: 850;
+
+  letter-spacing: .13em;
+
+  box-shadow:
+
+    0 15px 40px rgba(0,0,0,.2);
+
+}
+
+.sekret-hero__status span {
+
+  width: 6px;
+
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #38f5ad;
+
+  box-shadow:
+
+    0 0 10px rgba(56,245,173,.7);
+
+}
+
+.sekret-hero__status b {
+
+  color: white;
+
+  font-size: inherit;
+
+}
+
+.sekret-hero__floating-note {
+
+  position: absolute;
+
+  z-index: 12;
+
+  left: 27%;
+
+  bottom: 17%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 12px;
+
+  border:
+
+    1px solid rgba(255,255,255,.13);
+
+  border-radius: 999px;
+
+  background:
+
+    rgba(20,8,22,.66);
+
+  backdrop-filter: blur(16px);
+
+  color:
+
+    rgba(255,255,255,.75);
+
+  font-size: 9px;
+
+  font-weight: 750;
+
+  box-shadow:
+
+    0 15px 40px rgba(0,0,0,.2);
+
+}
+
+/* ============================================================
+
+   SCROLL
+
+   ============================================================ */
+
+.sekret-hero__scroll {
+
+  position: absolute;
+
+  z-index: 30;
+
+  left: 50%;
+
+  bottom: 22px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color:
+
+    rgba(255,255,255,.3);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: .15em;
+
+  text-transform: uppercase;
+
+  transition:
+
+    color .25s ease;
+
+}
+
+.sekret-hero__scroll:hover {
+
+  color:
+
+    rgba(255,255,255,.75);
+
+}
+
+/* ============================================================
+   RESPONSIVE COMPOSITION
+   Desktop keeps the cinematic side composition.
+   Mobile uses a crop-window + internal canvas so the visual
+   subject, not the transparent PNG bounds, is centered.
+   ============================================================ */
+
+/* LAPTOP */
+@media (min-width: 901px) and (max-width: 1200px) {
+  .sekret-hero {
+    grid-template-columns:
+      minmax(350px, .78fr)
+      minmax(540px, 1.22fr);
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(4.4rem, 7vw, 5.9rem);
+  }
+
+  .sekret-hero__copy {
+    max-width: 480px;
+  }
+
+  .sekret-hero__art-stage {
+    right: -58px;
+    width: min(76vw, 960px);
+  }
+}
+
+/* TABLET + MOBILE */
+@media (max-width: 900px) {
+  .sekret-hero {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 118px 20px 0;
+    overflow: hidden;
+    perspective: none;
+  }
+
+  .sekret-hero__copy {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .sekret-hero__eyebrow {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    white-space: nowrap;
+  }
+
+  .sekret-hero h1 {
+    align-items: center;
+    font-size: clamp(4rem, 14vw, 6.5rem);
+  }
+
+  .sekret-hero__description {
+    max-width: 510px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sekret-hero__actions,
+  .sekret-hero__microproof {
+    justify-content: center;
+  }
+
+  /* Visible mobile crop window. */
+  .sekret-hero__art-stage {
+    position: relative;
+    z-index: 10;
+    order: 2;
+
+    width: calc(100% + 40px);
+    height: 570px;
+
+    right: auto;
+    left: auto;
+    bottom: auto;
+
+    margin: 20px -20px 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    /* Prevent CSS centering from fighting Framer Motion x transforms. */
+    transform: none !important;
+    transform-origin: center center;
+  }
+
+  /* Oversized source canvas positioned by its actual visual focal point. */
+  .sekret-hero__art-canvas {
+    position: absolute;
+    inset: auto;
+
+    width: 760px;
+    height: 570px;
+
+    left: 50%;
+    top: 0;
+
+    transform: translateX(-50%);
+  }
+
+  .sekret-hero__art-image {
+    object-fit: contain;
+    object-position: center center;
+  }
+
+  .sekret-hero__art-halo {
+    left: 50%;
+    top: 17%;
+    width: 420px;
+    height: 380px;
+    transform: translateX(-50%);
+  }
+
+  .sekret-hero__status {
+    display: none;
+  }
+
+  .sekret-hero__floating-note {
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .sekret-hero__scroll {
+    display: none;
+  }
+}
+
+/* PHONES */
+@media (max-width: 600px) {
+  .sekret-hero {
+    padding: 105px 17px 0;
+  }
+
+  .sekret-hero__eyebrow {
+    gap: 6px;
+    padding: 8px 11px;
+    font-size: 7.5px;
+    letter-spacing: .1em;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(3.65rem, 17.3vw, 5rem);
+  }
+
+  .sekret-hero__description {
+    width: 94%;
+    margin-top: 25px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .sekret-hero__actions {
+    width: 100%;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .sekret-hero__primary,
+  .sekret-hero__secondary {
+    flex: 1 1 155px;
+    min-height: 50px;
+    padding: 0 16px;
+    font-size: 11px;
+  }
+
+  .sekret-hero__microproof {
+    margin-top: 19px;
+  }
+
+  .sekret-hero__art-stage {
+    width: calc(100% + 34px);
+    height: 500px;
+    margin: 16px -17px 0;
+  }
+
+  /* Intentional optical centering for the asymmetric source artwork. */
+  .sekret-hero__art-canvas {
+    width: 665px;
+    height: 500px;
+    left: 46%;
+    transform: translateX(-50%);
+  }
+
+  .sekret-hero__art-halo {
+    width: 330px;
+    height: 330px;
+  }
+
+  .sekret-hero__floating-note {
+    bottom: 20px;
+    font-size: 8px;
+  }
+}
+
+/* Common phone range, including the 385px DevTools test. */
+@media (min-width: 375px) and (max-width: 430px) {
+  .sekret-hero__art-stage {
+    height: 480px;
+  }
+
+  .sekret-hero__art-canvas {
+    width: 640px;
+    height: 480px;
+    left: 45%;
+  }
+}
+
+/* VERY SMALL PHONES */
+@media (max-width: 374px) {
+  .sekret-hero {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sekret-hero h1 {
+    font-size: 3.5rem;
+  }
+
+  .sekret-hero__art-stage {
+    width: calc(100% + 28px);
+    height: 450px;
+    margin-left: -14px;
+    margin-right: -14px;
+  }
+
+  .sekret-hero__art-canvas {
+    width: 600px;
+    height: 450px;
+    left: 44%;
+  }
+
+  .sekret-hero__floating-note {
+    display: none;
+  }
+}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  .sekret-hero *,
+  .sekret-hero *::before,
+  .sekret-hero *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

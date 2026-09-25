@@ -1,0 +1,2289 @@
+@import "tailwindcss";
+@import "../styles/hero.css";
+@import "../styles/proof-strip.css";
+@import "../styles/experience.css";
+@import "../styles/reformation.css";
+@import "../styles/final-home.css";
+@import "../styles/scenes.css";
+@import "../styles/world.css";
+@import "../styles/demo-polish.css";
+@import "../styles/art-direction-recovery.css";
+
+:root {
+  --background: #08070b;
+  --foreground: #f8f4f5;
+  --surface: #250615;
+  --surface-elevated: #260b38;
+  --wine: #250615;
+  --burgundy: #3a071e;
+  --purple: #a855ff;
+  --electric-blue: #3d7bff;
+  --cyan-pop: #20e7ff;
+  --sekret-pink: #ff3b8d;
+  --ultraviolet: #7b3cff;
+  --acid-lime: #c7ff38;
+  --hot-coral: #ff624d;
+  --sun-yellow: #ffd83d;
+  --paper: #fff8f2;
+  --ash: #a99eaa;
+  --text-primary: #f8f4f5;
+  --text-secondary: #b9aeba;
+  --border: rgba(255, 255, 255, 0.12);
+  --glow: rgba(255, 59, 141, 0.32);
+  --danger: #ff6f91;
+  --success: #9ce6b1;
+  --radius-sm: 0.65rem;
+  --radius-md: 1.1rem;
+  --radius-lg: 1.8rem;
+  --shadow-deep: 0 28px 90px rgba(0, 0, 0, 0.42);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), sans-serif;
+  overflow-x: hidden;
+}
+
+button, input, textarea { font: inherit; }
+
+button, a { -webkit-tap-highlight-color: transparent; }
+::selection { background: var(--purple); color: white; }
+
+.glass-surface {
+  background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-deep);
+  backdrop-filter: blur(22px);
+}
+
+.hero-grid {
+  background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 86%);
+}
+
+.text-gradient { background: linear-gradient(100deg, #fff 12%, #d5b9ff 48%, #75ddff 92%); background-clip: text; color: transparent; }
+
+@keyframes drift { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); } 50% { transform: translate3d(0, -14px, 0) rotate(2deg); } }
+@keyframes drift-reverse { 0%, 100% { transform: translate3d(0, 0, 0) rotate(2deg); } 50% { transform: translate3d(0, 12px, 0) rotate(-3deg); } }
+.animate-drift { animation: drift 7s ease-in-out infinite; }
+.animate-drift-reverse { animation: drift-reverse 8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+
+
+
+
+/* =========================================================
+   SEKRETLY — CINEMATIC HERO V2
+   ========================================================= */
+
+.sekret-hero {
+  position: relative;
+  min-height: 100svh;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 0.84fr) minmax(540px, 1.16fr);
+  align-items: center;
+  gap: clamp(20px, 3vw, 60px);
+  padding:
+    clamp(145px, 12vw, 185px)
+    max(24px, calc((100vw - 1440px) / 2))
+    150px;
+  background: #08060b;
+}
+
+.sekret-hero__background,
+.sekret-hero__noise,
+.sekret-hero__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sekret-hero__background {
+  z-index: -6;
+  background:
+    radial-gradient(
+      circle at 79% 36%,
+      rgba(156, 47, 255, 0.24),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 55% 64%,
+      rgba(255, 25, 119, 0.19),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 15% 72%,
+      rgba(117, 22, 67, 0.3),
+      transparent 33%
+    ),
+    linear-gradient(116deg, #08060b 0%, #0d0710 49%, #08070e 100%);
+}
+
+.sekret-hero__noise {
+  z-index: -4;
+  opacity: 0.16;
+  background-image:
+    radial-gradient(rgba(255,255,255,.12) .55px, transparent .55px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to bottom, #000, transparent 94%);
+}
+
+.sekret-hero__grid {
+  z-index: -5;
+  opacity: 0.12;
+  background-image:
+    linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image:
+    radial-gradient(circle at 75% 45%, #000, transparent 68%);
+}
+
+.sekret-hero__glow {
+  position: absolute;
+  z-index: -3;
+  border-radius: 50%;
+  filter: blur(110px);
+  pointer-events: none;
+}
+
+.sekret-hero__glow--pink {
+  width: 470px;
+  height: 470px;
+  right: 19%;
+  top: 25%;
+  background: rgba(255, 25, 124, 0.19);
+}
+
+.sekret-hero__glow--violet {
+  width: 390px;
+  height: 390px;
+  right: -4%;
+  top: 20%;
+  background: rgba(132, 61, 255, 0.18);
+}
+
+.sekret-hero__glow--blue {
+  width: 300px;
+  height: 300px;
+  right: 4%;
+  bottom: 5%;
+  background: rgba(0, 181, 255, 0.12);
+}
+
+/* COPY */
+
+.sekret-hero__copy {
+  position: relative;
+  z-index: 20;
+  align-self: center;
+  width: min(100%, 650px);
+}
+
+.sekret-hero__eyebrow {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 27px;
+  padding: 9px 13px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 999px;
+  background: rgba(255,255,255,.045);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 14px 40px rgba(0,0,0,.16);
+  backdrop-filter: blur(14px);
+  color: rgba(255,255,255,.73);
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+.sekret-hero__eyebrow i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.32);
+}
+
+.sekret-hero__eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3b9d;
+  box-shadow: 0 0 16px #ff3b9d;
+}
+
+.sekret-hero h1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(4.8rem, 7.15vw, 7.75rem);
+  line-height: .78;
+  font-weight: 950;
+  letter-spacing: -.075em;
+  text-transform: none;
+}
+
+.sekret-hero__say,
+.sekret-hero__stay,
+.sekret-hero__unknown {
+  position: relative;
+  display: block;
+}
+
+.sekret-hero__stay {
+  margin-top: .12em;
+  color: #ff3b9d;
+}
+
+.sekret-hero__unknown {
+  margin-top: .13em;
+  color: #fff;
+}
+
+.sekret-hero__scribble {
+  position: absolute;
+  left: 2%;
+  right: -8%;
+  bottom: -.16em;
+  height: 13px;
+  opacity: .92;
+  transform: rotate(-2deg);
+  background:
+    linear-gradient(
+      176deg,
+      transparent 35%,
+      #ff3b9d 38%,
+      #ff3b9d 54%,
+      transparent 58%
+    );
+  filter: drop-shadow(0 0 8px rgba(255,59,157,.4));
+}
+
+.sekret-hero__description {
+  max-width: 510px;
+  margin: 35px 0 0;
+  color: rgba(244,237,246,.7);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.sekret-hero__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.sekret-hero__primary,
+.sekret-hero__secondary {
+  min-height: 57px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  padding: 0 23px;
+  font-size: 13px;
+  font-weight: 850;
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    background .25s ease;
+}
+
+.sekret-hero__primary {
+  border: 1px solid rgba(255,255,255,.18);
+  background:
+    linear-gradient(110deg, #ff297e, #a64cff 63%, #655cff);
+  color: #fff;
+  box-shadow:
+    0 18px 55px rgba(210,35,130,.28),
+    inset 0 1px 0 rgba(255,255,255,.32);
+}
+
+.sekret-hero__secondary {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.045);
+  color: #fff;
+  backdrop-filter: blur(12px);
+}
+
+.sekret-hero__secondary:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,.3);
+  background: rgba(255,255,255,.075);
+}
+
+.sekret-hero__microproof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.sekret-hero__avatars {
+  display: flex;
+  align-items: center;
+}
+
+.sekret-hero__avatars span {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  margin-left: -7px;
+  border: 2px solid #0a070c;
+  border-radius: 50%;
+  background:
+    linear-gradient(145deg, #43224d, #141019);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.sekret-hero__avatars span:first-child {
+  margin-left: 0;
+}
+
+.sekret-hero__avatars span:nth-child(2) {
+  background: linear-gradient(145deg, #153f61, #10121a);
+}
+
+.sekret-hero__avatars span:nth-child(3) {
+  background: linear-gradient(145deg, #7b243e, #171016);
+}
+
+.sekret-hero__avatars span:last-child {
+  background: #ff3b9d;
+}
+
+.sekret-hero__microproof > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sekret-hero__microproof strong {
+  color: rgba(255,255,255,.86);
+  font-size: 11px;
+}
+
+.sekret-hero__microproof small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255,255,255,.42);
+  font-size: 9px;
+}
+
+/* VISUAL WORLD */
+
+.sekret-hero__visual {
+  position: relative;
+  z-index: 10;
+  align-self: center;
+  width: 100%;
+  min-height: min(710px, 72vw);
+}
+
+.sekret-hero__orbit {
+  position: absolute;
+  z-index: -1;
+  left: 42%;
+  top: 48%;
+  border: 1px solid rgba(255,72,178,.21);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sekret-hero__orbit--one {
+  width: 570px;
+  height: 210px;
+  transform: translate(-50%,-50%) rotate(-14deg);
+  box-shadow:
+    0 0 35px rgba(255,44,145,.07);
+}
+
+.sekret-hero__orbit--two {
+  width: 450px;
+  height: 150px;
+  transform: translate(-50%,-50%) rotate(25deg);
+  border-color: rgba(126,91,255,.2);
+}
+
+.sekret-character {
+  position: absolute;
+  z-index: 4;
+  left: -2%;
+  bottom: -4%;
+  width: min(640px, 47vw);
+  height: min(720px, 54vw);
+  pointer-events: none;
+  filter:
+    drop-shadow(0 40px 60px rgba(0,0,0,.55))
+    drop-shadow(0 0 28px rgba(255,35,143,.12));
+}
+
+.sekret-character__glow {
+  position: absolute;
+  z-index: -1;
+  left: 20%;
+  right: 18%;
+  bottom: 7%;
+  height: 50%;
+  border-radius: 50%;
+  background: rgba(255,26,126,.25);
+  filter: blur(70px);
+}
+
+.sekret-character__image {
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* PHONE */
+
+.sekret-phone-wrap {
+  position: absolute;
+  z-index: 9;
+  right: -3%;
+  top: 5%;
+  width: clamp(285px, 25vw, 395px);
+  transform: rotate(7deg);
+  transform-origin: center;
+  filter:
+    drop-shadow(0 50px 70px rgba(0,0,0,.58))
+    drop-shadow(0 0 34px rgba(153,72,255,.18));
+}
+
+.sekret-phone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: .51;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 53px;
+  background:
+    linear-gradient(145deg, #5c5362, #0b0a0e 13%, #1c1821 82%, #79717c);
+  box-shadow:
+    inset 0 0 0 2px rgba(0,0,0,.8),
+    inset 0 0 0 4px rgba(255,255,255,.08),
+    0 0 0 1px rgba(0,0,0,.7);
+}
+
+.sekret-phone__side {
+  position: absolute;
+  left: -4px;
+  width: 4px;
+  border-radius: 5px 0 0 5px;
+  background: #68606c;
+}
+
+.sekret-phone__side--one {
+  top: 22%;
+  height: 48px;
+}
+
+.sekret-phone__side--two {
+  top: 32%;
+  height: 73px;
+}
+
+.sekret-phone__screen {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: 46px;
+  padding: 27px 21px 19px;
+  background:
+    radial-gradient(
+      circle at 50% 33%,
+      rgba(130,60,255,.18),
+      transparent 33%
+    ),
+    radial-gradient(
+      circle at 100% 68%,
+      rgba(255,39,127,.12),
+      transparent 28%
+    ),
+    #090910;
+  color: #fff;
+}
+
+.sekret-phone__island {
+  position: absolute;
+  z-index: 5;
+  top: 11px;
+  left: 50%;
+  width: 31%;
+  height: 25px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #010103;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.sekret-phone__status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  color: rgba(255,255,255,.72);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.sekret-phone__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  font-size: 11px;
+  letter-spacing: .05em;
+}
+
+.sekret-phone__temporary-mark {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background:
+    linear-gradient(145deg, #ff347f, #a547ff);
+  box-shadow: 0 7px 22px rgba(255,42,126,.25);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.sekret-phone__prompt {
+  margin-top: 25px;
+}
+
+.sekret-phone__prompt small {
+  color: #ff55a4;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.sekret-phone__prompt h3 {
+  margin: 8px 0 0;
+  font-size: clamp(1.25rem, 1.9vw, 1.75rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+.sekret-phone__prompt p {
+  margin: 9px 0 0;
+  color: rgba(255,255,255,.45);
+  font-size: 8px;
+}
+
+.sekret-phone__modes {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.sekret-phone-mode {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 31px 1fr 17px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 14px;
+  padding: 5px 10px 5px 6px;
+  color: #fff;
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 8px 22px rgba(0,0,0,.13);
+}
+
+.sekret-phone-mode__icon {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255,255,255,.16);
+}
+
+.sekret-phone-mode > span:nth-child(2) {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sekret-phone-mode--opinion {
+  background: linear-gradient(105deg, #633aff, #8667ff);
+}
+
+.sekret-phone-mode--confession {
+  background: linear-gradient(105deg, #ff176e, #ff4f89);
+}
+
+.sekret-phone-mode--rate {
+  background: linear-gradient(105deg, #ff365f, #ff8b35);
+}
+
+.sekret-phone-mode--date {
+  background: linear-gradient(105deg, #008bd9, #15c1ee);
+}
+
+.sekret-phone-mode--ama {
+  background: linear-gradient(105deg, #7d35ef, #c23af1);
+}
+
+.sekret-phone-mode--describe {
+  background: linear-gradient(105deg, #ff9e23, #ff5d47);
+}
+
+.sekret-phone__bottom {
+  position: absolute;
+  left: 17px;
+  right: 17px;
+  bottom: 15px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.35);
+}
+
+.sekret-phone__bottom .is-active {
+  color: #ff3b94;
+}
+
+.sekret-phone__plus {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ff2e85;
+  color: #fff;
+  font-size: 22px;
+}
+
+/* FLOATING OBJECTS */
+
+.sekret-float {
+  position: absolute;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.sekret-float--heart {
+  left: 3%;
+  top: 9%;
+  width: 105px;
+  height: 105px;
+  color: #ff337f;
+  transform: rotate(-9deg);
+  filter:
+    drop-shadow(0 18px 20px rgba(0,0,0,.35))
+    drop-shadow(0 0 18px rgba(255,40,126,.42));
+}
+
+.sekret-float--heart svg {
+  width: 100%;
+  height: 100%;
+  stroke: #ff9bc6;
+}
+
+.sekret-float--chat {
+  right: 1%;
+  top: 42%;
+  width: 94px;
+  height: 94px;
+  color: #8b49ff;
+  filter:
+    drop-shadow(0 20px 22px rgba(0,0,0,.35))
+    drop-shadow(0 0 17px rgba(139,73,255,.38));
+}
+
+.sekret-float--chat svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  stroke: #c6a7ff;
+}
+
+.sekret-float--chat span {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  letter-spacing: 3px;
+  font-size: 16px;
+}
+
+.sekret-float--star {
+  right: 17%;
+  top: 1%;
+  width: 78px;
+  height: 78px;
+  color: #ffbd37;
+  filter:
+    drop-shadow(0 15px 20px rgba(0,0,0,.35))
+    drop-shadow(0 0 15px rgba(255,189,55,.35));
+}
+
+.sekret-float--star svg {
+  width: 100%;
+  height: 100%;
+  stroke: #ffe5a4;
+}
+
+.sekret-hero__truth-bubble {
+  position: absolute;
+  z-index: 13;
+  right: 5%;
+  bottom: 12%;
+  display: flex;
+  flex-direction: column;
+  min-width: 155px;
+  padding: 14px 17px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 20px 20px 4px 20px;
+  background:
+    linear-gradient(
+      130deg,
+      rgba(255,47,135,.93),
+      rgba(163,56,255,.91)
+    );
+  box-shadow:
+    0 22px 50px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.24);
+  transform: rotate(-4deg);
+  backdrop-filter: blur(10px);
+}
+
+.sekret-hero__truth-bubble small {
+  color: rgba(255,255,255,.65);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+.sekret-hero__truth-bubble strong {
+  margin-top: 2px;
+  color: #fff;
+  font-size: 15px;
+}
+
+.sekret-hero__question {
+  position: absolute;
+  z-index: 14;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  padding: 11px 15px;
+  background: rgba(17,12,21,.73);
+  box-shadow: 0 16px 35px rgba(0,0,0,.27);
+  backdrop-filter: blur(15px);
+  color: rgba(255,255,255,.78);
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.sekret-hero__question--one {
+  left: 2%;
+  bottom: 27%;
+  transform: rotate(5deg);
+}
+
+.sekret-hero__question--two {
+  right: 27%;
+  bottom: 2%;
+  transform: rotate(-4deg);
+}
+
+/* BOTTOM TRUST BAR */
+
+.sekret-hero__trust {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: 24px;
+  width: min(calc(100% - 48px), 1180px);
+  min-height: 77px;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center;
+  padding: 14px 25px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 23px;
+  background: rgba(16,11,18,.62);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter: blur(20px);
+}
+
+.sekret-hero__trust > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+}
+
+.sekret-hero__trust strong {
+  color: #fff;
+  font-size: 12px;
+}
+
+.sekret-hero__trust span {
+  color: rgba(255,255,255,.4);
+  font-size: 9px;
+}
+
+.sekret-hero__trust > i {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,.09);
+}
+
+.sekret-hero__scroll {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: 112px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,.35);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1180px) {
+  .sekret-hero {
+    grid-template-columns: minmax(0, .9fr) minmax(480px, 1.1fr);
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(4.4rem, 8.1vw, 6.7rem);
+  }
+
+  .sekret-character {
+    left: -7%;
+    width: min(600px, 52vw);
+    height: min(680px, 60vw);
+  }
+
+  .sekret-phone-wrap {
+    right: -8%;
+  }
+}
+
+@media (max-width: 900px) {
+  .sekret-hero {
+    min-height: auto;
+    display: block;
+    padding:
+      138px
+      20px
+      140px;
+  }
+
+  .sekret-hero__copy {
+    width: 100%;
+    max-width: 690px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .sekret-hero__eyebrow {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sekret-hero h1 {
+    align-items: center;
+    font-size: clamp(4.1rem, 13.5vw, 7rem);
+    line-height: .8;
+  }
+
+  .sekret-hero__description {
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sekret-hero__actions,
+  .sekret-hero__microproof {
+    justify-content: center;
+  }
+
+  .sekret-hero__visual {
+    width: min(100%, 720px);
+    min-height: 680px;
+    margin: 28px auto 0;
+  }
+
+  .sekret-character {
+    left: -1%;
+    bottom: 0;
+    width: min(590px, 80vw);
+    height: 640px;
+  }
+
+  .sekret-phone-wrap {
+    right: 0;
+    top: 11%;
+    width: clamp(260px, 39vw, 330px);
+  }
+
+  .sekret-float--heart {
+    left: 3%;
+    top: 14%;
+  }
+
+  .sekret-float--chat {
+    right: 1%;
+    top: 52%;
+  }
+
+  .sekret-hero__truth-bubble {
+    right: 2%;
+    bottom: 9%;
+  }
+
+  .sekret-hero__trust {
+    bottom: 20px;
+  }
+
+  .sekret-hero__scroll {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .sekret-hero {
+    padding:
+      118px
+      16px
+      128px;
+  }
+
+  .sekret-hero__eyebrow {
+    margin-bottom: 21px;
+    padding: 8px 10px;
+    gap: 7px;
+    font-size: 8px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(3.6rem, 18.2vw, 5.35rem);
+    letter-spacing: -.08em;
+  }
+
+  .sekret-hero__description {
+    width: min(100%, 430px);
+    margin-top: 27px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .sekret-hero__actions {
+    width: 100%;
+    gap: 9px;
+    margin-top: 25px;
+  }
+
+  .sekret-hero__primary,
+  .sekret-hero__secondary {
+    min-height: 52px;
+    flex: 1 1 150px;
+    padding: 0 16px;
+    font-size: 11px;
+  }
+
+  .sekret-hero__microproof {
+    margin-top: 22px;
+  }
+
+  .sekret-hero__visual {
+    min-height: 590px;
+    margin-top: 10px;
+  }
+
+  .sekret-character {
+    left: 50%;
+    bottom: -3%;
+    width: 530px;
+    max-width: 125vw;
+    height: 560px;
+    transform: translateX(-58%);
+  }
+
+  .sekret-phone-wrap {
+    right: -8%;
+    top: 13%;
+    width: clamp(215px, 59vw, 280px);
+    transform: rotate(7deg);
+  }
+
+  .sekret-phone {
+    border-radius: 39px;
+    padding: 6px;
+  }
+
+  .sekret-phone__screen {
+    border-radius: 34px;
+    padding: 24px 15px 14px;
+  }
+
+  .sekret-phone__island {
+    height: 20px;
+    top: 9px;
+  }
+
+  .sekret-phone__brand {
+    margin-top: 22px;
+  }
+
+  .sekret-phone__prompt {
+    margin-top: 18px;
+  }
+
+  .sekret-phone__prompt h3 {
+    font-size: 1.13rem;
+  }
+
+  .sekret-phone__modes {
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  .sekret-phone-mode {
+    min-height: 38px;
+    grid-template-columns: 27px 1fr 14px;
+    border-radius: 11px;
+  }
+
+  .sekret-phone-mode__icon {
+    width: 27px;
+    height: 27px;
+  }
+
+  .sekret-phone__bottom {
+    left: 12px;
+    right: 12px;
+    bottom: 11px;
+  }
+
+  .sekret-float--heart {
+    left: -3%;
+    top: 16%;
+    width: 72px;
+    height: 72px;
+  }
+
+  .sekret-float--chat {
+    right: -4%;
+    top: 56%;
+    width: 66px;
+    height: 66px;
+  }
+
+  .sekret-float--star {
+    right: 8%;
+    top: 3%;
+    width: 55px;
+    height: 55px;
+  }
+
+  .sekret-hero__truth-bubble {
+    right: -1%;
+    bottom: 6%;
+    min-width: 125px;
+    padding: 11px 13px;
+  }
+
+  .sekret-hero__truth-bubble strong {
+    font-size: 12px;
+  }
+
+  .sekret-hero__question {
+    padding: 9px 11px;
+    font-size: 8px;
+  }
+
+  .sekret-hero__question--one {
+    left: 0;
+    bottom: 31%;
+  }
+
+  .sekret-hero__question--two {
+    right: 20%;
+    bottom: 0;
+  }
+
+  .sekret-hero__trust {
+    width: calc(100% - 24px);
+    min-height: auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+    bottom: 13px;
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .sekret-hero__trust > i {
+    display: none;
+  }
+
+  .sekret-hero__trust strong {
+    font-size: 10px;
+  }
+
+  .sekret-hero__trust span {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 390px) {
+  .sekret-hero {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(3.3rem, 18vw, 4.5rem);
+  }
+
+  .sekret-hero__description {
+    padding: 0 5px;
+  }
+
+  .sekret-character {
+    width: 500px;
+    transform: translateX(-60%);
+  }
+
+  .sekret-phone-wrap {
+    right: -14%;
+    width: 230px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sekret-hero *,
+  .sekret-hero *::before,
+  .sekret-hero *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+/* =========================================================
+   SEKRETLY HERO — COMPOSITION REFINEMENT
+   ========================================================= */
+
+@media (min-width: 901px) {
+  .sekret-hero {
+    min-height: 920px;
+    height: 100svh;
+    max-height: 1050px;
+
+    grid-template-columns:
+      minmax(390px, 0.76fr)
+      minmax(680px, 1.24fr);
+
+    gap: 0;
+
+    padding:
+      112px
+      max(28px, calc((100vw - 1460px) / 2))
+      105px;
+
+    align-items: center;
+  }
+
+  /* LEFT COPY */
+
+  .sekret-hero__copy {
+    z-index: 30;
+    width: 100%;
+    max-width: 590px;
+    transform: translateY(-5px);
+  }
+
+  .sekret-hero__eyebrow {
+    margin-bottom: 22px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(5rem, 6.9vw, 7.5rem);
+    line-height: 0.77;
+  }
+
+  .sekret-hero__description {
+    max-width: 485px;
+    margin-top: 28px;
+  }
+
+  .sekret-hero__actions {
+    margin-top: 25px;
+  }
+
+  .sekret-hero__microproof {
+    margin-top: 23px;
+  }
+
+  /* COMPLETE RIGHT-HAND WORLD */
+
+  .sekret-hero__visual {
+    position: absolute;
+
+    top: 91px;
+    right: max(5px, calc((100vw - 1510px) / 2));
+
+    width: min(69vw, 1030px);
+    height: calc(100% - 175px);
+
+    min-height: 0;
+
+    margin: 0;
+
+    pointer-events: none;
+  }
+
+  /* LARGE CHARACTER */
+
+  .sekret-character {
+    left: 4%;
+    bottom: -5%;
+
+    width: min(720px, 48vw);
+    height: 100%;
+
+    max-height: 800px;
+
+    filter:
+      drop-shadow(0 35px 50px rgba(0, 0, 0, 0.48))
+      drop-shadow(0 0 30px rgba(255, 35, 143, 0.13));
+  }
+
+  .sekret-character__image {
+    object-fit: contain;
+    object-position: center bottom;
+    transform: scale(1.08);
+    transform-origin: center bottom;
+  }
+
+  /* PHONE */
+
+  .sekret-phone-wrap {
+    top: 4%;
+    right: -1%;
+
+    width: clamp(320px, 26vw, 410px);
+
+    transform:
+      rotate(6deg)
+      perspective(1000px)
+      rotateY(-3deg);
+
+    pointer-events: auto;
+  }
+
+  .sekret-phone {
+    border-radius: 50px;
+  }
+
+  /*
+   * Bring the phone closer to the concept:
+   * more premium, less like a huge rectangular dashboard.
+   */
+
+  .sekret-phone__screen {
+    padding:
+      25px
+      20px
+      17px;
+
+    border-radius: 43px;
+
+    background:
+      radial-gradient(
+        circle at 50% 32%,
+        rgba(126, 56, 255, 0.19),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 85% 73%,
+        rgba(255, 41, 134, 0.13),
+        transparent 30%
+      ),
+      linear-gradient(
+        160deg,
+        #0b0913,
+        #080810 70%
+      );
+  }
+
+  .sekret-phone__brand {
+    margin-top: 25px;
+  }
+
+  .sekret-phone__prompt {
+    margin-top: 22px;
+  }
+
+  .sekret-phone__prompt h3 {
+    font-size: clamp(1.5rem, 1.75vw, 1.85rem);
+    line-height: 0.96;
+  }
+
+  .sekret-phone__modes {
+    gap: 7px;
+    margin-top: 17px;
+  }
+
+  .sekret-phone-mode {
+    min-height: 42px;
+
+    border-radius: 13px;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.2),
+      0 9px 18px rgba(0,0,0,.15);
+  }
+
+  /* CHARACTER/PHONE OVERLAP */
+
+  .sekret-hero__orbit--one {
+    left: 49%;
+    top: 52%;
+
+    width: 650px;
+    height: 220px;
+  }
+
+  .sekret-hero__orbit--two {
+    left: 51%;
+    top: 54%;
+
+    width: 500px;
+    height: 160px;
+  }
+
+  /* UI CALLOUTS */
+
+  .sekret-hero__truth-bubble {
+    right: 2%;
+    bottom: 11%;
+  }
+
+  .sekret-hero__question--one {
+    left: 18%;
+    bottom: 29%;
+  }
+
+  .sekret-hero__question--two {
+    right: 23%;
+    bottom: 3%;
+  }
+
+  /* TRUST STRIP */
+
+  .sekret-hero__trust {
+    bottom: 18px;
+
+    width: min(
+      calc(100% - 70px),
+      1210px
+    );
+
+    min-height: 72px;
+  }
+
+  .sekret-hero__scroll {
+    bottom: 98px;
+  }
+}
+
+/* LARGE DESKTOP */
+
+@media (min-width: 1450px) {
+  .sekret-hero {
+    grid-template-columns:
+      minmax(470px, 0.78fr)
+      minmax(780px, 1.22fr);
+  }
+
+  .sekret-hero__visual {
+    width: min(68vw, 1080px);
+  }
+
+  .sekret-character {
+    left: 2%;
+
+    width: 750px;
+    max-height: 830px;
+  }
+
+  .sekret-phone-wrap {
+    right: 0;
+
+    width: 410px;
+  }
+}
+
+/* LAPTOPS */
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .sekret-hero {
+    min-height: 820px;
+
+    grid-template-columns:
+      minmax(350px, 0.8fr)
+      minmax(550px, 1.2fr);
+
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(4.3rem, 7.2vw, 5.8rem);
+  }
+
+  .sekret-hero__visual {
+    right: -20px;
+
+    width: 68vw;
+  }
+
+  .sekret-character {
+    left: -2%;
+
+    width: 55vw;
+  }
+
+  .sekret-phone-wrap {
+    right: -2%;
+
+    width: clamp(285px, 29vw, 350px);
+  }
+}
+
+
+/* ==========================================================
+   SEKRETLY — FINAL HERO COMPOSITION
+   Character + phone are ONE artwork.
+   ========================================================== */
+
+.sekret-hero {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+
+  display: grid;
+  grid-template-columns: minmax(390px, 0.82fr) minmax(650px, 1.18fr);
+  align-items: center;
+
+  padding:
+    108px
+    max(24px, calc((100vw - 1440px) / 2))
+    105px;
+
+  background: #08060b;
+}
+
+/* ---------- atmosphere ---------- */
+
+.sekret-hero__background {
+  position: absolute;
+  inset: 0;
+  z-index: -5;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 64% 55%,
+      rgba(213, 16, 104, 0.24),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 82% 35%,
+      rgba(117, 48, 255, 0.16),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 12% 72%,
+      rgba(117, 15, 63, 0.24),
+      transparent 35%
+    ),
+    linear-gradient(
+      110deg,
+      #08070b 0%,
+      #0b0710 43%,
+      #110611 72%,
+      #08070b 100%
+    );
+}
+
+.sekret-hero__glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(110px);
+  pointer-events: none;
+}
+
+.sekret-hero__glow--pink {
+  width: 550px;
+  height: 550px;
+  right: 20%;
+  bottom: -18%;
+
+  background: rgba(255, 28, 128, 0.2);
+}
+
+.sekret-hero__glow--purple {
+  width: 430px;
+  height: 430px;
+  right: -8%;
+  top: 5%;
+
+  background: rgba(115, 65, 255, 0.14);
+}
+
+.sekret-hero__grid {
+  position: absolute;
+  inset: 0;
+
+  opacity: 0.13;
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 70px 70px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      rgba(0,0,0,.6) 60%,
+      transparent 100%
+    );
+}
+
+.sekret-hero__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+}
+
+/* ==========================================================
+   COPY
+   ========================================================== */
+
+.sekret-hero__copy {
+  position: relative;
+  z-index: 20;
+
+  width: min(100%, 610px);
+  align-self: center;
+}
+
+.sekret-hero__eyebrow {
+  width: max-content;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-bottom: 25px;
+  padding: 9px 14px;
+
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.035);
+  backdrop-filter: blur(12px);
+
+  color: rgba(255,255,255,.7);
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
+.sekret-hero__eyebrow i {
+  color: rgba(255,255,255,.28);
+  font-style: normal;
+}
+
+.sekret-hero__eyebrow-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #ff2f91;
+
+  box-shadow:
+    0 0 13px rgba(255,47,145,.8);
+}
+
+.sekret-hero h1 {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+
+  margin: 0;
+
+  font-size: clamp(5.2rem, 7.4vw, 7.6rem);
+  font-weight: 950;
+  line-height: .76;
+  letter-spacing: -.075em;
+}
+
+.sekret-hero h1 > span {
+  display: block;
+  width: max-content;
+}
+
+.sekret-hero__title-white {
+  color: #f8f5f6;
+}
+
+.sekret-hero__title-pink {
+  position: relative;
+  color: #ff2d91;
+}
+
+.sekret-hero__scribble {
+  position: absolute;
+
+  left: 5%;
+  right: -7%;
+  bottom: -8px;
+
+  height: 10px;
+
+  transform: rotate(-4deg);
+
+  border-top: 3px solid #ff2d91;
+  border-radius: 50%;
+}
+
+.sekret-hero__description {
+  width: min(100%, 500px);
+
+  margin: 31px 0 0;
+
+  color: rgba(239,232,239,.74);
+
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.sekret-hero__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 28px;
+}
+
+.sekret-hero__primary,
+.sekret-hero__secondary {
+  min-height: 57px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 0 25px;
+
+  border-radius: 999px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    background .25s ease;
+}
+
+.sekret-hero__primary {
+  border: 0;
+
+  background:
+    linear-gradient(
+      110deg,
+      #ff2e91,
+      #b83fff 54%,
+      #6d54ff
+    );
+
+  color: white;
+
+  box-shadow:
+    0 14px 40px rgba(225, 37, 139, .28),
+    inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.sekret-hero__secondary {
+  border: 1px solid rgba(255,255,255,.18);
+
+  background: rgba(255,255,255,.035);
+
+  color: white;
+
+  backdrop-filter: blur(12px);
+}
+
+.sekret-hero__secondary:hover {
+  border-color: rgba(255,255,255,.34);
+  background: rgba(255,255,255,.07);
+  transform: translateY(-2px);
+}
+
+.sekret-hero__microproof {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-top: 27px;
+}
+
+.sekret-hero__avatars {
+  display: flex;
+}
+
+.sekret-hero__avatars span {
+  width: 31px;
+  height: 31px;
+
+  display: grid;
+  place-items: center;
+
+  margin-left: -7px;
+
+  border: 2px solid #0b080d;
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #34283b,
+      #111019
+    );
+
+  color: white;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.sekret-hero__avatars span:first-child {
+  margin-left: 0;
+}
+
+.sekret-hero__avatars span:last-child {
+  background: #ff2e91;
+}
+
+.sekret-hero__microproof strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: rgba(255,255,255,.9);
+
+  font-size: 12px;
+}
+
+.sekret-hero__microproof p {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin: 0;
+
+  color: rgba(255,255,255,.46);
+
+  font-size: 10px;
+}
+
+/* ==========================================================
+   MAIN ART
+   ========================================================== */
+
+.sekret-hero__art {
+  position: absolute;
+
+  z-index: 10;
+
+  /*
+   * Deliberately huge.
+   * This is the key change.
+   */
+  width: min(72vw, 1080px);
+  height: calc(100% - 110px);
+
+  right: max(-35px, calc((100vw - 1560px) / 2));
+  bottom: 44px;
+
+  transform-origin: center bottom;
+
+  pointer-events: none;
+}
+
+.sekret-hero__art-image {
+  object-fit: contain;
+  object-position: right bottom;
+
+  filter:
+    drop-shadow(0 38px 50px rgba(0,0,0,.46))
+    drop-shadow(0 0 35px rgba(255,30,137,.1));
+}
+
+.sekret-hero__art-glow {
+  position: absolute;
+
+  left: 21%;
+  top: 24%;
+
+  width: 60%;
+  height: 58%;
+
+  border-radius: 50%;
+
+  background:
+    rgba(230, 22, 126, .17);
+
+  filter: blur(90px);
+
+  pointer-events: none;
+}
+
+/* ==========================================================
+   TRUST RAIL
+   ========================================================== */
+
+.sekret-hero__trust {
+  position: absolute;
+
+  z-index: 30;
+
+  left: 50%;
+  bottom: 17px;
+
+  width: min(calc(100% - 80px), 1210px);
+  min-height: 77px;
+
+  transform: translateX(-50%);
+
+  display: grid;
+  grid-template-columns:
+    1fr auto
+    1fr auto
+    1fr auto
+    1fr;
+
+  align-items: center;
+
+  padding: 14px 30px;
+
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 24px;
+
+  background: rgba(11,8,14,.72);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.24);
+
+  backdrop-filter: blur(22px);
+}
+
+.sekret-hero__trust > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.sekret-hero__trust strong {
+  color: rgba(255,255,255,.92);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sekret-hero__trust span {
+  color: rgba(255,255,255,.4);
+
+  font-size: 9px;
+}
+
+.sekret-hero__trust > i {
+  width: 1px;
+  height: 29px;
+
+  background: rgba(255,255,255,.1);
+}
+
+.sekret-hero__scroll {
+  position: absolute;
+
+  z-index: 31;
+
+  left: 50%;
+  bottom: 101px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: rgba(255,255,255,.34);
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================
+   LARGE DESKTOP
+   ========================================================== */
+
+@media (min-width: 1450px) {
+  .sekret-hero {
+    grid-template-columns:
+      minmax(470px, .82fr)
+      minmax(760px, 1.18fr);
+  }
+
+  .sekret-hero__art {
+    width: min(70vw, 1120px);
+
+    right:
+      max(
+        0px,
+        calc((100vw - 1580px) / 2)
+      );
+  }
+}
+
+/* ==========================================================
+   LAPTOP
+   ========================================================== */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .sekret-hero {
+    min-height: 820px;
+
+    grid-template-columns:
+      minmax(340px, .78fr)
+      minmax(540px, 1.22fr);
+
+    padding:
+      105px
+      24px
+      100px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(4.4rem, 7vw, 5.8rem);
+  }
+
+  .sekret-hero__copy {
+    max-width: 470px;
+  }
+
+  .sekret-hero__art {
+    width: 73vw;
+    height: calc(100% - 105px);
+
+    right: -70px;
+  }
+}
+
+/* ==========================================================
+   MOBILE / TABLET
+   ========================================================== */
+
+@media (max-width: 900px) {
+  .sekret-hero {
+    min-height: 980px;
+
+    display: block;
+
+    padding:
+      122px
+      20px
+      100px;
+  }
+
+  .sekret-hero__copy {
+    width: 100%;
+    max-width: 590px;
+
+    margin: 0 auto;
+
+    position: relative;
+    z-index: 20;
+  }
+
+  .sekret-hero__eyebrow {
+    margin-bottom: 19px;
+
+    padding: 8px 11px;
+
+    font-size: 8px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(4rem, 16vw, 6.2rem);
+    line-height: .78;
+  }
+
+  .sekret-hero__description {
+    max-width: 430px;
+
+    margin-top: 25px;
+
+    font-size: 15px;
+  }
+
+  .sekret-hero__actions {
+    margin-top: 22px;
+  }
+
+  .sekret-hero__primary,
+  .sekret-hero__secondary {
+    min-height: 52px;
+  }
+
+  .sekret-hero__microproof {
+    margin-top: 20px;
+  }
+
+  /*
+   * Recompose instead of shrinking desktop.
+   */
+
+  .sekret-hero__art {
+    width: 760px;
+    max-width: none;
+
+    height: 560px;
+
+    right: -190px;
+    bottom: 69px;
+
+    z-index: 9;
+  }
+
+  .sekret-hero__art-image {
+    object-position: right bottom;
+  }
+
+  .sekret-hero__trust {
+    width: calc(100% - 30px);
+
+    bottom: 14px;
+
+    min-height: 63px;
+
+    padding: 12px 10px;
+
+    border-radius: 18px;
+  }
+
+  .sekret-hero__trust strong {
+    font-size: 9px;
+  }
+
+  .sekret-hero__trust span {
+    font-size: 7px;
+  }
+
+  .sekret-hero__trust > i {
+    height: 24px;
+  }
+
+  .sekret-hero__scroll {
+    display: none;
+  }
+}
+
+/* ==========================================================
+   SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 600px) {
+  .sekret-hero {
+    min-height: 960px;
+
+    padding:
+      112px
+      17px
+      90px;
+  }
+
+  .sekret-hero h1 {
+    font-size: clamp(3.65rem, 17.5vw, 5rem);
+  }
+
+  .sekret-hero__description {
+    width: 93%;
+
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .sekret-hero__actions {
+    width: 100%;
+  }
+
+  .sekret-hero__primary,
+  .sekret-hero__secondary {
+    flex: 1 1 160px;
+
+    min-height: 50px;
+
+    padding: 0 17px;
+
+    font-size: 12px;
+  }
+
+  .sekret-hero__art {
+    width: 680px;
+    height: 500px;
+
+    right: -220px;
+    bottom: 65px;
+  }
+
+  .sekret-hero__microproof {
+    position: relative;
+    z-index: 15;
+  }
+
+  .sekret-hero__trust {
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 4px;
+
+    width: calc(100% - 20px);
+
+    padding: 11px 7px;
+  }
+
+  .sekret-hero__trust > i {
+    display: none;
+  }
+}
+
+/* ==========================================================
+   VERY SMALL DEVICES
+   ========================================================== */
+
+@media (max-width: 374px) {
+  .sekret-hero {
+    min-height: 930px;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sekret-hero h1 {
+    font-size: 3.55rem;
+  }
+
+  .sekret-hero__art {
+    width: 620px;
+    height: 455px;
+
+    right: -220px;
+  }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .sekret-hero *,
+  .sekret-hero *::before,
+  .sekret-hero *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
