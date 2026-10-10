@@ -1,0 +1,4 @@
+Install one new dependency in the existing SEKRETLY repository:
+npm install bcryptjs
+npm install -D @types/bcryptjs
+Do not replace your existing package.json with this text file.
