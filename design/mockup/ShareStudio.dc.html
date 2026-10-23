@@ -185,6 +185,17 @@ body{margin:0;background:#0c0811}
         <p class="muted" style="margin-top: 10px; font-size: 13px; line-height: 1.45">🔒 cards are your own words. They can go to friends on Sekretly, but never to public stories.</p>
       </sc-if>
 
+      <div class="sec-h"><h2>Promote your link</h2><span class="muted" style="font-size: 13px">cards that bring people in</span></div>
+      <div class="rail" style="display: flex; gap: 10px; margin: 0 -16px; padding: 0 16px 4px">
+        <sc-for list="{{promos}}" as="pr" hint-placeholder-count="5">
+          <div class="{{pr.th}}" style="flex: none; width: 150px; aspect-ratio: 9 / 14; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden">
+            <span style="font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .9">{{pr.tag}}</span>
+            <b class="d" style="font-size: 15px; line-height: 1.1; margin-top: 8px">{{pr.title}}</b>
+            <button class="tap" onClick="{{pr.add}}" disabled="{{pr.inTray}}" style="margin-top: auto; min-height: 40px; border-radius: 12px; border: 0; background: rgba(255,255,255,.92); color: #2a0a1c; font-weight: 800; font-size: 13px">{{pr.label}}</button>
+          </div>
+        </sc-for>
+      </div>
+
       <div class="sec-h"><h2>Add more to this share</h2><span class="muted" style="font-size: 13px">{{poolCount}} available</span></div>
       <div class="card" style="overflow: hidden">
         <sc-for list="{{pool}}" as="pm" hint-placeholder-count="4">
@@ -271,7 +282,13 @@ class Component extends DCLogic {
       m4: { topic: 'Describe me in 3 words', th: 'sunset', icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', text: 'Smart · Calm · Ludo' },
       c1: { topic: 'Chat · Fox', th: 'default', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', text: 'ok but who do you keep posting on your story?' },
       o1: { topic: 'Your reply to Fox', th: 'default', icon: '/_blob/7356090e8cd14d77123c7e2f69c92dcb', text: 'lowkey?? be serious', own: true },
-      o2: { topic: 'Your reply to Moon', th: 'midnight', icon: '/_blob/7356090e8cd14d77123c7e2f69c92dcb', text: 'depends. is it good or bad', own: true }
+      o2: { topic: 'Your reply to Moon', th: 'midnight', icon: '/_blob/7356090e8cd14d77123c7e2f69c92dcb', text: 'depends. is it good or bad', own: true },
+      // promo cards: they point people at your link instead of sharing a message
+      pd: { promo: 'Today’s drop', topic: 'Today’s drop · No. 214', th: 'sunset', icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', text: 'What’s one thing people get wrong about me? Tell me. I won’t know it’s you.' },
+      pc: { promo: 'Countdown', topic: 'Drop closes at 7pm', th: 'midnight', icon: '/_blob/ea3a1403d8fe6d1943450cfacf059348', text: 'Last chance. 5 hours left to tell me what you really think.' },
+      pt: { promo: 'Teaser', topic: 'Answers so far', th: 'bubblegum', icon: '/_blob/9fa11a307ccc8cbf33b563a8df193335', text: '9 answers already. 2 of you left hints. Who’s next?' },
+      pw: { promo: 'Weekly wrap', topic: 'My week on Sekretly', th: 'ocean', icon: '/_blob/1df7299954a782c5de8338339634a8e6', text: '41 messages this week. People called me chaotic, stubborn and unbothered. Fair.' },
+      pk: { promo: 'Word cloud', topic: 'How people describe me', th: 'default', icon: '/_blob/1fb2cbc919646a3a048411532a08bd4c', text: 'Loyal · Funny · Calm · Smart · Stubborn. Add your word.' }
     }, this.extra || {});
   }
   componentDidMount() {
@@ -364,7 +381,8 @@ class Component extends DCLogic {
     var dest = DEST.filter(function (x) { return x[0] === s.dest; })[0] || DEST[0];
     var pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });
     var allOn = anySel === total && total > 0;
-    var pool = Object.keys(M).filter(function (id) { return s.tray.indexOf(id) < 0; });
+    var pool = Object.keys(M).filter(function (id) { return s.tray.indexOf(id) < 0 && !M[id].promo; });
+    var promos = Object.keys(M).filter(function (id) { return !!M[id].promo; });
     var FR = [['Fox', '#ffb35c', 'chatting now'], ['Moon', '#9db8ff', 'active 2h ago'], ['KolaNut', '#ff9ad5', 'from Friday Night Never'], ['PixelOwl', '#7ef0c1', 'from Hostel B confessions']];
     var postedList = flat.filter(function (c) { return !!s.posted[c.key]; });
     var fParts = fc ? fc.parts.length : 0;
@@ -400,6 +418,7 @@ class Component extends DCLogic {
       friends: s.friends, openFriends: function () { self.setState({ friends: true }); }, closeFriends: function () { self.setState({ friends: false }); },
       friendsSub: anySel + ' card' + (anySel === 1 ? '' : 's') + ', in order. Your own messages are fine here: only friends you pick will see them.',
       friendList: FR.map(function (f) { var done = !!s.sentTo[f[0]]; return { name: f[0], initial: f[0].charAt(0), bg: f[1], sub: f[2], label: done ? 'Sent ✓' : 'Send', cls: done ? '' : 'btn-cta', send: function () { var o = Object.assign({}, s.sentTo); o[f[0]] = true; self.setState({ sentTo: o }); } }; }),
+      promos: promos.map(function (id) { var m = M[id], inTray = s.tray.indexOf(id) >= 0; return { th: 'th-' + m.th, tag: m.promo, title: m.topic, inTray: inTray, label: inTray ? 'Added ✓' : '+ Add card', add: function () { if (!inTray) self.setState({ tray: s.tray.concat([id]), focus: total }); } }; }),
       poolCount: pool.length,
       pool: pool.map(function (id) { var m = M[id], n = self.split(m.text, 390).length; return { th: 'th-' + m.th, icon: m.icon, meta: m.topic + ' · ' + n + ' card' + (n === 1 ? '' : 's'), text: m.text, own: !!m.own, add: function () { self.setState({ tray: s.tray.concat([id]), focus: total }); } }; })
     };

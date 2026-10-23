@@ -3,6 +3,7 @@ import "server-only";
 import { headers } from "next/headers";
 
 import { CLOSE_AFTER_MS, TOPIC_COMPOSER, TOPIC_TITLE, isNapping, linkPath, appOrigin } from "@/features/links/topics";
+import { deviceKey, standingWith, userKey } from "@/features/safety/standing";
 import { db } from "@/lib/db";
 import { requestFingerprint } from "@/lib/rate-limit";
 
@@ -44,7 +45,10 @@ export async function loadLinkPage(params: { username: string; key: string; them
     ]);
   }
 
-  const visitor = viewer ? "member" : (await db.visitor.findUnique({ where: { fingerprint: await requestFingerprint() } })) ? "returning" : "first";
+  const fingerprint = await requestFingerprint();
+  const visitor = viewer ? "member" : (await db.visitor.findUnique({ where: { fingerprint } })) ? "returning" : "first";
+  // a sender this owner has reported sees their warnings, or the blocked page after the 4th report
+  const standing = viewer?.id === owner.id ? { warns: 0, blocked: false } : await standingWith(owner.id, viewer ? [userKey(viewer.id), deviceKey(fingerprint)] : [deviceKey(fingerprint)]);
   const board =
     link.topic === "QUIZ"
       ? (await db.message.findMany({ where: { linkId: link.id, topic: "QUIZ" }, orderBy: { createdAt: "desc" }, take: 200, select: { data: true } }))
@@ -64,7 +68,9 @@ export async function loadLinkPage(params: { username: string; key: string; them
     customQuestion: link.customQuestion,
     quiz: link.questions.map((q) => [q.text, q.options, q.correctIndex] as [string, string[], number]),
     board,
-    linkState: isNapping(link) ? "paused" : "live",
+    linkState: standing.blocked ? "blocked" : isNapping(link) ? "paused" : "live",
+    senderWarnings: String(Math.min(3, standing.warns)),
+    allowHints: owner.allowHints && !link.hintsOff,
     visitor,
   };
 }
@@ -107,7 +113,8 @@ export async function loadMyLinks(userId: string) {
 /** One link for Create link's edit mode (owner only). */
 export async function loadLinkForEdit(userId: string, id: string) {
   const link = await db.link.findFirst({ where: { id, ownerId: userId, status: { not: "DELETED" } }, include: { questions: { orderBy: { position: "asc" } } } });
-  if (!link) return null;
+  // a daily drop is edited from the drop screen, not Create link
+  if (!link || link.topic === "DROP") return null;
   const slugFor = { DESCRIBE: "describe-3", QUIZ: "know-me", CONFESS: "confess", RATE: "rate-me", AMA: "ama", CUSTOM: "custom" } as const;
   const closeLeft = link.closesAt ? link.closesAt.getTime() - Date.now() : 0;
   const time = Object.entries(CLOSE_AFTER_MS).find(([, ms]) => ms >= closeLeft)?.[0] ?? "24 hours";
@@ -151,7 +158,7 @@ export async function loadLinkInsights(userId: string, id: string) {
   const messages = await db.message.findMany({ where: { linkId: link.id }, orderBy: { createdAt: "desc" }, take: 1000, select: { data: true, createdAt: true } });
   type Data = { words?: string[]; score?: number; of?: number; category?: string; nickname?: string; picks?: number[] };
   const data = messages.map((m) => ({ d: (m.data ?? {}) as Data, at: m.createdAt }));
-  const kind = { QUIZ: "know", DESCRIBE: "describe", RATE: "rate", CONFESS: "confess", AMA: "ama", CUSTOM: "ama" }[link.topic];
+  const kind = { QUIZ: "know", DESCRIBE: "describe", RATE: "rate", CONFESS: "confess", AMA: "ama", CUSTOM: "ama", DROP: "ama" }[link.topic];
   const n = link.messageCount;
   const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
   const stats: [string | number, string][] = [

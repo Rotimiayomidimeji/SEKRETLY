@@ -14,12 +14,12 @@ export default class Main extends React.Component<Record<string, any>, any> {
   }
   componentDidUpdate(prev) {
     var p = this.props;
-    if (prev.topic !== p.topic || prev.theme !== p.theme || prev.visitor !== p.visitor || prev.linkState !== p.linkState || prev.senderWarnings !== p.senderWarnings) this.setState(this.blank());
+    if (p.send ? prev.linkId !== p.linkId : prev.topic !== p.topic || prev.theme !== p.theme || prev.visitor !== p.visitor || prev.linkState !== p.linkState || prev.senderWarnings !== p.senderWarnings) this.setState(this.blank());
   }
   componentWillUnmount() { clearTimeout(this.qt); }
   blank() {
     return { words: [], deckSeed: 0, ownWord: '', rate: null, rateCat: 'Overall', qi: 0, picks: [], qLocked: false,
-      text: '', media: null, sent: false, popup: false, popStep: 'ask', popUser: '', popPass: '', popAgree: false, popShow: false, popLogin: false, wantReply: false, report: false, reported: false, picked: null, other: false, otherText: '', seed: 1 };
+      text: '', media: null, sent: false, popup: false, popStep: 'ask', popUser: '', popPass: '', popAgree: false, popShow: false, popLogin: false, wantReply: false, report: false, reported: false, picked: null, other: false, otherText: '', seed: 1, sHint: 0, sHintBox: false, sHintCustom: '', rcCopied: false };
   }
   cats() {
     return ['Abusive', 'Harassment', 'Bullying', 'Insults', 'Threats', 'Intimidation', 'Hate speech', 'Racism', 'Tribalism', 'Religious hate', 'Sexism', 'Body shaming', 'Disability mockery', 'Sexual content', 'Unwanted nudity', 'Explicit photo', 'Explicit video', 'Non-consensual image', 'Unwanted advances', 'Creepy or inappropriate', 'Grooming concern', 'Underage concern', 'Stalking', 'Doxxing / private info', 'Exposing secrets', 'Blackmail', 'Extortion', 'Impersonation', 'Scam', 'Fraud', 'Phishing link', 'Malware link', 'Spam', 'Flooding', 'Advertising', 'Selling things', 'Gambling promo', 'Drugs', 'Weapons', 'Violence', 'Graphic gore', 'Self-harm', 'Suicide talk', 'Misinformation', 'False rumour', 'Defamation', 'Trolling', 'Mocking', 'Profanity', 'Other harmful'];
@@ -127,7 +127,10 @@ export default class Main extends React.Component<Record<string, any>, any> {
       if (s.sending) return;
       self.setState({ sending: true, sendErr: null });
       self.props.send({ linkId: self.props.linkId, wantsReply: !!replies, payload: body }).then(function (r) {
-        if (r && r.ok) self.setState({ sent: true, popup: false, wantReply: replies, sending: false });
+        if (r && r.ok) {
+          self.setState({ sent: true, popup: false, wantReply: replies, sending: false, receipt: r.receipt || null });
+          try { var saved = JSON.parse(window.localStorage.getItem('sk-receipts') || '[]'); if (r.receipt) window.localStorage.setItem('sk-receipts', JSON.stringify([r.receipt].concat(saved).slice(0, 30))); } catch (e) {}
+        }
         else self.setState({ sending: false, popup: false, sendErr: (r && r.error) || 'Couldn’t send. Try again.' });
       });
     };
@@ -147,7 +150,21 @@ export default class Main extends React.Component<Record<string, any>, any> {
     var userOk = /^[a-z0-9_]{3,20}$/.test(s.popUser), userTaken = !s.popLogin && !!(s.taken || {})[s.popUser];
     var passOk = s.popPass.length >= 8, joinOk = userOk && !userTaken && passOk && (s.popLogin || s.popAgree);
     var cards = Math.ceil(trimmed / 110);
+    var SH = ['No hint', 'Same school', 'We met this year', 'We talked today', 'We’re close', 'Write my own'];
+    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';
+    body.hint = hintTxt || undefined;
     return {
+      // optional sender hint, same on every link type
+      hintDisplay: this.props.send && this.props.allowHints === false ? 'none' : 'block',
+      hintBox: s.sHintBox, hintBoxStr: s.sHintBox ? 'true' : 'false', hintChev: s.sHintBox ? '180deg' : '0deg',
+      toggleHintBox: function () { self.setState({ sHintBox: !s.sHintBox }); },
+      hintHead: hintTxt ? 'Your hint: ' + hintTxt : 'Leave a hint?',
+      senderHints: SH.map(function (h, k) { var o = on(s.sHint === k); return { label: h, on: s.sHint === k ? 'true' : 'false', bg: o.bg, ink: o.ink, line: o.line, pick: function () { self.setState({ sHint: k }); } }; }),
+      hintIsCustom: s.sHint === 5, hintCustom: s.sHintCustom,
+      onHintCustom: function (e) { self.setState({ sHintCustom: e.target.value.replace(/@\S+/g, '').replace(/\d{4,}/g, '').slice(0, 40) }); },
+      showReceipt: !member && !s.wantReply && !embed && !!s.receipt, receiptCode: s.receipt || '',
+      copyReceipt: function () { try { navigator.clipboard.writeText(s.receipt || ''); } catch (e) {} self.setState({ rcCopied: true }); },
+      copyReceiptLabel: s.rcCopied ? 'Copied' : 'Copy code',
       owner: OWNER, ownerAvatar: this.props.ownerAvatar || 'peach', onbHref: '/onboarding?from=link&to=' + encodeURIComponent(OWNER),
       th: th, tp: tp, ads: this.props.ads === 'off' ? 'off' : 'on',
       showChrome: !embed, pad: embed ? '16px 16px 18px' : '14px 20px 26px', minH: embed ? '0' : '100vh',
@@ -240,7 +257,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
       ownTitle: embed ? 'That’s your link page' : 'Want your own link?', ownSub: embed ? 'This is exactly what your friends see. Make yours in 30 seconds.' : 'See what your people really think. Takes 30 seconds.', ownCta: embed ? 'Make my link' : 'Get my own link',
       sentEmoji: topic === 'confess' ? E.letter : topic === 'quiz' ? E.trophy : E.party,
       sentTitle: topic === 'confess' ? 'Confession sent' : topic === 'quiz' ? 'Score sent!' : 'Sent!',
-      sentBody: topic === 'quiz' ? '@' + OWNER + ' sees you scored ' + score + '/' + QN + ', never your name.' : replies ? '@' + OWNER + ' will see it soon. If they reply, you’ll hear back here.' : '@' + OWNER + ' will see it soon. They will never know it was you.',
+      sentBody: topic === 'quiz' ? '@' + OWNER + ' sees you scored ' + score + '/' + QN + ', never your name.' : replies ? '@' + OWNER + ' will see it soon. If they reply, you’ll hear back here.' : '@' + OWNER + ' will see it soon. They will never know it was you' + (hintTxt ? ', only your hint: ' + hintTxt + '.' : '.'),
       againLabel: topic === 'quiz' ? 'Take it again' : 'Send another',
       napEmoji: nap.e, napTitle: nap.t, napBody: nap.b, napCta: nap.c, napAdLabel: nap.a,
       confetti: s.sent ? confetti : [],
@@ -644,7 +661,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
                         {" "}
                         {(v.tiles || []).map((tl, i0) => (
                           <Fragment key={i0}>
-                          <button className="lp-tile" role="radio" aria-checked={tl.on} onClick={tl.pick} style={{ background: tl.bg, color: tl.ink, borderColor: tl.line }}>
+                          <button className="lp-tile" role="radio" aria-checked={tl.on} aria-pressed={tl.on} onClick={tl.pick} style={{ background: tl.bg, color: tl.ink, borderColor: tl.line }}>
                             {tl.n}
                           </button>
                           </Fragment>
@@ -835,6 +852,77 @@ export default class Main extends React.Component<Record<string, any>, any> {
                         </>
                       ) : null}
                       {" "}
+                      <div style={{ marginTop: "14px", padding: "10px 12px", borderRadius: "16px", background: v.th.chipBg, display: v.hintDisplay }}>
+                        {" "}
+                        <button className="tap" onClick={v.toggleHintBox} aria-expanded={v.hintBoxStr} style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", border: "0", background: "transparent", color: "inherit", padding: "0", minHeight: "40px", textAlign: "left" }}>
+                          {" "}
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ flex: "none" }}>
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-3.5-3.5" />
+                          </svg>
+                          {" "}
+                          <span style={{ flex: "1", fontSize: "13.5px", lineHeight: "1.35" }}>
+                            <b>
+                              {v.hintHead}
+                            </b>
+                            <br />
+                            <span style={{ color: v.th.muted }}>
+                              Optional clue for @{v.owner}{" to guess with. Never your name."}
+                            </span>
+                          </span>
+                          {" "}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: "none", transform: `rotate(${v.hintChev})` }}>
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                          {" "}
+                        </button>
+                        {" "}
+                        {v.hintBox ? (
+                          <>
+                          {" "}
+                          <div>
+                            {" "}
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
+                              {" "}
+                              {(v.senderHints || []).map((sh, i0) => (
+                                <Fragment key={i0}>
+                                {" "}
+                                <button className="tap" onClick={sh.pick} aria-pressed={sh.on} style={{ minHeight: "40px", padding: "0 14px", borderRadius: "99px", border: `1px solid ${sh.line}`, background: sh.bg, color: sh.ink, fontWeight: "700", fontSize: "13.5px" }}>
+                                  {sh.label}
+                                </button>
+                                {" "}
+                                </Fragment>
+                              ))}
+                              {" "}
+                            </div>
+                            {" "}
+                            {v.hintIsCustom ? (
+                              <>
+                              {" "}
+                              <div>
+                                {" "}
+                                <label htmlFor="lp-hint" className="sr">
+                                  Your own hint
+                                </label>
+                                {" "}
+                                <input id="lp-hint" value={v.hintCustom ?? ""} onChange={v.onHintCustom} maxLength="40" placeholder="e.g. I sit behind you in GST" style={{ display: "block", width: "100%", marginTop: "10px", minHeight: "46px", borderRadius: "14px", border: `1px solid ${v.th.cardLine}`, background: v.th.field, color: "inherit", font: "inherit", fontSize: "15px", padding: "0 14px" }} />
+                                {" "}
+                                <div style={{ marginTop: "4px", fontSize: "12px", color: v.th.muted }}>
+                                  Names, phone numbers and @handles are removed.
+                                </div>
+                                {" "}
+                              </div>
+                              {" "}
+                              </>
+                            ) : null}
+                            {" "}
+                          </div>
+                          {" "}
+                          </>
+                        ) : null}
+                        {" "}
+                      </div>
+                      {" "}
                       <button className="tap" onClick={v.send} disabled={!!(v.cantSend)} style={{ marginTop: "14px", width: "100%", minHeight: "56px", border: "0", borderRadius: "18px", background: v.th.btnBg, color: v.th.btnInk, fontWeight: "800", fontSize: "17px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", opacity: v.sendOpacity }}>
                         {" "}{v.sendLabel}{" "}
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -919,6 +1007,40 @@ export default class Main extends React.Component<Record<string, any>, any> {
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "flex-start", gap: "18px", marginTop: "24px", width: "100%" }}>
                 {" "}
                 <div className="rise" style={{ flex: "0 1 380px", background: v.th.card, border: `1px solid ${v.th.cardLine}`, borderRadius: "26px", padding: "20px", backdropFilter: "blur(18px)", animationDelay: ".2s" }}>
+                  {" "}
+                  {v.showReceipt ? (
+                    <>
+                    {" "}
+                    <div style={{ marginBottom: "16px", padding: "16px", borderRadius: "20px", background: "#ffffff", color: "#2a0a1c", textAlign: "left" }}>
+                      {" "}
+                      <div style={{ fontSize: "12px", fontWeight: "800", letterSpacing: ".08em", textTransform: "uppercase", color: "#b0246a" }}>
+                        Your receipt
+                      </div>
+                      {" "}
+                      <div className="d" style={{ fontSize: "28px", fontWeight: "800", letterSpacing: ".04em", marginTop: "4px" }}>
+                        {v.receiptCode}
+                      </div>
+                      {" "}
+                      <p style={{ margin: "4px 0 0", fontSize: "13.5px", color: "#5b4b55", lineHeight: "1.45" }}>
+                        See if @{v.owner}{" reacts, replies or guesses it’s you. No account needed, and only this code links back to you."}
+                      </p>
+                      {" "}
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px", marginTop: "12px" }}>
+                        {" "}
+                        <button className="tap" onClick={v.copyReceipt} style={{ minHeight: "46px", borderRadius: "14px", border: "1px solid #e3d7de", background: "#ffffff", color: "#2a0a1c", fontWeight: "800", fontSize: "14px" }}>
+                          {v.copyReceiptLabel}
+                        </button>
+                        {" "}
+                        <SkLink href="/receipt" className="tap" style={{ minHeight: "46px", borderRadius: "14px", background: "#2a0a1c", color: "#ffffff", fontWeight: "800", fontSize: "14px", display: "grid", placeItems: "center", textDecoration: "none" }}>
+                          Check receipt
+                        </SkLink>
+                        {" "}
+                      </div>
+                      {" "}
+                    </div>
+                    {" "}
+                    </>
+                  ) : null}
                   {" "}
                   {v.repliesOn ? (
                     <>

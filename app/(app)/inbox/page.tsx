@@ -1,2 +1,45 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function InboxPage() { return <FoundationPage title="Your inbox, without the noise." description="Private messages will be connected to the Message and Reply models in Phase 2." />; }
+import type { Metadata } from "next";
+
+import { LiveRefresh } from "@/components/layout/LiveRefresh";
+import Inbox from "@/components/sk/Inbox";
+import { deleteBubbles, deleteItems, markAllRead, markRead, report, sendChat, setArchived, startChat, undoBlock } from "@/features/inbox/actions";
+import { loadInbox } from "@/features/inbox/queries";
+import { guess, react, releaseHeld, searchPeople } from "@/features/mystery/actions";
+import { requireUser } from "@/lib/auth/session";
+import { getMode } from "@/lib/sk/mode";
+
+export const metadata: Metadata = { title: "Sekretly · Inbox" };
+
+// /inbox?open=m:<id> or ?open=c:<id> opens one item (links from notifications); ?filter=held opens on a filter.
+export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
+  const user = await requireUser("/inbox");
+  const { open, filter } = await searchParams;
+  const { items } = await loadInbox(user.id);
+  return (
+    <>
+      <LiveRefresh />
+      <Inbox
+        mode={await getMode()}
+        ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+        username={user.username}
+        items={items}
+        startOpen={typeof open === "string" && items.some((i) => i.id === open) ? open : null}
+        markRead={markRead}
+        markAllRead={markAllRead}
+        setArchived={setArchived}
+        deleteItems={deleteItems}
+        startChat={startChat}
+        sendChat={sendChat}
+        deleteBubbles={deleteBubbles}
+        report={report}
+        undoBlock={undoBlock}
+        startFilter={filter === "held" || filter === "unread" || filter === "chats" ? filter : null}
+        allowGuess={user.allowGuess}
+        react={react}
+        releaseHeld={releaseHeld}
+        searchPeople={searchPeople}
+        guess={guess}
+      />
+    </>
+  );
+}

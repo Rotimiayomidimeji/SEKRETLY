@@ -71,6 +71,9 @@ body{margin:0;background:#0c0811}
             <h2 style="font-size: 24px">Set it up</h2>
             <div class="card row" style="margin-top: 12px; padding: 12px 14px; gap: 12px"><img src="{{gicon}}" alt="" style="width: 40px; height: 40px"><span style="flex: 1"><span class="muted" style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Game</span><b class="d" style="display: block; font-size: 18px">{{gname}}</b></span><button class="btn btn-sm tap" onClick="{{changeGame}}">Change</button></div>
             <div class="card" style="padding: 4px 16px; margin-top: 12px">
+              <div class="cg-row" style="display: block"><b>Play with a crew</b><div class="muted" style="font-size: 12.5px">{{crewHint}}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px"><sc-for list="{{crewOpts}}" as="co" hint-placeholder-count="4"><button class="chip tap {{co.cls}}" aria-pressed="{{co.on}}" onClick="{{co.pick}}">{{co.label}}</button></sc-for></div>
+              </div>
               <div class="cg-row"><span><b>Room name</b><input class="field" value="{{room}}" onChange="{{onRoom}}" maxlength="32" aria-label="Room name" style="margin-top: 8px; min-height: 46px"></span><button class="icon-btn tap" onClick="{{rollRoom}}" aria-label="Random room name" style="align-self: flex-end"><img src="/_blob/c31fcca8682736cc92ca4f3073f8c7dd" alt="" style="width: 26px; height: 26px"></button></div>
               <div class="cg-row" style="display: block"><b>Who can join</b><div class="seg" style="margin-top: 8px"><sc-for list="{{joinOpts}}" as="j" hint-placeholder-count="3"><button onClick="{{j.pick}}" aria-pressed="{{j.on}}" style="color: var(--ink)">{{j.label}}</button></sc-for></div></div>
               <div class="cg-row"><span><b>Max players</b><div class="muted" style="font-size: 12.5px">{{maxHint}}</div></span><span class="num-step" style="flex: none"><button onClick="{{maxDown}}" aria-label="Fewer" style="color: var(--ink)">−</button><b>{{max}}</b><button onClick="{{maxUp}}" aria-label="More" style="color: var(--ink)">+</button></span></div>
@@ -172,15 +175,16 @@ class Component extends DCLogic {
   }
   // what to show on arrival: a game picked in the hub, settings coming back from the lobby, or a blank wizard
   arrive(mode) {
-    var pick = null, edit = null, saved = null;
+    var pick = null, edit = null, saved = null, crew = null;
     try {
+      crew = window.localStorage.getItem('sk-crew'); window.localStorage.removeItem('sk-crew');
       pick = window.localStorage.getItem('sk-pick'); edit = window.localStorage.getItem('sk-edit'); saved = JSON.parse(window.localStorage.getItem('sk-wiz') || 'null');
       this.nav = window.localStorage.getItem('sk-nav') || '';
       window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit');
     } catch (e) { this.nav = ''; }
     if (edit && saved) return Object.assign({}, saved, { mode: mode, step: edit === 'review' ? 3 : 1, reached: 3 });
     var game = pick || this.props.game || 'nhie';
-    return { mode: mode, step: pick ? 1 : 0, reached: pick ? 1 : 0, game: game, room: '', roomSeed: 0, join: 'both', max: 6, laps: 1, timer: 15, spice: 'mild', esc: true,
+    return { crew: crew || null, mode: mode, step: pick || crew ? 1 : 0, reached: pick || crew ? 1 : 0, game: crew && !pick ? 'mlt' : game, room: '', roomSeed: 0, join: 'both', max: 6, laps: 1, timer: 15, spice: 'mild', esc: true,
       packs: { campus: true, situationship: true }, special: this.defaults(game), scene: null, shape: 'round', sound: true, when: 'now',
       pollQ: 'Best place to hang out after exams?', pollOpts: ['Beach', 'Mall', 'Owambe'] };
   }
@@ -221,15 +225,18 @@ class Component extends DCLogic {
     var gm = GM[s.game] || GM.nhie;
     var sceneId = s.scene || gm.scene, sc = SC[sceneId];
     var ROOMS = ['Friday Night Never', 'Hostel B after dark', 'Class of 2027 chaos', 'Owambe aftermath', 'No chickens allowed', 'Sunday vibes only'];
-    var room = s.room || ROOMS[(s.roomSeed + Object.keys(GM).indexOf(s.game)) % ROOMS.length];
+    // saved crews: same people every time, under their game nicknames
+    var CREWS = { 'Hostel B gang': ['Fox', 'KolaNut', 'PixelOwl', 'Zobo', 'MangoMoon'], 'Class of 2027': ['Moon', 'PixelOwl', 'ChinChin', 'Suya', 'Zobo', 'Fox', 'KolaNut'], 'Sunday brunch crew': ['KolaNut', 'Moon', 'Zobo'] };
+    var crewList = s.crew && CREWS[s.crew] ? CREWS[s.crew] : null;
+    var room = s.room || (crewList ? s.crew + ' night' : ROOMS[(s.roomSeed + Object.keys(GM).indexOf(s.game)) % ROOMS.length]);
     var opt = function (list, cur, key) { return list.map(function (x) { return { label: x[1], on: cur === x[0] ? 'true' : 'false', pick: function () { var o = {}; o[key] = x[0]; self.setState(o); } }; }); };
     var PK = [['campus', 'Campus life'], ['situationship', 'Situationship'], ['owambe', 'Owambe'], ['hostel', 'Hostel secrets'], ['exam', 'Exam szn'], ['unhinged', 'Unhinged 🔒']];
     var STEP = ['Pick a game', 'Set it up', 'Choose the table', 'Review'];
     var seats = [], n = s.max > 8 ? 8 : s.max, R = 182, C = ['#ffd23d', '#7ef0c1', '#7fb2ff', '#ff9ad5', '#ffb35c', '#b78bff', '#5be0a0', '#ff8b98'];
-    for (var i = 0; i < n; i++) { var a = (90 + i * 360 / n) * Math.PI / 180; seats.push({ x: Math.round(R * Math.cos(a) * (s.shape === 'long' ? 1.12 : 1)), y: Math.round(R * Math.sin(a) * (s.shape === 'long' ? 0.8 : 1)), label: i === 0 ? 'You' : 'open', initial: i === 0 ? 'Y' : '+', color: i === 0 ? C[0] : C[i % C.length], cls: i === 0 ? 'g3-me' : '', op: i === 0 ? 1 : 0.4 }); }
+    for (var i = 0; i < n; i++) { var a = (90 + i * 360 / n) * Math.PI / 180, mate = crewList && i > 0 ? crewList[i - 1] : null; seats.push({ x: Math.round(R * Math.cos(a) * (s.shape === 'long' ? 1.12 : 1)), y: Math.round(R * Math.sin(a) * (s.shape === 'long' ? 0.8 : 1)), label: i === 0 ? 'You' : mate || 'open', initial: i === 0 ? 'Y' : mate ? mate.charAt(0) : '+', color: i === 0 ? C[0] : C[i % C.length], cls: i === 0 ? 'g3-me' : '', op: i === 0 || mate ? 1 : 0.4 }); }
     var spiceLabel = s.esc ? { mild: 'Mild → Unhinged', spicy: 'Spicy → Unhinged', unhinged: 'Unhinged all night' }[s.spice] : { mild: 'Mild', spicy: 'Spicy', unhinged: 'Unhinged' }[s.spice];
     var packsOn = PK.filter(function (p) { return s.packs[p[0]]; }).map(function (p) { return p[1]; });
-    var summary = [(s.max * s.laps) + ' turns', spiceLabel, s.timer + 's turns', 'Up to ' + s.max, { link: 'Public link', friends: 'Friends only', both: 'Link + friends' }[s.join]].concat(packsOn);
+    var summary = (crewList ? ['Crew: ' + s.crew] : []).concat([(s.max * s.laps) + ' turns', spiceLabel, s.timer + 's turns', 'Up to ' + s.max, { link: 'Public link', friends: 'Friends only', both: 'Link + friends' }[s.join]]).concat(packsOn);
     var last = s.step === 3;
     var LOBBY = { nhie: 'NHIELobby', tod: 'TruthDareLobby', wyr: 'WYRLobby', mlt: 'MostLikelyLobby', hot: 'HotTakesLobby', poll: 'PollsLobby' };
     var stash = function () {
@@ -264,14 +271,19 @@ class Component extends DCLogic {
       scenes: Object.keys(SC).map(function (k) { return { name: SC[k].name, sky: SC[k].sky, table: SC[k].table, on: sceneId === k ? 'true' : 'false', pick: function () { self.setState({ scene: k }); } }; }),
       shapes: opt([['round', 'Round'], ['long', 'Long']], s.shape, 'shape'),
       soundStr: s.sound ? 'true' : 'false', toggleSound: function () { self.setState({ sound: !s.sound }); },
-      whenOpts: opt([['now', 'Start now'], ['later', 'Schedule for 9pm']], s.when, 'when'),
+      whenOpts: opt([['now', 'Start now'], ['later', 'Tonight 9pm']].concat(crewList ? [['weekly', 'Every Fri 9pm']] : []), s.when, 'when'),
+      crewHint: crewList ? 'Everyone in ' + s.crew + ' gets an invite and keeps their nickname' : 'Pick a saved crew and the seats fill themselves',
+      crewOpts: [['', 'No crew']].concat(Object.keys(CREWS).map(function (k) { return [k, k + ' · ' + (CREWS[k].length + 1)]; })).map(function (c) {
+        var on = (s.crew || '') === c[0];
+        return { label: c[1], cls: on ? 'on' : '', on: on ? 'true' : 'false', pick: function () { var g = GM[s.game] || GM.nhie, size = c[0] ? CREWS[c[0]].length + 1 : s.max; self.setState({ crew: c[0] || null, join: c[0] ? 'friends' : s.join, max: Math.min(Math.max(size, g.min), g.cap), when: !c[0] && s.when === 'weekly' ? 'now' : s.when }); } };
+      }),
       summary: summary, sceneName: sc.name, sc: sc, seats: seats, spiceLabel: spiceLabel,
       tableShape: s.shape === 'long' ? 'border-radius: 999px; transform: scaleX(1.25) scaleY(.75)' : '',
       hasBack: s.step > 0, back: function () { self.setState({ step: s.step - 1 }); },
       notLast: !last, isLast: last, nextLabel: ['Set it up', 'Choose the table', 'Review'][s.step] || 'Next',
       next: function () { var nx = Math.min(3, s.step + 1); self.setState({ step: nx, reached: Math.max(s.reached || 0, nx) }); },
       noBack: s.step === 0, backLabel: ['', 'Game', 'Setup', 'Table'][s.step] || 'Back',
-      lobbyHref: LOBBY[s.game] + '.dc.html', openLabel: s.when === 'later' ? 'Schedule the room' : 'Open the room',
+      lobbyHref: LOBBY[s.game] + '.dc.html', openLabel: s.when === 'weekly' ? 'Lock in weekly game night' : s.when === 'later' ? 'Schedule the room' : crewList ? 'Open & invite the crew' : 'Open the room',
       changeGame: function () { self.setState({ step: 0 }); },
       open: stash,
       orbStart: function (e) { self.drag = { x: e.clientX, o: self.orb || 0 }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },

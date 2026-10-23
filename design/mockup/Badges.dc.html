@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Badges</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 640px">
+      <header class="topbar">
+        <a href="Profile.dc.html" class="icon-btn tap" aria-label="Back to profile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+        <h1 class="grow" style="font-size: 26px">Badges</h1>
+        <span class="pill">{{earned}} / {{total}}</span>
+      </header>
+
+      <div class="card" style="padding: 14px 16px">
+        <div class="row" style="justify-content: space-between; font-size: 14px"><b>Collection</b><span class="muted">{{pct}}% complete</span></div>
+        <div class="bar" style="margin-top: 8px"><span style="width: {{pct}}%"></span></div>
+        <p class="muted" style="font-size: 13px; margin-top: 8px">Pin up to 3 to show on your profile. Pinned: {{pinnedNames}}</p>
+      </div>
+
+      <div class="rail" role="group" aria-label="Category" style="display: flex; gap: 8px; margin: 14px -16px 0; padding: 0 16px 4px">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+          <button class="chip tap {{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.name}}</button>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px">
+        <sc-for list="{{items}}" as="b" hint-placeholder-count="12">
+          <button class="card tap" onClick="{{b.open}}" aria-label="{{b.name}}, {{b.stateWord}}" style="padding: 12px 8px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 150px; position: relative">
+            <sc-if value="{{b.pinned}}" hint-placeholder-val="{{ false }}"><span class="pill" style="position: absolute; top: 6px; right: 6px; padding: 2px 7px; font-size: 10.5px; background: var(--pink); color: #fff">Pinned</span></sc-if>
+            <span style="width: 60px; height: 60px; border-radius: 20px; display: grid; place-items: center; background: {{b.bg}}; filter: {{b.filter}}; opacity: {{b.op}}"><img src="{{b.icon}}" alt="" style="width: 38px; height: 38px"></span>
+            <b style="font-size: 12.5px; line-height: 1.15">{{b.name}}</b>
+            <sc-if value="{{b.locked}}" hint-placeholder-val="{{ false }}">
+              <span style="width: 100%; margin-top: auto"><span class="bar" style="height: 6px; display: block"><span style="width: {{b.prog}}%"></span></span><span class="muted" style="display: block; font-size: 11px; margin-top: 3px">{{b.have}}/{{b.need}}</span></span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="{{cur.name}}" style="text-align: center">
+        <span class="pop" style="width: 96px; height: 96px; border-radius: 30px; margin: 0 auto; display: grid; place-items: center; background: {{cur.bg}}; filter: {{cur.filter}}"><img src="{{cur.icon}}" alt="" style="width: 60px; height: 60px"></span>
+        <h2 style="font-size: 24px; margin-top: 12px">{{cur.name}}</h2>
+        <p class="muted" style="margin-top: 4px; font-size: 14.5px">{{cur.how}}</p>
+        <div class="row" style="justify-content: center; gap: 18px; margin-top: 12px; font-size: 13.5px">
+          <span><b>{{cur.rarity}}%</b> <span class="muted">of people have it</span></span>
+          <span class="muted">{{cur.when}}</span>
+        </div>
+        <sc-if value="{{cur.locked}}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top: 14px; text-align: left"><div class="row" style="justify-content: space-between; font-size: 13.5px"><b>Progress</b><span class="muted">{{cur.have}} / {{cur.need}}</span></div><div class="bar" style="margin-top: 6px"><span style="width: {{cur.prog}}%"></span></div></div>
+          <a href="{{cur.go}}" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 16px">{{cur.goLabel}}</a>
+        </sc-if>
+        <sc-if value="{{cur.got}}" hint-placeholder-val="{{ true }}">
+          <button class="btn btn-cta btn-lg btn-block tap" onClick="{{togglePin}}" style="margin-top: 16px" disabled="{{pinFull}}">{{pinLabel}}</button>
+          <a href="ShareStudio.dc.html" class="btn btn-block tap" style="margin-top: 8px">Share it</a>
+        </sc-if>
+        <button class="btn btn-ghost btn-block tap" onClick="{{close}}" style="margin-top: 6px; border: 0">Close</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', cat: 'All', open: -1, pins: ['flame7', 'detective1'] };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var I = { fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348', eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', spark: '/_blob/727ac58e5046d6eefbb35427eff3c1df', letter: '/_blob/ee2791bdeac805bec379541426d39014', moon: '/_blob/1df7299954a782c5de8338339634a8e6', peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', uni: '/_blob/7ee69e13b899e048010df41d0cf87143', octo: '/_blob/e910746badea9d78c41ac4aa913de4a6' };
+    var G = { s: 'linear-gradient(135deg,#ff8a2b,#ff3d6e)', i: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', g: 'linear-gradient(135deg,#7a3cff,#3a6bff)', c: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', k: 'linear-gradient(135deg,#22b36f,#127a80)' };
+    var B = [
+      { id: 'flame7', cat: 'Streaks', name: 'Flame', how: 'Drop 7 days in a row.', icon: I.fire, bg: G.s, have: 7, need: 7, rarity: 31, when: 'Earned Oct 9', go: 'DropAnswer.dc.html', goLabel: 'Drop today' },
+      { id: 'flame30', cat: 'Streaks', name: 'Wildfire', how: 'Drop 30 days in a row.', icon: I.fire, bg: G.s, have: 12, need: 30, rarity: 6, when: '18 days to go', go: 'Streak.dc.html', goLabel: 'See your streak' },
+      { id: 'flame100', cat: 'Streaks', name: 'Legend', how: 'Drop 100 days in a row.', icon: I.moon, bg: G.s, have: 12, need: 100, rarity: 1, when: '88 days to go', go: 'Streak.dc.html', goLabel: 'See your streak' },
+      { id: 'msg50', cat: 'Inbox', name: '50 messages', how: 'Receive 50 messages in total.', icon: I.letter, bg: G.i, have: 50, need: 50, rarity: 38, when: 'Earned Oct 2', go: 'ShareStudio.dc.html', goLabel: 'Share a link' },
+      { id: 'msg100', cat: 'Inbox', name: 'Century', how: 'Receive 100 messages in total.', icon: I.letter, bg: G.i, have: 86, need: 100, rarity: 17, when: '14 to go', go: 'ShareStudio.dc.html', goLabel: 'Post your link' },
+      { id: 'cloud20', cat: 'Inbox', name: 'Word collector', how: 'Get 20 different words in your cloud.', icon: I.peach, bg: G.i, have: 16, need: 20, rarity: 12, when: '4 to go', go: 'Profile.dc.html', goLabel: 'See your cloud' },
+      { id: 'detective1', cat: 'Inbox', name: 'Detective', how: 'Guess a sender right and they reveal.', icon: I.eyes, bg: G.g, have: 1, need: 1, rarity: 22, when: 'Earned Oct 14', go: 'Inbox.dc.html', goLabel: 'Play guess who' },
+      { id: 'detective10', cat: 'Inbox', name: 'Sherlock', how: 'Get 10 confirmed guesses.', icon: I.eyes, bg: G.g, have: 4, need: 10, rarity: 3, when: '6 to go', go: 'Inbox.dc.html', goLabel: 'Play guess who' },
+      { id: 'host10', cat: 'Games', name: 'Host with the most', how: 'Host 10 games.', icon: I.uni, bg: G.g, have: 7, need: 10, rarity: 9, when: '3 to go', go: 'CreateGame.dc.html', goLabel: 'Plan a game night' },
+      { id: 'crew1', cat: 'Crews', name: 'Crew founder', how: 'Start a crew with 3 or more people.', icon: I.shush, bg: G.c, have: 1, need: 1, rarity: 14, when: 'Earned Oct 5', go: 'Crews.dc.html', goLabel: 'Open crews' },
+      { id: 'crew4', cat: 'Crews', name: 'Ride or die', how: 'Keep a crew streak for 4 weeks.', icon: I.octo, bg: G.c, have: 4, need: 4, rarity: 7, when: 'Earned Oct 21', go: 'Crews.dc.html', goLabel: 'Open crews' },
+      { id: 'kind', cat: 'Kindness', name: 'Kind soul', how: 'Send 20 messages with no reports.', icon: I.spark, bg: G.k, have: 20, need: 20, rarity: 40, when: 'Earned Sep 28', go: 'Main.dc.html', goLabel: 'Send something nice' }
+    ];
+    var cats = ['All', 'Streaks', 'Inbox', 'Games', 'Crews', 'Kindness'];
+    var dec = function (b, i) {
+      var got = b.have >= b.need, pinned = s.pins.indexOf(b.id) >= 0;
+      return Object.assign({}, b, { idx: i, got: got, locked: !got, pinned: pinned, prog: Math.round(100 * b.have / b.need), filter: got ? 'none' : 'grayscale(1)', op: got ? 1 : 0.55, stateWord: got ? 'earned' : b.have + ' of ' + b.need,
+        open: function () { self.setState({ open: i }); } });
+    };
+    var all = B.map(dec);
+    var cur = s.open >= 0 ? all[s.open] : all[0];
+    var earned = all.filter(function (b) { return b.got; }).length;
+    var curPinned = s.pins.indexOf(cur.id) >= 0;
+    return {
+      mode: dark ? 'dark' : 'light',
+      earned: earned, total: B.length, pct: Math.round(100 * earned / B.length),
+      pinnedNames: all.filter(function (b) { return b.pinned; }).map(function (b) { return b.name; }).join(', ') || 'none',
+      cats: cats.map(function (c) { var on = s.cat === c; return { name: c, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ cat: c }); } }; }),
+      items: all.filter(function (b) { return s.cat === 'All' || b.cat === s.cat; }),
+      open: s.open >= 0, cur: cur,
+      close: function () { self.setState({ open: -1 }); },
+      pinFull: !curPinned && s.pins.length >= 3,
+      pinLabel: curPinned ? 'Unpin from profile' : (s.pins.length >= 3 ? '3 pinned · unpin one first' : 'Pin to profile'),
+      togglePin: function () { var p = s.pins.slice(); var k = p.indexOf(cur.id); if (k >= 0) p.splice(k, 1); else if (p.length < 3) p.push(cur.id); self.setState({ pins: p }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

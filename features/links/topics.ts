@@ -18,6 +18,8 @@ export const TOPIC_COMPOSER: Record<LinkTopic, string> = {
   RATE: "rate",
   AMA: "ama",
   CUSTOM: "custom",
+  // a drop is answered like a custom question (its question is the day's drop)
+  DROP: "custom",
 };
 
 export const TOPIC_TITLE: Record<LinkTopic, string> = {
@@ -27,6 +29,7 @@ export const TOPIC_TITLE: Record<LinkTopic, string> = {
   RATE: "Rate me 1–10",
   AMA: "Ask me anything",
   CUSTOM: "Custom topic",
+  DROP: "Today’s drop",
 };
 
 export const THEMES = ["default", "sunset", "midnight", "bubblegum", "neon", "ocean"] as const;

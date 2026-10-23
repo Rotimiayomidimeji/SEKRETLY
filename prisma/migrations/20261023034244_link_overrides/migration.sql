@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Link" ADD COLUMN     "hintsOff" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "kindOff" BOOLEAN NOT NULL DEFAULT false;
+

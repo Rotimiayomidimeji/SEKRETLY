@@ -50,9 +50,27 @@ body{margin:0;background:#0c0811}
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
-        <a href="JoinApp.dc.html" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; gap: 10px; align-items: center"><img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 36px; height: 36px"><span><b class="d" style="font-size: 17px; display: block">4-day streak</b><span class="muted" style="font-size: 12.5px">Play today to keep it</span></span></a>
+        <a href="Streak.dc.html" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; gap: 10px; align-items: center"><img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 36px; height: 36px"><span><b class="d" style="font-size: 17px; display: block">12-day streak</b><span class="muted" style="font-size: 12.5px">Play or drop today</span></span></a>
         <a href="JoinApp.dc.html" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; gap: 10px; align-items: center"><img class="float" src="/_blob/0bb83498eeb25491f1a1f03843b26271" alt="" style="width: 36px; height: 36px"><span><b class="d" style="font-size: 17px; display: block">Daily pack</b><span class="muted" style="font-size: 12.5px">2 invites waiting</span></span></a>
       </div>
+      <div class="sec-h"><h2>Your crews</h2><a href="Crews.dc.html" class="pink" style="font-weight: 700; font-size: 14px">All crews</a></div>
+      <div class="rail" style="display: flex; gap: 10px; margin: 0 -16px; padding: 0 16px 4px">
+        <sc-for list="{{crews}}" as="cr" hint-placeholder-count="3">
+          <div class="card" style="flex: none; width: 236px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+            <a href="Crews.dc.html" onClick="{{cr.open}}" class="row" style="gap: 10px; text-decoration: none; color: var(--ink)">
+              <span class="av" style="width: 42px; height: 42px; border-radius: 14px; background: {{cr.tint}}"><img src="{{cr.icon}}" alt=""></span>
+              <span style="min-width: 0"><b style="display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cr.name}}</b><span class="muted" style="font-size: 12.5px">{{cr.meta}}</span></span>
+            </a>
+            <div class="muted" style="font-size: 13px">{{cr.next}}</div>
+            <a href="CreateGame.dc.html" onClick="{{cr.play}}" class="btn btn-sm btn-cta tap">Start a game with them</a>
+          </div>
+        </sc-for>
+        <div class="card" style="flex: none; width: 168px; padding: 14px; display: flex; flex-direction: column; justify-content: center; gap: 6px; border-style: dashed">
+          <b style="font-size: 14px">New crew?</b>
+          <span class="muted" style="font-size: 12.5px; line-height: 1.4">Finish a game and tap “Save this table as a crew”.</span>
+        </div>
+      </div>
+
       <div class="sec-h"><h2>Start a game</h2><span class="muted" style="font-size: 13px">every table is 3D</span></div>
       <div class="gh-games">
         <sc-for list="{{games}}" as="g" hint-placeholder-count="6">
@@ -147,12 +165,22 @@ class Component extends DCLogic {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
       ads: this.props.ads === 'off' ? 'off' : 'on',
+      crews: [
+        { name: 'Hostel B gang', meta: '6 members · 4-week streak', next: 'Game night Fri 9pm · Most Likely To', icon: E.fire, tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)' },
+        { name: 'Class of 2027', meta: '8 members · question reveals 9pm', next: 'Today’s crew question is open', icon: E.eyes, tint: 'linear-gradient(135deg,#22e1ff,#3a6bff)' },
+        { name: 'Sunday brunch crew', meta: '4 members · 7-week streak', next: 'Hot Takes rematch · Sun 2pm', icon: E.shush, tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)' }
+      ].map(function (c) {
+        return Object.assign({}, c, {
+          open: function () { try { window.localStorage.setItem('sk-crew', c.name); } catch (e) {} },
+          play: function () { try { window.localStorage.setItem('sk-crew', c.name); window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }
+        });
+      }),
       code: s.code, onCode: function (e) { self.setState({ code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') }); }, codeOk: s.code.length >= 5,
-      games: G.map(function (g) { return Object.assign({ tint: 'var(--card2)' }, g, { pick: function () { try { window.localStorage.setItem('sk-pick', g.id); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} } }); }),
+      games: G.map(function (g) { return Object.assign({ tint: 'var(--card2)' }, g, { pick: function () { try { window.localStorage.setItem('sk-pick', g.id); window.localStorage.removeItem('sk-edit'); window.localStorage.removeItem('sk-crew'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} } }); }),
       filters: [['all', 'All'], ['nhie', 'Never Have I Ever'], ['tod', 'Truth or Dare'], ['wyr', 'Would You Rather'], ['mlt', 'Most Likely To'], ['hot', 'Hot Takes'], ['poll', 'Polls']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
       openCount: shown.length,
       joinCode: function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: 'nhie', room: 'Friday Night Never', role: 'player' })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
-      newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.removeItem('sk-crew'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
       open: shown.map(function (o, i) {
         var joinRoom = function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: o.g, room: o.name, role: 'player' })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} };
         var g = gById[o.g], seats = [];

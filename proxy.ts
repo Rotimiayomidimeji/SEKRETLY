@@ -26,5 +26,10 @@ export const config = {
     "/admin/:path*",
     "/activity/:path*",
     "/analytics/:path*",
+    "/drop/:path*",
+    "/streak/:path*",
+    "/badges/:path*",
+    "/wrap/:path*",
+    "/crews/:path*",
   ],
 };

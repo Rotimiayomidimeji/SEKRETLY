@@ -5,7 +5,10 @@ import { z } from "zod";
 
 import { createAccount } from "@/features/auth/accounts";
 import { passwordSchema, usernameSchema } from "@/features/auth/schemas";
-import { MESSAGE_TTL_MS, RATE_CATEGORIES, isNapping } from "@/features/links/topics";
+import { MESSAGE_TTL_MS, RATE_CATEGORIES, TOPIC_TITLE, isNapping } from "@/features/links/topics";
+import { notify } from "@/features/notifications/notify";
+import { classify, cleanHint } from "@/features/safety/kind";
+import { deviceKey, senderHint, standingWith, userKey } from "@/features/safety/standing";
 import { createSession, getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
@@ -29,8 +32,12 @@ const sendSchema = z.object({
       category: z.string().optional(),
       text: z.string().optional(),
       note: z.string().optional(),
+      /** the sender's own optional clue */
+      hint: z.string().max(80).optional(),
     })
     .default({}),
+  /** set when the sender adds to a message from its receipt */
+  followUpOf: z.string().max(40).optional(),
 });
 export type SendInput = z.input<typeof sendSchema>;
 type Built = { text: string; data: Prisma.InputJsonValue | undefined } | { error: string };
@@ -65,24 +72,48 @@ async function buildMessage(topic: LinkTopic, linkId: string, p: z.infer<typeof 
       if (text.length < 5) return { error: "Type your question." };
       return { text: text.slice(0, 300), data: undefined };
     case "CUSTOM":
+    case "DROP":
       if (text.length < 1) return { error: "Write something." };
       return { text: text.slice(0, 1000), data: undefined };
   }
 }
 
 /** Saves one anonymous message through a link. senderId is set only when the sender is logged in. */
-async function deliver(input: z.infer<typeof sendSchema>, senderId: string | null): Promise<{ ok: true } | { ok: false; error: string }> {
-  const link = await db.link.findUnique({ where: { id: input.linkId } });
+// Receipt codes look like SK-7Q4M-2J (no 0/O or 1/I so they're easy to read back).
+const CODE_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+const receiptCode = () => {
+  const c = Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => CODE_CHARS[b % CODE_CHARS.length]).join("");
+  return "SK-" + c.slice(0, 4) + "-" + c.slice(4);
+};
+
+async function deliver(
+  input: z.infer<typeof sendSchema>,
+  senderId: string | null,
+): Promise<{ ok: true; receipt: string } | { ok: false; error: string; blocked?: true }> {
+  const link = await db.link.findUnique({ where: { id: input.linkId }, include: { owner: true } });
   if (!link || link.status === "DELETED") return { ok: false, error: "This link no longer exists." };
   if (isNapping(link)) return { ok: false, error: "This link is taking a nap. Try again later." };
   if (senderId && senderId === link.ownerId) return { ok: false, error: "You can’t send to your own link. Share it with your friends instead." };
   const fingerprint = await requestFingerprint();
+  // reported 4 times by this owner (as this account or from this device): blocked from them only
+  const standing = await standingWith(link.ownerId, senderId ? [userKey(senderId), deviceKey(fingerprint)] : [deviceKey(fingerprint)]);
+  if (standing.blocked) return { ok: false, error: "You can’t message this person anymore.", blocked: true };
   const perLink = await hitRateLimit(`send:${link.id}:${fingerprint}`, 10, 60 * MINUTE);
   const overall = await hitRateLimit(`send-any:${fingerprint}`, 60, 60 * MINUTE);
   if (!perLink.allowed || !overall.allowed) return { ok: false, error: "You’ve sent a lot in a short time. Take a breather and try again later." };
-  const built = await buildMessage(link.topic, link.id, input.payload);
+  // a follow-up from a receipt is plain text, whatever the link asks for
+  const built: Built = input.followUpOf
+    ? (input.payload.text ?? "").trim().length < 1
+      ? { error: "Write something." }
+      : { text: (input.payload.text ?? "").trim().slice(0, 500), data: undefined }
+    : await buildMessage(link.topic, link.id, input.payload);
   if ("error" in built) return { ok: false, error: built.error };
   const day = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00Z");
+  // Kind mode: mean messages wait in Inbox › Held and never ping the owner
+  const owner = link.owner;
+  const held = classify({ text: built.text, score: input.payload.score }, link.kindOff ? 0 : owner.kindMode, owner.hiddenWords);
+  const hint = owner.allowHints && !link.hintsOff ? cleanHint(input.payload.hint) : "";
+  const code = receiptCode();
   await db.$transaction([
     db.message.create({
       data: {
@@ -94,6 +125,11 @@ async function deliver(input: z.infer<typeof sendSchema>, senderId: string | nul
         senderId,
         senderFingerprint: fingerprint,
         wantsReply: !!senderId && input.wantsReply,
+        hint: await senderHint(),
+        senderHint: hint || null,
+        receiptCode: code,
+        held,
+        followUpOfId: input.followUpOf ?? null,
         expiresAt: new Date(Date.now() + MESSAGE_TTL_MS),
       },
     }),
@@ -101,7 +137,11 @@ async function deliver(input: z.infer<typeof sendSchema>, senderId: string | nul
     db.linkDay.upsert({ where: { linkId_day: { linkId: link.id, day } }, create: { linkId: link.id, day, messages: 1 }, update: { messages: { increment: 1 } } }),
     db.visitor.upsert({ where: { fingerprint }, create: { fingerprint }, update: {} }),
   ]);
-  return { ok: true };
+  const title = link.topic === "CUSTOM" || link.topic === "DROP" ? link.customQuestion ?? TOPIC_TITLE[link.topic] : TOPIC_TITLE[link.topic];
+  if (!held) await notify(link.ownerId, "MESSAGE", (input.followUpOf ? "A sender added to their message on " : "Someone sent you a message on ") + title, "/inbox", hint ? "They left a hint" : "Inbox");
+  if (link.maxMessages != null && link.messageCount + 1 === link.maxMessages)
+    await notify(link.ownerId, "LINK_NAP", "Your link " + title + " is taking a nap", "/links", "Hit its " + link.maxMessages + " message limit · tap to resume");
+  return { ok: true, receipt: code };
 }
 
 /** "Send" on the link page. Logged-in senders are attached so the owner can reply; visitors stay fully anonymous. */

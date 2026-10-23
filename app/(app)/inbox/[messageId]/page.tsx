@@ -1,2 +1,7 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default async function MessagePage({ params }: { params: Promise<{ messageId: string }> }) { const { messageId } = await params; return <FoundationPage title="A secret message." description={`Message ${messageId} will render with private reply and moderation actions in Phase 2.`} />; }
+import { redirect } from "next/navigation";
+
+// Old address shape (/inbox/<id>); the inbox opens one item with ?open=.
+export default async function MessagePage({ params }: PageProps<"/inbox/[messageId]">) {
+  const { messageId } = await params;
+  redirect("/inbox?open=" + encodeURIComponent(messageId));
+}

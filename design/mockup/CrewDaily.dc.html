@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Crew question</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 560px">
+      <header class="topbar">
+        <a href="Crews.dc.html" class="icon-btn tap" aria-label="Back to crews"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+        <div class="grow">
+          <div class="muted" style="font-size: 13px">Class of 2027 · day 9</div>
+          <div class="d" style="font-size: 20px; font-weight: 800">Crew question</div>
+        </div>
+        <span class="pill" style="background: rgba(255,176,32,.16); color: var(--warn)">{{phaseLabel}}</span>
+      </header>
+
+      <section style="padding: 20px; border-radius: 28px; color: #fff; background: radial-gradient(130% 110% at 100% 0%,#22e1ff 0%,#3a6bff 50%,#22337d 100%)">
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.22)">Most likely to</span>
+        <h1 style="font-size: 30px; line-height: 1.02; margin-top: 12px">Who here becomes famous first?</h1>
+        <div class="row" style="gap: 8px; margin-top: 14px">
+          <sc-for list="{{answered}}" as="a" hint-placeholder-count="9">
+            <span class="av" title="{{a.name}}" style="width: 28px; height: 28px; border-radius: 9px; background: {{a.tint}}; opacity: {{a.op}}; border: 2px solid rgba(255,255,255,.6)"><img src="{{a.icon}}" alt="{{a.label}}"></span>
+          </sc-for>
+        </div>
+        <div style="font-size: 13.5px; margin-top: 8px; opacity: .92">{{answeredText}}</div>
+      </section>
+
+      <sc-if value="{{isAnswer}}" hint-placeholder-val="{{ true }}">
+        <div class="rise">
+          <h2 style="font-size: 17px; margin: 18px 0 10px">Your vote is secret</h2>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{members}}" as="mb" hint-placeholder-count="8">
+              <button class="card tap" onClick="{{mb.pick}}" aria-pressed="{{mb.on}}" style="padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 2px solid {{mb.ring}}">
+                <span class="av" style="width: 44px; height: 44px; border-radius: 14px; background: {{mb.tint}}"><img src="{{mb.icon}}" alt=""></span>
+                <b style="font-size: 12.5px">{{mb.name}}</b>
+              </button>
+            </sc-for>
+          </div>
+          <label for="cd-why" class="label" style="margin-top: 16px">Why? <span class="muted" style="font-weight: 500">optional, shown without your name</span></label>
+          <textarea id="cd-why" class="field" value="{{why}}" onChange="{{onWhy}}" maxlength="140" style="min-height: 80px" placeholder="Already has 3k followers from one cooking video."></textarea>
+          <button class="btn btn-cta btn-lg btn-block tap" onClick="{{submit}}" disabled="{{noPick}}" style="margin-top: 14px">Lock in my vote</button>
+          <p class="muted" style="font-size: 13px; text-align: center; margin-top: 8px">Answer before 9pm to keep the crew streak. +20 season points.</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isWait}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <div class="card pop" style="margin-top: 16px; padding: 18px; text-align: center">
+            <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 56px; height: 56px">
+            <h2 style="font-size: 22px; margin-top: 8px">Locked in. Results at 9pm.</h2>
+            <div class="d" style="font-size: 40px; font-weight: 800; margin-top: 6px" role="timer">{{hh}}:{{mm}}:{{ss}}</div>
+            <p class="muted" style="font-size: 13.5px; margin-top: 4px">You voted for <b>{{myPick}}</b>. Nobody will see that, not even the reveal.</p>
+          </div>
+          <div class="card" style="margin-top: 12px; padding: 14px">
+            <b style="font-size: 15px">Still waiting on</b>
+            <ul style="list-style: none; margin: 8px 0 0; padding: 0">
+              <sc-for list="{{waiting}}" as="w" hint-placeholder-count="2">
+                <li class="row" style="padding: 8px 0">
+                  <span class="av" style="width: 36px; height: 36px; border-radius: 12px; background: {{w.tint}}"><img src="{{w.icon}}" alt=""></span>
+                  <b style="flex: 1">{{w.name}}</b>
+                  <button class="btn btn-sm tap" onClick="{{w.nudge}}" disabled="{{w.nudged}}">{{w.label}}</button>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+          <button class="btn btn-block tap" onClick="{{reveal}}" style="margin-top: 12px">Preview the 9pm reveal</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isReveal}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <div class="sec-h"><h2>The crew has spoken</h2><span class="muted" style="font-size: 13px">8 votes</span></div>
+          <div class="card" style="padding: 14px; display: flex; flex-direction: column; gap: 12px">
+            <sc-for list="{{results}}" as="r" hint-placeholder-count="5">
+              <div>
+                <div class="row" style="gap: 10px">
+                  <span class="av" style="width: 34px; height: 34px; border-radius: 11px; background: {{r.tint}}"><img src="{{r.icon}}" alt=""></span>
+                  <b style="flex: 1; font-size: 15px">{{r.name}}</b>
+                  <b class="d">{{r.votes}}</b>
+                </div>
+                <div class="bar" style="margin-top: 6px"><span style="width: {{r.pct}}%"></span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="sec-h"><h2>What people said</h2></div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div class="card" style="padding: 12px 14px; font-size: 14.5px">"Moon’s cooking videos are one algorithm away from blowing."</div>
+            <div class="card" style="padding: 12px 14px; font-size: 14.5px">"PixelOwl will be famous for something nobody can explain."</div>
+            <div class="card" style="padding: 12px 14px; font-size: 14.5px">"Fox. Podcast. Calling it now."</div>
+          </div>
+          <div class="row" style="margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(34,179,111,.14); font-size: 14px; gap: 10px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--ok)"><path d="m5 12 5 5 9-10"></path></svg>
+            <span>Crew streak: day 9. Moon’s win was pinned to Inside jokes.</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+            <a href="ShareStudio.dc.html" class="btn btn-cta tap">Share result</a>
+            <a href="Crews.dc.html" class="btn tap">Back to crew</a>
+          </div>
+          <p class="muted" style="font-size: 13px; text-align: center; margin-top: 10px">Tomorrow's question drops at noon.</p>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"phase":{"editor":"enum","options":["answer","wait","reveal"],"default":"answer"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', phase: props.phase || 'answer', pick: -1, why: '', left: 1 * 3600 + 58 * 60 + 40, nudged: {} };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.tick = setInterval(function () { self.setState({ left: Math.max(0, self.state.left - 1) }); }, 1000);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tick); }
+  componentDidUpdate(prev) {
+    if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
+    if (prev.phase !== this.props.phase && this.props.phase) this.setState({ phase: this.props.phase });
+  }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var p = function (n) { return n < 10 ? '0' + n : String(n); };
+    var M = [
+      { name: 'Moon', icon: '/_blob/4b5463ad60ec0a1915c9b60ecf54e134', tint: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)', done: true, votes: 3 },
+      { name: 'PixelOwl', icon: '/_blob/e910746badea9d78c41ac4aa913de4a6', tint: 'linear-gradient(135deg,#ffd0f0,#a46bff)', done: true, votes: 2 },
+      { name: 'Fox', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', tint: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', done: true, votes: 1 },
+      { name: 'You', icon: '/_blob/fab7f564a0c6a958be79ebcec7291c73', tint: 'linear-gradient(135deg,#d6ff6b,#22c4a0)', done: false, me: true, votes: 2 },
+      { name: 'KolaNut', icon: '/_blob/f0e10078eb17fce65ae1a0a64d3fed2b', tint: 'linear-gradient(135deg,#ffe48a,#ff8a5c)', done: true, votes: 0 },
+      { name: 'Zobo', icon: '/_blob/7ee69e13b899e048010df41d0cf87143', tint: 'linear-gradient(135deg,#9fe7ff,#ff9ad5)', done: false, votes: 0 },
+      { name: 'ChinChin', icon: '/_blob/1fb2cbc919646a3a048411532a08bd4c', tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', done: true, votes: 0 },
+      { name: 'Suya', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', done: false, votes: 0 }
+    ];
+    var meDone = s.phase !== 'answer';
+    var done = M.filter(function (m) { return m.done || (m.me && meDone); }).length;
+    var maxV = 3;
+    return {
+      mode: dark ? 'dark' : 'light',
+      isAnswer: s.phase === 'answer', isWait: s.phase === 'wait', isReveal: s.phase === 'reveal',
+      phaseLabel: s.phase === 'reveal' ? 'revealed' : 'reveals 9pm',
+      answered: M.map(function (m) { var d = m.done || (m.me && meDone); return { name: m.name, icon: m.icon, tint: m.tint, op: d ? 1 : 0.35, label: m.name + (d ? ' answered' : ' has not answered') }; }),
+      answeredText: done + ' of ' + M.length + ' answered · you see who, never what',
+      members: M.filter(function (m) { return !m.me; }).map(function (m, i) { var on = s.pick === i; return { name: m.name, icon: m.icon, tint: m.tint, on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'var(--line)', pick: function () { self.setState({ pick: i }); } }; }),
+      why: s.why, onWhy: function (e) { self.setState({ why: e.target.value.slice(0, 140) }); },
+      noPick: s.pick < 0,
+      submit: function () { if (s.pick >= 0) self.setState({ phase: 'wait' }); },
+      myPick: s.pick >= 0 ? M.filter(function (m) { return !m.me; })[s.pick].name : 'Moon',
+      hh: p(Math.floor(s.left / 3600)), mm: p(Math.floor(s.left % 3600 / 60)), ss: p(s.left % 60),
+      waiting: M.filter(function (m) { return !m.done && !m.me; }).map(function (m) { var n = !!s.nudged[m.name]; return { name: m.name, icon: m.icon, tint: m.tint, nudged: n, label: n ? 'Nudged' : 'Nudge', nudge: function () { var x = Object.assign({}, s.nudged); x[m.name] = true; self.setState({ nudged: x }); } }; }),
+      reveal: function () { self.setState({ phase: 'reveal' }); },
+      results: M.filter(function (m) { return m.votes > 0; }).sort(function (a, b) { return b.votes - a.votes; }).map(function (m) { return { name: m.name, icon: m.icon, tint: m.tint, votes: m.votes, pct: Math.round(100 * m.votes / maxV) }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

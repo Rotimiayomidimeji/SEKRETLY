@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Weekly wrap</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#05030a}
+@keyframes wwfill{from{width:0}to{width:100%}}
+.ww-fill{animation:wwfill 5s linear both}
+</style>
+</helmet>
+<div class="sk" style="min-height: 100vh; background: #05030a; display: flex; justify-content: center">
+  <div style="position: relative; width: 100%; max-width: 480px; min-height: 100vh; overflow: hidden; color: #fff; background: {{bg}}; transition: background .5s">
+
+    <div style="position: absolute; top: 12px; left: 12px; right: 12px; display: flex; gap: 4px; z-index: 3" aria-hidden="true">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="7">
+        <span style="flex: 1; height: 4px; border-radius: 9px; background: rgba(255,255,255,.3); overflow: hidden"><span class="{{b.cls}}" style="display: block; height: 100%; width: {{b.w}}; background: #fff"></span></span>
+      </sc-for>
+    </div>
+    <div class="row" style="position: absolute; top: 26px; left: 16px; right: 16px; z-index: 3">
+      <span class="logo-mark" style="width: 30px; height: 30px; border-radius: 10px; font-size: 16px; background: rgba(255,255,255,.2)">S</span>
+      <span style="flex: 1; font-size: 13px; font-weight: 700">Your week · Oct 16–22</span>
+      <button class="tap" onClick="{{togglePause}}" aria-label="{{pauseWord}}" style="width: 44px; height: 44px; border: 0; border-radius: 14px; background: rgba(0,0,0,.2); color: #fff; display: grid; place-items: center">
+        <sc-if value="{{playing}}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></sc-if>
+        <sc-if value="{{paused}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg></sc-if>
+      </button>
+      <a href="Home.dc.html" class="tap" aria-label="Close" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(0,0,0,.2); color: #fff; display: grid; place-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+    </div>
+
+    <button onClick="{{prev}}" aria-label="Previous slide" style="position: absolute; left: 0; top: 80px; bottom: 120px; width: 35%; border: 0; background: transparent; z-index: 2"></button>
+    <button onClick="{{next}}" aria-label="Next slide" style="position: absolute; right: 0; top: 80px; bottom: 120px; width: 65%; border: 0; background: transparent; z-index: 2"></button>
+
+    <div style="position: relative; z-index: 1; min-height: 100vh; padding: 110px 26px 130px; display: flex; flex-direction: column; justify-content: center">
+      <sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+        <div class="rise">
+          <img class="float" src="/_blob/1df7299954a782c5de8338339634a8e6" alt="" style="width: 96px; height: 96px">
+          <h1 style="font-size: 48px; line-height: .95; margin-top: 18px">Peach, your week was a lot.</h1>
+          <p style="font-size: 18px; opacity: .9; margin-top: 14px">Here's what people said, guessed and played. Tap to keep going.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <p style="font-size: 18px; font-weight: 700; opacity: .9">You got</p>
+          <div class="d pop" style="font-size: 132px; font-weight: 800; line-height: .9; letter-spacing: -.05em">41</div>
+          <p class="d" style="font-size: 30px; font-weight: 800; line-height: 1">anonymous messages</p>
+          <span style="display: inline-block; margin-top: 16px; padding: 8px 12px; border-radius: 99px; background: rgba(255,255,255,.2); font-weight: 800">12 more than last week</span>
+          <p style="font-size: 16px; opacity: .9; margin-top: 14px">Busiest night: Thursday, 9pm. Exam week hits different.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <p style="font-size: 18px; font-weight: 700; opacity: .9">This week people called you</p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+            <span class="d pop" style="font-size: 64px; font-weight: 800; line-height: .9">chaotic</span>
+            <span class="d pop" style="font-size: 46px; font-weight: 800; line-height: .9; opacity: .85; animation-delay: .15s">stubborn</span>
+            <span class="d pop" style="font-size: 34px; font-weight: 800; line-height: .9; opacity: .7; animation-delay: .3s">unbothered</span>
+          </div>
+          <p style="font-size: 16px; opacity: .9; margin-top: 18px">"Loyal" is still number one all time. 14 people agree.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <p style="font-size: 18px; font-weight: 700; opacity: .9">Your most loved link</p>
+          <div style="margin-top: 14px; padding: 20px; border-radius: 26px; background: linear-gradient(165deg,#ff9a4a,#ff4f6d 42%,#6d2187)">
+            <span style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .9">Drop No. 211</span>
+            <div class="d" style="font-size: 28px; font-weight: 800; line-height: 1; margin-top: 8px">What would you never guess about me?</div>
+            <div style="margin-top: 14px; font-weight: 800">17 answers · 4 with hints</div>
+          </div>
+          <p style="font-size: 16px; opacity: .9; margin-top: 16px">You dropped 5 of 7 days. Your status brought in 63% of your messages.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s4}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <p style="font-size: 18px; font-weight: 700; opacity: .9">Knows you best</p>
+          <span class="av pop" style="width: 110px; height: 110px; border-radius: 36px; margin-top: 16px; background: linear-gradient(135deg,#ffb35c,#ff5f8f); border: 4px solid rgba(255,255,255,.6)"><img src="/_blob/a1feeb887ae498080201d5cedfa0036a" alt="Fox's avatar"></span>
+          <h2 class="d" style="font-size: 52px; margin-top: 14px">Fox</h2>
+          <p style="font-size: 20px; font-weight: 700; margin-top: 4px">9 out of 10 on your quiz</p>
+          <p style="font-size: 16px; opacity: .9; margin-top: 12px">And you guessed 2 senders right. Detective level 2 unlocked.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s5}}" hint-placeholder-val="{{ false }}">
+        <div class="rise">
+          <p style="font-size: 18px; font-weight: 700; opacity: .9">With your crews</p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+            <div style="padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.14)"><b style="font-size: 18px">Hostel B gang</b><div style="opacity: .9">Game night · you were "Most likely to cry at a wedding"</div></div>
+            <div style="padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.14)"><b style="font-size: 18px">Class of 2027</b><div style="opacity: .9">You answered 6 of 7 daily questions</div></div>
+          </div>
+          <p class="d" style="font-size: 28px; font-weight: 800; margin-top: 18px">12-day streak. 2 badges earned.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{s6}}" hint-placeholder-val="{{ false }}">
+        <div class="rise" style="text-align: center">
+          <div style="margin: 0 auto; width: 240px; padding: 18px; border-radius: 26px; background: rgba(255,255,255,.95); color: #2a0a1c; text-align: left">
+            <div class="row" style="gap: 8px"><span class="logo-mark" style="width: 26px; height: 26px; border-radius: 8px; font-size: 14px">S</span><b style="font-size: 13px">@peach · week 43</b></div>
+            <div class="d" style="font-size: 44px; font-weight: 800; line-height: .9; margin-top: 12px">41</div>
+            <div style="font-weight: 700">messages</div>
+            <div class="d" style="font-size: 24px; font-weight: 800; margin-top: 10px; color: #b0246a">chaotic · stubborn · unbothered</div>
+            <div style="font-size: 13px; margin-top: 10px; color: #5b4b55">sekretly.com/peach</div>
+          </div>
+          <h2 style="font-size: 30px; margin-top: 18px">That's your week.</h2>
+          <p style="opacity: .9; margin-top: 4px">Next wrap drops Sunday at 6pm.</p>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="position: absolute; left: 16px; right: 16px; bottom: 22px; z-index: 3; display: flex; gap: 8px">
+      <a href="ShareStudio.dc.html" onClick="{{stashWrap}}" class="tap" style="flex: 1; min-height: 54px; border-radius: 18px; background: #fff; color: #2a0a1c; font-weight: 800; display: grid; place-items: center; text-decoration: none">Share my wrap</a>
+      <button class="tap" onClick="{{replay}}" style="flex: none; min-height: 54px; padding: 0 18px; border-radius: 18px; border: 0; background: rgba(0,0,0,.28); color: #fff; font-weight: 800">Replay</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { i: 0, playing: true, key: 0 };
+  }
+  componentDidMount() { this.arm(); }
+  componentWillUnmount() { clearTimeout(this.t); }
+  arm() {
+    var self = this;
+    clearTimeout(this.t);
+    if (!this.state.playing) return;
+    this.t = setTimeout(function () { if (self.state.i < 6) { self.setState({ i: self.state.i + 1 }, function () { self.arm(); }); } }, 5000);
+  }
+  go(i) { var self = this; this.setState({ i: Math.max(0, Math.min(6, i)), key: this.state.key + 1 }, function () { self.arm(); }); }
+  renderVals() {
+    var self = this, s = this.state;
+    var BG = [
+      'radial-gradient(120% 90% at 80% 0%,#7a3cff 0%,#22337d 55%,#0c1236 100%)',
+      'radial-gradient(120% 90% at 20% 0%,#ff4f9a 0%,#b0166a 50%,#3a0b5a 100%)',
+      'radial-gradient(120% 90% at 80% 10%,#ffb347 0%,#ff4f6d 45%,#5d1785 100%)',
+      'radial-gradient(120% 90% at 50% 0%,#2a1b55 0%,#130a2a 60%,#05030a 100%)',
+      'radial-gradient(120% 90% at 50% 0%,#12b5cf 0%,#0b63ad 50%,#0a2457 100%)',
+      'radial-gradient(120% 90% at 20% 0%,#2c8f5a 0%,#127a80 45%,#0a2b3a 100%)',
+      'radial-gradient(120% 90% at 50% 0%,#d81b72 0%,#7a3cff 60%,#22337d 100%)'
+    ];
+    var o = {};
+    for (var k = 0; k < 7; k++) o['s' + k] = s.i === k;
+    return Object.assign(o, {
+      bg: BG[s.i],
+      bars: BG.map(function (b, k) { return { w: k < s.i ? '100%' : (k === s.i ? (s.playing ? '' : '50%') : '0'), cls: (k === s.i && s.playing) ? 'ww-fill' : '' }; }),
+      stashWrap: function () { try { window.localStorage.setItem('sk-share', JSON.stringify(['pw', 'pk'])); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      prev: function () { self.go(s.i - 1); },
+      next: function () { self.go(s.i + 1); },
+      replay: function () { self.setState({ playing: true }); self.go(0); },
+      playing: s.playing, paused: !s.playing, pauseWord: s.playing ? 'Pause' : 'Play',
+      togglePause: function () { self.setState({ playing: !s.playing }, function () { self.arm(); }); }
+    });
+  }
+}
+</script>
+</body>
+</html>

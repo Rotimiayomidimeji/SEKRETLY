@@ -30,7 +30,7 @@ body{margin:0;background:#0c0811}
 /* rate me: tap a number */
 .lp-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
 .sk .lp-tile{min-height:60px;border-radius:16px;border:2px solid;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:24px;font-weight:800;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}
-.lp-tile[aria-checked="true"]{transform:translateY(-3px) scale(1.07);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.lp-tile[aria-pressed="true"]{transform:translateY(-3px) scale(1.07);box-shadow:0 10px 24px rgba(0,0,0,.25)}
 .lp-tile:active{transform:scale(.94)}
 .lp-big{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:76px;font-weight:800;line-height:.9;letter-spacing:-.05em}
 /* quiz */
@@ -167,7 +167,7 @@ body{margin:0;background:#0c0811}
                   </sc-for>
                 </div>
                 <div class="lp-tiles" role="radiogroup" aria-label="Score from 1 to 10" style="margin-top: 6px">
-                  <sc-for list="{{tiles}}" as="tl" hint-placeholder-count="10"><button class="lp-tile" role="radio" aria-checked="{{tl.on}}" onClick="{{tl.pick}}" style="background: {{tl.bg}}; color: {{tl.ink}}; border-color: {{tl.line}}">{{tl.n}}</button></sc-for>
+                  <sc-for list="{{tiles}}" as="tl" hint-placeholder-count="10"><button class="lp-tile" role="radio" aria-checked="{{tl.on}}" aria-pressed="{{tl.on}}" onClick="{{tl.pick}}" style="background: {{tl.bg}}; color: {{tl.ink}}; border-color: {{tl.line}}">{{tl.n}}</button></sc-for>
                 </div>
                 <div style="display: flex; align-items: center; gap: 14px; margin-top: 14px">
                   <span class="lp-big" style="color: {{rateColor}}">{{rateShown}}</span>
@@ -230,6 +230,29 @@ body{margin:0;background:#0c0811}
                     <span><b>Replies come to your inbox.</b> <span style="color: {{th.muted}}">@peach never sees your name.</span></span>
                   </div>
                 </sc-if>
+                <div style="margin-top: 14px; padding: 10px 12px; border-radius: 16px; background: {{th.chipBg}}">
+                  <button class="tap" onClick="{{toggleHintBox}}" aria-expanded="{{hintBoxStr}}" style="width: 100%; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; color: inherit; padding: 0; min-height: 40px; text-align: left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="flex: none"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+                    <span style="flex: 1; font-size: 13.5px; line-height: 1.35"><b>{{hintHead}}</b><br><span style="color: {{th.muted}}">Optional clue for @peach to guess with. Never your name.</span></span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; transform: rotate({{hintChev}})"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                  <sc-if value="{{hintBox}}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px">
+                        <sc-for list="{{senderHints}}" as="sh" hint-placeholder-count="6">
+                          <button class="tap" onClick="{{sh.pick}}" aria-pressed="{{sh.on}}" style="min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid {{sh.line}}; background: {{sh.bg}}; color: {{sh.ink}}; font-weight: 700; font-size: 13.5px">{{sh.label}}</button>
+                        </sc-for>
+                      </div>
+                      <sc-if value="{{hintIsCustom}}" hint-placeholder-val="{{ false }}">
+                        <div>
+                          <label for="lp-hint" class="sr">Your own hint</label>
+                          <input id="lp-hint" value="{{hintCustom}}" onChange="{{onHintCustom}}" maxlength="40" placeholder="e.g. I sit behind you in GST" style="display: block; width: 100%; margin-top: 10px; min-height: 46px; border-radius: 14px; border: 1px solid {{th.cardLine}}; background: {{th.field}}; color: inherit; font: inherit; font-size: 15px; padding: 0 14px">
+                          <div style="margin-top: 4px; font-size: 12px; color: {{th.muted}}">Names, phone numbers and @handles are removed.</div>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+                </div>
                 <button class="tap" onClick="{{send}}" disabled="{{cantSend}}" style="margin-top: 14px; width: 100%; min-height: 56px; border: 0; border-radius: 18px; background: {{th.btnBg}}; color: {{th.btnInk}}; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: {{sendOpacity}}">
                   {{sendLabel}}
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg>
@@ -254,6 +277,17 @@ body{margin:0;background:#0c0811}
         <p class="rise" style="margin-top: 10px; font-size: 17px; line-height: 1.5; max-width: 32ch; color: {{th.muted}}; animation-delay: .1s">{{sentBody}}</p>
         <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 18px; margin-top: 24px; width: 100%">
           <div class="rise" style="flex: 0 1 380px; background: {{th.card}}; border: 1px solid {{th.cardLine}}; border-radius: 26px; padding: 20px; backdrop-filter: blur(18px); animation-delay: .2s">
+            <sc-if value="{{showReceipt}}" hint-placeholder-val="{{ true }}">
+              <div style="margin-bottom: 16px; padding: 16px; border-radius: 20px; background: #ffffff; color: #2a0a1c; text-align: left">
+                <div style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #b0246a">Your receipt</div>
+                <div class="d" style="font-size: 28px; font-weight: 800; letter-spacing: .04em; margin-top: 4px">SK-7Q4M-2J</div>
+                <p style="margin: 4px 0 0; font-size: 13.5px; color: #5b4b55; line-height: 1.45">See if @peach reacts, replies or guesses it’s you. No account needed, and only this code links back to you.</p>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+                  <button class="tap" onClick="{{copyReceipt}}" style="min-height: 46px; border-radius: 14px; border: 1px solid #e3d7de; background: #ffffff; color: #2a0a1c; font-weight: 800; font-size: 14px">{{copyReceiptLabel}}</button>
+                  <a href="Receipt.dc.html" class="tap" style="min-height: 46px; border-radius: 14px; background: #2a0a1c; color: #ffffff; font-weight: 800; font-size: 14px; display: grid; place-items: center; text-decoration: none">Check receipt</a>
+                </div>
+              </div>
+            </sc-if>
             <sc-if value="{{repliesOn}}" hint-placeholder-val="{{ false }}">
               <div>
                 <div class="d" style="font-size: 22px; font-weight: 800; letter-spacing: -.02em">Replies are on</div>
@@ -406,7 +440,7 @@ class Component extends DCLogic {
   componentWillUnmount() { clearTimeout(this.qt); }
   blank() {
     return { words: [], deckSeed: 0, ownWord: '', rate: null, rateCat: 'Overall', qi: 0, picks: [], qLocked: false,
-      text: '', media: null, sent: false, popup: false, popStep: 'ask', popUser: '', popPass: '', popAgree: false, popShow: false, popLogin: false, wantReply: false, report: false, reported: false, picked: null, other: false, otherText: '', seed: 1 };
+      text: '', media: null, sent: false, popup: false, popStep: 'ask', popUser: '', popPass: '', popAgree: false, popShow: false, popLogin: false, wantReply: false, report: false, reported: false, picked: null, other: false, otherText: '', seed: 1, sHint: 0, sHintBox: false, sHintCustom: '', rcCopied: false };
   }
   cats() {
     return ['Abusive', 'Harassment', 'Bullying', 'Insults', 'Threats', 'Intimidation', 'Hate speech', 'Racism', 'Tribalism', 'Religious hate', 'Sexism', 'Body shaming', 'Disability mockery', 'Sexual content', 'Unwanted nudity', 'Explicit photo', 'Explicit video', 'Non-consensual image', 'Unwanted advances', 'Creepy or inappropriate', 'Grooming concern', 'Underage concern', 'Stalking', 'Doxxing / private info', 'Exposing secrets', 'Blackmail', 'Extortion', 'Impersonation', 'Scam', 'Fraud', 'Phishing link', 'Malware link', 'Spam', 'Flooding', 'Advertising', 'Selling things', 'Gambling promo', 'Drugs', 'Weapons', 'Violence', 'Graphic gore', 'Self-harm', 'Suicide talk', 'Misinformation', 'False rumour', 'Defamation', 'Trolling', 'Mocking', 'Profanity', 'Other harmful'];
@@ -514,7 +548,19 @@ class Component extends DCLogic {
     var userOk = /^[a-z0-9_]{3,20}$/.test(s.popUser), userTaken = !s.popLogin && (s.popUser === 'maya' || s.popUser === 'peach');
     var passOk = s.popPass.length >= 8, joinOk = userOk && !userTaken && passOk && (s.popLogin || s.popAgree);
     var cards = Math.ceil(trimmed / 110);
+    var SH = ['No hint', 'Same school', 'We met this year', 'We talked today', 'We’re close', 'Write my own'];
+    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';
     return {
+      // optional sender hint, same on every link type
+      hintBox: s.sHintBox, hintBoxStr: s.sHintBox ? 'true' : 'false', hintChev: s.sHintBox ? '180deg' : '0deg',
+      toggleHintBox: function () { self.setState({ sHintBox: !s.sHintBox }); },
+      hintHead: hintTxt ? 'Your hint: ' + hintTxt : 'Leave a hint?',
+      senderHints: SH.map(function (h, k) { var o = on(s.sHint === k); return { label: h, on: s.sHint === k ? 'true' : 'false', bg: o.bg, ink: o.ink, line: o.line, pick: function () { self.setState({ sHint: k }); } }; }),
+      hintIsCustom: s.sHint === 5, hintCustom: s.sHintCustom,
+      onHintCustom: function (e) { self.setState({ sHintCustom: e.target.value.replace(/@\S+/g, '').replace(/\d{4,}/g, '').slice(0, 40) }); },
+      showReceipt: !member && !s.wantReply && !embed,
+      copyReceipt: function () { try { navigator.clipboard.writeText('SK-7Q4M-2J'); } catch (e) {} self.setState({ rcCopied: true }); },
+      copyReceiptLabel: s.rcCopied ? 'Copied' : 'Copy code',
       th: th, tp: tp, ads: this.props.ads === 'off' ? 'off' : 'on',
       showChrome: !embed, pad: embed ? '16px 16px 18px' : '14px 20px 26px', minH: embed ? '0' : '100vh',
       isDescribe: topic === 'describe', isQuiz: topic === 'quiz', isConfess: topic === 'confess', isRate: topic === 'rate', isAma: topic === 'ama', isCustom: topic === 'custom',
@@ -596,7 +642,7 @@ class Component extends DCLogic {
       ownTitle: embed ? 'That’s your link page' : 'Want your own link?', ownSub: embed ? 'This is exactly what your friends see. Make yours in 30 seconds.' : 'See what your people really think. Takes 30 seconds.', ownCta: embed ? 'Make my link' : 'Get my own link',
       sentEmoji: topic === 'confess' ? E.letter : topic === 'quiz' ? E.trophy : E.party,
       sentTitle: topic === 'confess' ? 'Confession sent' : topic === 'quiz' ? 'Score sent!' : 'Sent!',
-      sentBody: topic === 'quiz' ? '@peach sees you scored ' + score + '/' + QN + ', never your name.' : replies ? '@peach will see it soon. If they reply, you’ll hear back here.' : '@peach will see it soon. They will never know it was you.',
+      sentBody: topic === 'quiz' ? '@peach sees you scored ' + score + '/' + QN + ', never your name.' : replies ? '@peach will see it soon. If they reply, you’ll hear back here.' : '@peach will see it soon. They will never know it was you' + (hintTxt ? ', only your hint: ' + hintTxt + '.' : '.'),
       againLabel: topic === 'quiz' ? 'Take it again' : 'Send another',
       napEmoji: nap.e, napTitle: nap.t, napBody: nap.b, napCta: nap.c, napAdLabel: nap.a,
       confetti: s.sent ? confetti : [],

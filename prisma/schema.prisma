@@ -9,7 +9,9 @@ datasource db {
 
 // Phase 1: accounts, sessions and the codes for email checks.
 // Phase 2: links (with quiz questions), the anonymous messages they receive, and per-day link stats.
-// Chats, safety, games and admin data are added by their own migrations as each phase is built.
+// Phase 3: private chats, reports and the warning ladder, notifications, and inbox state (read/archived/deleted).
+// Phase 3b: mystery features (sender hints, receipts, reactions, guess who), Kind mode, daily drops and streaks.
+// Games and admin data are added by their own migrations as each phase is built.
 
 enum Role {
   MEMBER
@@ -34,6 +36,8 @@ enum LinkTopic {
   RATE
   AMA
   CUSTOM
+  /// Today's drop: everyone gets the same daily question and shares their own link to it
+  DROP
 }
 
 enum LinkStatus {
@@ -64,11 +68,47 @@ model User {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   lastSeenAt      DateTime?
+  /// Kind mode: 0 off (only threats held), 1 standard, 2 kind only
+  kindMode        Int         @default(1)
+  /// The member's own hidden words: messages containing them are held
+  hiddenWords     String[]    @default([])
+  /// Mystery features the member allows on their links
+  allowHints      Boolean     @default(true)
+  receiptReactions Boolean    @default(true)
+  allowGuess      Boolean     @default(true)
+  streakSaves     Int         @default(2)
+  /// Last Monday a free streak save was added (1 a week, holding at most 2)
+  savesToppedAt   DateTime?
+  /// Up to 3 badge ids shown on the profile
+  pinnedBadges    String[]    @default([])
+  cloudPublic     Boolean     @default(true)
+  /// Settings › Privacy: who can start private chats ("everyone" or "nobody"), whether visitors without an
+  /// account can message, and whether the public profile (/u/<username>) is visible
+  chatsFrom       String      @default("everyone")
+  allowVisitors   Boolean     @default(true)
+  publicProfile   Boolean     @default(true)
+  /// Settings › Messages: how many days messages and chat bubbles last before they disappear
+  inboxTimerDays  Int         @default(1)
+  chatTimerDays   Int         @default(1)
+  /// Settings › Safety: photos and videos stay blurred until tapped
+  blurMedia       Boolean     @default(true)
+  /// Settings › Notifications: which pushes to send ({ msg, reply, join, turn, paused, warn, drop, streak, wrap, quiet })
+  notifPrefs      Json?
+  /// Settings › Games
+  gameInvites     Boolean     @default(true)
+  gameListing     Boolean     @default(true)
+  pushSubs        PushSubscription[]
   sessions        Session[]
   codes           EmailCode[]
   links           Link[]
   received        Message[]   @relation("received")
   sent            Message[]   @relation("sent")
+  guessesMade     Guess[]     @relation("guesser")
+  streakSavesUsed StreakSave[]
+  chatsOwned      Chat[]      @relation("chatOwner")
+  chatsJoined     Chat[]      @relation("chatGuest")
+  notifications   Notification[]
+  reportsMade     Report[]
 }
 
 /// One shareable link: a topic in a theme. Address: /<username>/<owner's linkKey>/<theme>/<slug>.
@@ -80,6 +120,12 @@ model Link {
   slug           String
   theme          String
   customQuestion String?
+  /// For DROP links: the drop number (one question per day for everyone) and the owner's own answer, if shared
+  dropNumber     Int?
+  dropSelf       String?
+  /// Per-link overrides set when making a drop: Kind mode on/off and whether senders may leave hints
+  kindOff        Boolean        @default(false)
+  hintsOff       Boolean        @default(false)
   /// Optional limits: the link naps after this many messages, or at this time.
   maxMessages    Int?
   closesAt       DateTime?
@@ -125,12 +171,31 @@ model Message {
   /// Hashed network + browser of the sender, for spam limits and (later) the warning ladder. Never the raw IP.
   senderFingerprint String
   wantsReply        Boolean   @default(false)
+  /// Coarse "who sent this" hint the recipient can unlock: city · device · time of day. Never exact.
+  hint              String?
+  /// The sender's own optional clue ("we met this year"). Names, numbers and @handles are stripped.
+  senderHint        String?
+  /// Lets an anonymous sender check what happened to their message (SK-XXXX-XX). Only this code links back.
+  receiptCode       String?   @unique
+  /// The recipient's reaction (0 love it, 1 laughing, 2 shook, 3 secret safe, 4 touched)
+  reaction          Int?
+  reactedAt         DateTime?
+  /// Kind mode held this for review instead of delivering it (the reason), until released
+  held              String?
+  releasedAt        DateTime?
+  /// A follow-up the sender added from their receipt
+  followUpOfId      String?
   readAt            DateTime?
+  archivedAt        DateTime?
+  /// Deleted by the recipient. Kept (hidden) until it expires so reports about it still count.
+  deletedAt         DateTime?
   expiresAt         DateTime
   createdAt         DateTime  @default(now())
   link              Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
   recipient         User      @relation("received", fields: [recipientId], references: [id], onDelete: Cascade)
   sender            User?     @relation("sent", fields: [senderId], references: [id], onDelete: SetNull)
+  chat              Chat?
+  guesses           Guess[]
 
   @@index([recipientId, createdAt])
   @@index([linkId, createdAt])
@@ -156,6 +221,148 @@ model LinkDay {
 model Visitor {
   fingerprint String   @id
   firstSeenAt DateTime @default(now())
+}
+
+/// A private, anonymous chat the recipient ("owner") starts from a message whose sender has an account ("guest").
+/// The owner sees the guest only as `alias`; the guest sees the owner's username (they messaged their link).
+model Chat {
+  id              String        @id @default(cuid())
+  messageId       String        @unique
+  ownerId         String
+  guestId         String
+  alias           String
+  aliasAvatar     String
+  lastAt          DateTime      @default(now())
+  ownerReadAt     DateTime?
+  guestReadAt     DateTime?
+  ownerArchivedAt DateTime?
+  guestArchivedAt DateTime?
+  ownerDeletedAt  DateTime?
+  guestDeletedAt  DateTime?
+  createdAt       DateTime      @default(now())
+  message         Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  owner           User          @relation("chatOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  guest           User          @relation("chatGuest", fields: [guestId], references: [id], onDelete: Cascade)
+  messages        ChatMessage[]
+
+  @@index([ownerId, lastAt])
+  @@index([guestId, lastAt])
+}
+
+/// One bubble in a chat. Disappears a day after it is sent, like every message.
+model ChatMessage {
+  id             String    @id @default(cuid())
+  chatId         String
+  fromOwner      Boolean
+  text           String?
+  mediaUrl       String?
+  /// photo or video
+  mediaKind      String?
+  deletedByOwner Boolean   @default(false)
+  deletedByGuest Boolean   @default(false)
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+  chat           Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt])
+}
+
+/// "Guess who": the recipient names who they think sent a message. A right guess asks the sender privately;
+/// they choose to reveal or not. Wrong guesses resolve as "not confirmed" after a while, so timing gives nothing away.
+model Guess {
+  id            String    @id @default(cuid())
+  messageId     String
+  guesserId     String
+  guessedUserId String
+  correct       Boolean
+  /// PENDING until the sender decides (right guesses) or until resolveAt passes (wrong ones); then REVEALED or HIDDEN
+  status        String    @default("PENDING")
+  resolveAt     DateTime
+  createdAt     DateTime  @default(now())
+  message       Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  guesser       User      @relation("guesser", fields: [guesserId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([guessedUserId, status])
+}
+
+/// A streak save spent on a missed drop day.
+model StreakSave {
+  userId     String
+  dropNumber Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, dropNumber])
+}
+
+/// A report a recipient made about something sent to them.
+model Report {
+  id            String   @id @default(cuid())
+  reporterId    String
+  /// "u:<userId>" for account holders, "f:<fingerprint>" for anonymous senders
+  senderKey     String
+  messageId     String?
+  chatMessageId String?
+  category      String
+  /// What was reported, copied so moderators can still see it after the message disappears.
+  excerpt       String
+  createdAt     DateTime @default(now())
+  reporter      User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId, senderKey])
+  @@index([createdAt])
+}
+
+/// How a sender stands with one recipient: each report is a warning; the 4th blocks them from that recipient only.
+/// Undoing a block puts them back on 3 warnings, so the next report blocks again.
+model SenderStanding {
+  recipientId String
+  senderKey   String
+  warns       Int       @default(0)
+  blockedAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@id([recipientId, senderKey])
+}
+
+enum NotificationKind {
+  MESSAGE
+  REPLY
+  WARNING
+  BLOCKED
+  BLOCKED_SENDER
+  SUPPORT
+  LINK_NAP
+  WELCOME
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  kind      NotificationKind
+  title     String
+  body      String           @default("")
+  href      String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// A browser or phone that agreed to push notifications (Web Push). Removed when the push service says it's gone.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 /// One logged-in device. The cookie holds a random token; only its SHA-256 hash is stored here.

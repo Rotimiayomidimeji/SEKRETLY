@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Streak</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 560px">
+      <header class="topbar">
+        <a href="Home.dc.html" class="icon-btn tap" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+        <h1 class="grow" style="font-size: 24px">Your streak</h1>
+      </header>
+
+      <section style="text-align: center; padding: 26px 18px; border-radius: 28px; color: #fff; background: radial-gradient(120% 100% at 50% 0%,#ffb347 0%,#ff4f6d 45%,#5d1785 100%)">
+        <svg class="pop" width="84" height="84" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-4-1-6 1-9.5z"></path></svg>
+        <div class="d" style="font-size: 64px; font-weight: 800; line-height: .9; margin-top: 4px">12</div>
+        <div style="font-size: 16px; font-weight: 700; margin-top: 4px">days in a row</div>
+        <p style="font-size: 14px; margin: 10px auto 0; max-width: 30ch; opacity: .92">Drop today's link before 7pm tomorrow to make it 13.</p>
+        <a href="DropAnswer.dc.html" class="tap" style="display: inline-grid; place-items: center; margin-top: 16px; min-height: 50px; padding: 0 26px; border-radius: 16px; background: #fff; color: #5d1785; font-weight: 800; text-decoration: none">Drop today's link</a>
+      </section>
+
+      <div class="card" style="margin-top: 12px; padding: 16px">
+        <div class="row" style="justify-content: space-between">
+          <div><b style="font-size: 16px">Streak saves</b><div class="muted" style="font-size: 13px">Miss a day and a save keeps your streak alive</div></div>
+          <div style="display: flex; gap: 6px" aria-label="{{saves}} of 2 saves left">
+            <sc-for list="{{saveDots}}" as="sd" hint-placeholder-count="2">
+              <span style="width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: {{sd.bg}}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{sd.ink}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg>
+              </span>
+            </sc-for>
+          </div>
+        </div>
+        <p class="muted" style="font-size: 13px; margin-top: 10px">You get 1 free save every Monday and can hold 2. Earn an extra one by bringing a friend who drops their first link.</p>
+        <button class="btn btn-sm tap" onClick="{{showRisk}}" style="margin-top: 12px">Preview: streak at risk</button>
+      </div>
+
+      <div class="sec-h"><h2>October</h2><span class="muted" style="font-size: 13px">{{doneCount}} drops</span></div>
+      <div class="card" style="padding: 14px">
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center">
+          <sc-for list="{{dow}}" as="w" hint-placeholder-count="7"><div class="muted" style="font-size: 11.5px; font-weight: 800">{{w}}</div></sc-for>
+          <sc-for list="{{cal}}" as="c" hint-placeholder-count="31">
+            <div aria-label="{{c.label}}" style="aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; font-size: 12.5px; font-weight: 800; background: {{c.bg}}; color: {{c.ink}}; border: 2px solid {{c.ring}}; opacity: {{c.op}}">{{c.n}}</div>
+          </sc-for>
+        </div>
+        <div class="row" style="gap: 14px; margin-top: 12px; flex-wrap: wrap; font-size: 12.5px">
+          <span class="row" style="gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; background: linear-gradient(135deg,#ff8a2b,#ff3d6e)"></span>Dropped</span>
+          <span class="row" style="gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; background: #3a6bff"></span>Save used</span>
+          <span class="row" style="gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; border: 2px solid #ff8a2b"></span>Today</span>
+        </div>
+      </div>
+
+      <div class="sec-h"><h2>Milestones</h2></div>
+      <ul class="card" style="list-style: none; margin: 0; padding: 0; overflow: hidden">
+        <sc-for list="{{miles}}" as="ms" hint-placeholder-count="5">
+          <li class="list-row">
+            <span style="width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-weight: 800; background: {{ms.bg}}; color: {{ms.ink}}">{{ms.days}}</span>
+            <div style="flex: 1; min-width: 0"><b style="font-size: 15px">{{ms.reward}}</b><div class="muted" style="font-size: 12.5px">{{ms.state}}</div></div>
+            <sc-if value="{{ms.got}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-label="Unlocked" role="img" style="color: var(--ok)"><path d="m5 12 5 5 9-10"></path></svg></sc-if>
+          </li>
+        </sc-for>
+      </ul>
+
+      <div class="sec-h"><h2>Friends' streaks</h2><span class="muted" style="font-size: 13px">only friends see this</span></div>
+      <ol class="card" style="list-style: none; margin: 0; padding: 0; overflow: hidden">
+        <sc-for list="{{friends}}" as="fr" hint-placeholder-count="4">
+          <li class="list-row" style="background: {{fr.bg}}">
+            <span class="d" style="width: 20px; font-weight: 800" aria-label="Rank {{fr.rank}}">{{fr.rank}}</span>
+            <span class="av" style="width: 38px; height: 38px; border-radius: 12px; background: {{fr.tint}}"><img src="{{fr.icon}}" alt=""></span>
+            <b style="flex: 1; font-size: 15px">{{fr.name}}</b>
+            <span class="row" style="gap: 4px; font-weight: 800"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ff6a3d" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-4-1-6 1-9.5z"></path></svg>{{fr.days}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </div>
+
+  <sc-if value="{{risk}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Streak at risk" style="text-align: center">
+        <img class="shake" src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 64px; height: 64px">
+        <h2 style="font-size: 24px; margin-top: 8px">Your 12-day streak ends in 2 hours</h2>
+        <p class="muted" style="margin-top: 6px; font-size: 14.5px">This is the push we send at 5pm when you haven't dropped yet. One tap keeps it.</p>
+        <a href="DropAnswer.dc.html" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 16px">Drop now</a>
+        <button class="btn btn-block tap" onClick="{{useSave}}" style="margin-top: 10px">{{saveLabel}}</button>
+        <button class="btn btn-ghost btn-block tap" onClick="{{hideRisk}}" style="margin-top: 6px; border: 0">Not now</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', risk: false, saves: 1, used: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var today = 23, saved = { 17: true }, cal = [];
+    for (var b = 0; b < 4; b++) cal.push({ n: '', label: '', bg: 'transparent', ink: 'inherit', ring: 'transparent', op: 1 });
+    for (var d = 1; d <= 31; d++) {
+      var done = d >= 3 && d < today && d !== 9 && d !== 10 && !saved[d];
+      var save = !!saved[d] || (s.used && d === today);
+      var bg = done ? 'linear-gradient(135deg,#ff8a2b,#ff3d6e)' : save ? '#3a6bff' : 'var(--card2)';
+      cal.push({ n: d, label: 'October ' + d + (done ? ', dropped' : save ? ', save used' : ''), bg: bg, ink: (done || save) ? '#fff' : 'var(--ink)', ring: d === today ? '#ff8a2b' : 'transparent', op: d > today ? 0.45 : 1 });
+    }
+    var M = [
+      { days: 7, reward: 'Flame badge on your profile', got: true },
+      { days: 14, reward: 'Unlock the Neon link theme', got: false },
+      { days: 30, reward: '2 extra streak saves', got: false },
+      { days: 50, reward: 'Custom colour for your word cloud', got: false },
+      { days: 100, reward: 'Legend frame for your avatar', got: false }
+    ];
+    var A = { fox: '/_blob/a1feeb887ae498080201d5cedfa0036a', panda: '/_blob/4b5463ad60ec0a1915c9b60ecf54e134', frog: '/_blob/fab7f564a0c6a958be79ebcec7291c73', koala: '/_blob/f0e10078eb17fce65ae1a0a64d3fed2b' };
+    return {
+      mode: dark ? 'dark' : 'light',
+      saves: s.saves,
+      saveDots: [0, 1].map(function (i) { var has = i < s.saves; return { bg: has ? '#3a6bff' : 'var(--card2)', ink: has ? '#ffffff' : 'var(--muted)' }; }),
+      dow: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      cal: cal, doneCount: 17,
+      miles: M.map(function (x) { return { days: x.days, reward: x.reward, got: x.got, state: x.got ? 'Unlocked on Oct 9' : (x.days - 12) + ' more days', bg: x.got ? 'linear-gradient(135deg,#ff8a2b,#ff3d6e)' : 'var(--card2)', ink: x.got ? '#fff' : 'var(--ink)' }; }),
+      friends: [
+        { rank: 1, name: 'Fox', days: 31, icon: A.fox, tint: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', bg: 'transparent' },
+        { rank: 2, name: 'Moon', days: 19, icon: A.panda, tint: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)', bg: 'transparent' },
+        { rank: 3, name: 'You', days: 12, icon: A.frog, tint: 'linear-gradient(135deg,#d6ff6b,#22c4a0)', bg: 'rgba(255,59,141,.10)' },
+        { rank: 4, name: 'KolaNut', days: 5, icon: A.koala, tint: 'linear-gradient(135deg,#ffe48a,#ff8a5c)', bg: 'transparent' }
+      ],
+      risk: s.risk,
+      showRisk: function () { self.setState({ risk: true }); },
+      hideRisk: function () { self.setState({ risk: false }); },
+      saveLabel: s.used ? 'Save used · streak protected' : 'Use a streak save (' + s.saves + ' left)',
+      useSave: function () { if (!s.used && s.saves > 0) self.setState({ used: true, saves: s.saves - 1 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

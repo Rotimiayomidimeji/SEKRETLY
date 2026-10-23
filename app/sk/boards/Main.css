@@ -18,7 +18,7 @@ body{margin:0;background:#0c0811}
 /* rate me: tap a number */
 .lp-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
 .sk .lp-tile{min-height:60px;border-radius:16px;border:2px solid;font-family:var(--font-display),system-ui,sans-serif;font-size:24px;font-weight:800;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}
-.lp-tile[aria-checked="true"]{transform:translateY(-3px) scale(1.07);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.lp-tile[aria-pressed="true"]{transform:translateY(-3px) scale(1.07);box-shadow:0 10px 24px rgba(0,0,0,.25)}
 .lp-tile:active{transform:scale(.94)}
 .lp-big{font-family:var(--font-display),system-ui,sans-serif;font-size:76px;font-weight:800;line-height:.9;letter-spacing:-.05em}
 /* quiz */

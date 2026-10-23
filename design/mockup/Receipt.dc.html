@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Your receipt</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 560px">
+      <header class="topbar">
+        <a href="Landing.dc.html" class="logo"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <span class="grow"></span>
+        <a href="Signup.dc.html" class="btn btn-sm btn-cta">Get your link</a>
+      </header>
+
+      <h1 style="font-size: 28px">Your receipts</h1>
+      <p class="muted" style="margin-top: 4px; font-size: 14.5px">Messages you sent from this phone. Nobody, not even @peach, can link them to you.</p>
+
+      <form onSubmit="{{lookup}}" style="display: flex; gap: 8px; margin-top: 14px">
+        <label for="rc-code" class="sr">Receipt code</label>
+        <input id="rc-code" class="field" value="{{code}}" onChange="{{onCode}}" placeholder="Enter a code, e.g. SK-7Q4M-2J" style="flex: 1; min-width: 0; text-transform: uppercase">
+        <button type="submit" class="btn tap" style="flex: none">Check</button>
+      </form>
+
+      <div class="rail" style="display: flex; gap: 8px; margin: 14px -16px 0; padding: 0 16px 4px">
+        <sc-for list="{{list}}" as="r" hint-placeholder-count="3">
+          <button class="chip tap {{r.cls}}" onClick="{{r.pick}}" aria-pressed="{{r.on}}">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: {{r.dot}}"></span>{{r.to}} · {{r.status}}
+          </button>
+        </sc-for>
+      </div>
+
+      <section class="card rise" style="margin-top: 14px; padding: 16px" aria-label="Receipt {{cur.code}}">
+        <div class="row" style="justify-content: space-between">
+          <div class="row" style="gap: 10px">
+            <span class="av" style="width: 40px; height: 40px; border-radius: 13px; background: {{cur.tint}}"><img src="{{cur.icon}}" alt=""></span>
+            <div><b style="font-size: 15px">To {{cur.to}}</b><div class="muted" style="font-size: 12.5px">{{cur.topic}}</div></div>
+          </div>
+          <span class="mono muted" style="font-size: 12px; font-weight: 700">{{cur.code}}</span>
+        </div>
+        <div style="margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: var(--card2); font-size: 15px; line-height: 1.45">{{cur.msg}}</div>
+        <sc-if value="{{cur.hasHint}}" hint-placeholder-val="{{ true }}">
+          <div class="muted" style="font-size: 12.5px; margin-top: 6px">Your hint: {{cur.hint}}</div>
+        </sc-if>
+
+        <ol style="list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 0">
+          <sc-for list="{{cur.steps}}" as="st" hint-placeholder-count="4">
+            <li style="display: flex; gap: 12px">
+              <div style="display: flex; flex-direction: column; align-items: center">
+                <span style="width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: {{st.bg}}; color: #fff; flex: none">
+                  <sc-if value="{{st.done}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></sc-if>
+                </span>
+                <span style="width: 2px; flex: 1; min-height: 18px; background: {{st.line}}"></span>
+              </div>
+              <div style="padding-bottom: 14px; flex: 1; min-width: 0">
+                <b style="font-size: 14.5px; color: {{st.ink}}">{{st.label}}</b>
+                <div class="muted" style="font-size: 12.5px">{{st.when}}</div>
+              </div>
+            </li>
+          </sc-for>
+        </ol>
+
+        <sc-if value="{{cur.reacted}}" hint-placeholder-val="{{ true }}">
+          <div class="row" style="padding: 12px; border-radius: 16px; background: rgba(255,176,32,.12); gap: 12px">
+            <img class="pop" src="{{cur.reactIcon}}" alt="" style="width: 44px; height: 44px">
+            <div><b style="font-size: 15px">{{cur.to}} reacted</b><div class="muted" style="font-size: 13px">{{cur.reactWord}}</div></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{cur.replied}}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: var(--cta); color: #fff">
+            <div style="font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .85">{{cur.to}} replied</div>
+            <div style="font-size: 15px; line-height: 1.45; margin-top: 4px">{{cur.reply}}</div>
+          </div>
+          <sc-if value="{{canFollow}}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top: 10px">
+              <label for="rc-follow" class="label" style="font-size: 13.5px">Reply back, still anonymous (1 left)</label>
+              <div style="display: flex; gap: 8px">
+                <input id="rc-follow" class="field" value="{{follow}}" onChange="{{onFollow}}" maxlength="200" placeholder="Not telling. Keep guessing." style="flex: 1; min-width: 0">
+                <button class="btn btn-cta tap" onClick="{{sendFollow}}" style="flex: none">Send</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{followSent}}" hint-placeholder-val="{{ false }}">
+            <div class="muted" style="font-size: 13px; margin-top: 10px">Sent. That was your one reply on this message.</div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{cur.guessed}}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top: 12px; padding: 14px; border-radius: 18px; border: 2px solid #7a3cff; background: rgba(122,60,255,.10)">
+            <b style="font-size: 16px">{{cur.to}} thinks it's you</b>
+            <p class="muted" style="font-size: 13.5px; margin-top: 4px">They guessed right. You decide: reveal, or stay a mystery. Staying hidden tells them "wrong guess or not telling" — never which.</p>
+            <sc-if value="{{undecided}}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+                <button class="btn btn-cta tap" onClick="{{reveal}}">Yes, it's me</button>
+                <button class="btn tap" onClick="{{hide}}">Stay hidden</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{revealed}}" hint-placeholder-val="{{ false }}"><div class="pop" style="margin-top: 10px; font-weight: 800; color: var(--ok)">Revealed. They can see your name on this message now.</div></sc-if>
+            <sc-if value="{{hidden}}" hint-placeholder-val="{{ false }}"><div class="pop" style="margin-top: 10px; font-weight: 800">Still a mystery. Nice.</div></sc-if>
+          </div>
+        </sc-if>
+      </section>
+
+      <section style="margin-top: 16px; padding: 18px; border-radius: 24px; text-align: center; color: #fff; background: radial-gradient(130% 110% at 100% 0%,#ffb347 0%,#ff4f6d 40%,#7a1fa2 100%)">
+        <h2 style="font-size: 22px">You've sent 3. Ready to receive?</h2>
+        <p style="font-size: 14px; opacity: .92; margin-top: 4px">Make your own link in 20 seconds. Your receipts move into your account.</p>
+        <a href="Signup.dc.html" class="tap" style="display: grid; place-items: center; margin-top: 12px; min-height: 52px; border-radius: 16px; background: #fff; color: #3a0b5a; font-weight: 800; text-decoration: none">Get my own link</a>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', sel: 0, code: '', decide: null, follow: '', followSent: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var ok = '#22b36f', wait = 'var(--card2)';
+    var mk = function (labels, n) {
+      return labels.map(function (l, i) { var done = i < n; return { label: l[0], when: done ? l[1] : 'not yet', done: done, bg: done ? ok : wait, line: i === labels.length - 1 ? 'transparent' : (i < n - 1 ? ok : 'var(--line)'), ink: done ? 'var(--ink)' : 'var(--muted)' }; });
+    };
+    var R = [
+      { code: 'SK-7Q4M-2J', to: '@peach', topic: 'Drop No. 214', msg: 'People think you don’t care. You remember everybody’s birthday.', hint: 'we met this year', icon: '/_blob/fab7f564a0c6a958be79ebcec7291c73', tint: 'linear-gradient(135deg,#d6ff6b,#22c4a0)', status: 'guessed', dot: '#7a3cff',
+        steps: mk([['Sent', 'Today 6:42pm'], ['Seen', 'Today 7:05pm'], ['Reacted', 'Today 7:06pm'], ['Replied', 'Today 7:09pm']], 4), reacted: true, reactIcon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', reactWord: 'Touched', replied: true, reply: 'Okay this one got me. Who ARE you?', guessed: true },
+      { code: 'SK-2LXA-9P', to: '@tolu', topic: 'Rate me 1–10', msg: '9. Minus one for always being late to everything.', hint: '', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', tint: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', status: 'reacted', dot: '#ffb020',
+        steps: mk([['Sent', 'Yesterday 9:14pm'], ['Seen', 'Yesterday 9:30pm'], ['Reacted', 'Yesterday 9:31pm'], ['Replied', '']], 3), reacted: true, reactIcon: '/_blob/ea3a1403d8fe6d1943450cfacf059348', reactWord: 'Laughing', replied: false, reply: '', guessed: false },
+      { code: 'SK-H83C-0K', to: '@ada', topic: 'Ask me anything', msg: 'What’s the one thing you’d change about this semester?', hint: 'same school', icon: '/_blob/4b5463ad60ec0a1915c9b60ecf54e134', tint: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)', status: 'sent', dot: '#8f8399',
+        steps: mk([['Sent', 'Mon 4:02pm'], ['Seen', ''], ['Reacted', ''], ['Replied', '']], 1), reacted: false, reactIcon: '', reactWord: '', replied: false, reply: '', guessed: false }
+    ];
+    var c = R[s.sel];
+    return {
+      mode: dark ? 'dark' : 'light',
+      code: s.code, onCode: function (e) { self.setState({ code: e.target.value.toUpperCase() }); },
+      lookup: function (e) { if (e && e.preventDefault) e.preventDefault(); var i = R.findIndex(function (r) { return r.code === s.code.trim(); }); if (i >= 0) self.setState({ sel: i, decide: null }); },
+      list: R.map(function (r, i) { var on = s.sel === i; return { to: r.to, status: r.status, dot: r.dot, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ sel: i, decide: null, followSent: false, follow: '' }); } }; }),
+      cur: Object.assign({}, c, { hasHint: !!c.hint }),
+      undecided: s.decide === null, revealed: s.decide === 'reveal', hidden: s.decide === 'hide',
+      reveal: function () { self.setState({ decide: 'reveal' }); }, hide: function () { self.setState({ decide: 'hide' }); },
+      follow: s.follow, onFollow: function (e) { self.setState({ follow: e.target.value.slice(0, 200) }); },
+      canFollow: !s.followSent, followSent: s.followSent,
+      sendFollow: function () { if (s.follow.trim()) self.setState({ followSent: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

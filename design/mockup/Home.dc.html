@@ -39,6 +39,9 @@ body{margin:0;background:#0c0811}
             <div class="muted" style="font-size: 13px">Good evening</div>
             <div class="d" style="font-size: 22px; font-weight: 800; letter-spacing: -.02em">Hey, peach</div>
           </div>
+          <a href="Streak.dc.html" class="tap" aria-label="Your streak, 12 days" style="display: inline-flex; align-items: center; gap: 5px; min-height: 44px; padding: 0 12px; border-radius: 99px; text-decoration: none; font-weight: 800; font-size: 15px; color: #ffffff; background: linear-gradient(135deg,#ff8a2b,#ff3d6e); flex: none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-4-1-6 1-9.5z"></path></svg>12
+          </a>
           <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
             <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
             <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
@@ -49,20 +52,41 @@ body{margin:0;background:#0c0811}
           </a>
         </header>
 
-        <a href="Inbox.dc.html" class="tap" style="display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: 26px; text-decoration: none; color: #ffffff; background: radial-gradient(120% 120% at 100% 0%,#7a3cff 0%,#d81b72 55%,#8a0f47 100%); overflow: hidden">
-          <div style="flex: 1; min-width: 0">
-            <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.22)"><span class="live" style="width: 8px; height: 8px; border-radius: 50%; background: #5be0a0"></span>Inbox</span>
-            <div class="d" style="margin-top: 10px; font-size: clamp(28px, 6cqi, 40px); font-weight: 800; letter-spacing: -.03em; line-height: 1">{{count}} new messages</div>
-            <div style="margin-top: 6px; font-size: 15px; color: rgba(255,255,255,.88)">since you last checked · tap to read</div>
-          </div>
-          <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 88px; height: 88px; flex: none; transform: rotate(-8deg)">
-        </a>
+        <sc-if value="{{heroInbox}}" hint-placeholder-val="{{ true }}">
+          <a href="Inbox.dc.html" class="tap rise" style="display: flex; align-items: center; gap: 16px; padding: 20px; min-height: 168px; border-radius: 26px; text-decoration: none; color: #ffffff; background: radial-gradient(120% 120% at 100% 0%,#7a3cff 0%,#d81b72 55%,#8a0f47 100%); overflow: hidden">
+            <div style="flex: 1; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.22)"><span class="live" style="width: 8px; height: 8px; border-radius: 50%; background: #5be0a0"></span>Inbox</span>
+              <div class="d" style="margin-top: 10px; font-size: clamp(28px, 6cqi, 40px); font-weight: 800; letter-spacing: -.03em; line-height: 1">{{count}} new messages</div>
+              <div style="margin-top: 6px; font-size: 15px; color: rgba(255,255,255,.88)">since you last checked · 2 left a hint</div>
+            </div>
+            <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 88px; height: 88px; flex: none; transform: rotate(-8deg)">
+          </a>
+        </sc-if>
+        <sc-if value="{{heroDrop}}" hint-placeholder-val="{{ false }}">
+          <a href="DropAnswer.dc.html" class="tap rise" style="display: flex; align-items: center; gap: 16px; padding: 20px; min-height: 168px; border-radius: 26px; text-decoration: none; color: #ffffff; background: radial-gradient(130% 120% at 100% 0%,#ffb347 0%,#ff4f6d 40%,#7a1fa2 100%); overflow: hidden">
+            <div style="flex: 1; min-width: 0">
+              <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.22)"><span class="live" style="width: 8px; height: 8px; border-radius: 50%; background: #5be0a0"></span>Today’s drop · closes in {{dropLeft}}</span>
+              <div class="d" style="margin-top: 10px; font-size: clamp(22px, 5cqi, 32px); font-weight: 800; letter-spacing: -.03em; line-height: 1.02">What’s one thing people get wrong about me?</div>
+              <div style="margin-top: 6px; font-size: 15px; color: rgba(255,255,255,.9)">Fox, KolaNut and 9 others dropped · tap to drop yours</div>
+            </div>
+            <img class="float" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 76px; height: 76px; flex: none">
+          </a>
+        </sc-if>
+        <div class="row" style="justify-content: center; gap: 6px; margin-top: 8px" role="group" aria-label="Top card">
+          <sc-for list="{{heroDots}}" as="hd" hint-placeholder-count="2"><button class="tap" onClick="{{hd.pick}}" aria-label="{{hd.label}}" aria-pressed="{{hd.on}}" style="width: 28px; height: 28px; border: 0; background: transparent; padding: 0; display: grid; place-items: center"><span style="display: block; width: {{hd.w}}; height: 7px; border-radius: 9px; background: {{hd.c}}; transition: width .25s"></span></button></sc-for>
+        </div>
 
         <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
           <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">43</div><div class="muted" style="font-size: 12.5px">messages this week</div></div>
           <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">218</div><div class="muted" style="font-size: 12.5px">link visits</div></div>
           <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">2</div><div class="muted" style="font-size: 12.5px">active chats</div></div>
         </div>
+
+        <a href="{{sp.href}}" onClick="{{sp.go}}" class="tap" aria-live="polite" style="display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 14px; border-radius: 22px; text-decoration: none; color: {{sp.ink}}; background: {{sp.bg}}; border: 1px solid {{sp.line}}; min-height: 76px">
+          <img class="pop" src="{{sp.icon}}" alt="" style="width: 42px; height: 42px; flex: none">
+          <span style="flex: 1; min-width: 0"><b style="display: block; font-size: 15.5px">{{sp.title}}</b><span style="font-size: 13px; opacity: .88">{{sp.sub}}</span></span>
+          <span style="display: flex; gap: 4px; flex: none" aria-hidden="true"><sc-for list="{{spDots}}" as="sd" hint-placeholder-count="5"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{sd.c}}"></span></sc-for></span>
+        </a>
 
         <div class="sec-h"><h2>My links</h2><a href="MyLinks.dc.html" class="pink" style="font-weight: 700; font-size: 14px">Manage</a></div>
         <div class="rail" style="display: flex; gap: 12px; margin: 0 -16px; padding: 0 16px 4px; scroll-snap-type: x mandatory">
@@ -178,17 +202,24 @@ class Component extends DCLogic {
     super(props);
     var m = null;
     try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
-    this.state = { mode: m || props.mode || 'dark', count: 4, drop: false, installPrompt: false, installed: false, toast: null, paused: { confess: true } };
+    this.state = { mode: m || props.mode || 'dark', count: 4, drop: false, installPrompt: false, installed: false, toast: null, paused: { confess: true }, hero: 0, spot: 0, left: 5 * 3600 + 42 * 60, tick: 0 };
   }
   componentDidMount() {
     var self = this;
+    // two spots on Home take turns so the page stays short: the top card and the spotlight
+    this.rot = setInterval(function () {
+      var s = self.state, t = s.tick + 1, n = { tick: t, left: Math.max(0, s.left - 1) };
+      if (t % 7 === 0) n.hero = (s.hero + 1) % 2;
+      if (t % 5 === 0) n.spot = (s.spot + 1) % 5;
+      self.setState(n);
+    }, 1000);
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
     this.t1 = setTimeout(function () { if (!self.state.installed) self.setState({ drop: true }); }, 2500);
     this.t2 = setTimeout(function () { self.setState({ count: 5, toast: 'msg' }); }, 9000);
     this.t3 = setTimeout(function () { if (self.state.toast === 'msg') self.setState({ toast: null }); }, 13400);
   }
-  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); clearTimeout(this.t4); }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.rot); clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); clearTimeout(this.t4); }
   componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
   renderVals() {
     var self = this, s = this.state, dark = s.mode !== 'light';
@@ -204,7 +235,21 @@ class Component extends DCLogic {
       installed: { title: 'Sekretly is on your home screen', sub: 'Open it like any other app', icon: E.sparkles, href: 'Home.dc.html' }
     };
     var t = s.toast ? toasts[s.toast] : toasts.msg;
+    var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+    var SP = [
+      { title: 'Your week, wrapped', sub: '41 messages · your top words · tap to watch', icon: E.sparkles, href: 'WeeklyWrap.dc.html', bg: 'linear-gradient(135deg,#22337d,#7a3cff 70%,#d81b72)', ink: '#ffffff', line: 'transparent' },
+      { title: 'Guess who sent it', sub: '3 messages came with a hint', icon: E.eyes, href: 'Inbox.dc.html', bg: 'var(--card)', ink: 'var(--ink)', line: 'var(--line)' },
+      { title: 'Hostel B gang · Fri 9pm', sub: 'Most Likely To · 5 of 6 coming', icon: E.fire, href: 'Crews.dc.html', bg: 'var(--card)', ink: 'var(--ink)', line: 'var(--line)' },
+      { title: '2 held by Kind mode', sub: 'Hidden until you choose to look', icon: E.shush, href: 'Inbox.dc.html', held: true, bg: 'var(--card)', ink: 'var(--ink)', line: 'var(--line)' },
+      { title: '14 messages to your Century badge', sub: '86 of 100 · see all badges', icon: E.letter, href: 'Badges.dc.html', bg: 'var(--card)', ink: 'var(--ink)', line: 'var(--line)' }
+    ];
+    var sp = SP[s.spot];
     return {
+      heroInbox: s.hero === 0, heroDrop: s.hero === 1,
+      dropLeft: Math.floor(s.left / 3600) + 'h ' + pad(Math.floor(s.left % 3600 / 60)) + 'm',
+      heroDots: ['New messages', 'Today’s drop'].map(function (l, k) { var on = s.hero === k; return { label: 'Show ' + l, on: on ? 'true' : 'false', w: on ? '22px' : '7px', c: on ? 'var(--pink)' : 'var(--line)', pick: function () { self.setState({ hero: k, tick: 0 }); } }; }),
+      sp: { title: sp.title, sub: sp.sub, icon: sp.icon, href: sp.href, bg: sp.bg, ink: sp.ink, line: sp.line, go: function () { if (sp.held) { try { window.localStorage.setItem('sk-ibf', 'held'); } catch (e) {} } } },
+      spDots: SP.map(function (x, k) { return { c: k === s.spot ? (sp.ink === '#ffffff' ? '#ffffff' : 'var(--pink)') : (sp.ink === '#ffffff' ? 'rgba(255,255,255,.4)' : 'var(--line)') }; }),
       newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },

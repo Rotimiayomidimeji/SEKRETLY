@@ -19,6 +19,12 @@ export const LINK_FIXUPS = {
   //        send(input), joinAndSend(input), checkUsername(name). Without `send` (the landing demo) it stays a demo.
   Main: [
     personaliseLinkPage,
+    // the mockup starts over when its tweak props change; a real page only starts over for a different link
+    // (logging in from the popup refreshes the page with visitor="member" and must not wipe the "account made" step)
+    [
+      `    if (prev.topic !== p.topic || prev.theme !== p.theme || prev.visitor !== p.visitor || prev.linkState !== p.linkState || prev.senderWarnings !== p.senderWarnings) this.setState(this.blank());`,
+      `    if (p.send ? prev.linkId !== p.linkId : prev.topic !== p.topic || prev.theme !== p.theme || prev.visitor !== p.visitor || prev.linkState !== p.linkState || prev.senderWarnings !== p.senderWarnings) this.setState(this.blank());`,
+    ],
     [`  renderVals() {\n    var E = {`, `  renderVals() {\n    var OWNER = this.props.owner || 'peach';\n    var E = {`],
     [`      th: th, tp: tp, ads:`, `      owner: OWNER, ownerAvatar: this.props.ownerAvatar || 'peach', onbHref: '/onboarding?from=link&to=' + encodeURIComponent(OWNER),\n      th: th, tp: tp, ads:`],
     [
@@ -39,7 +45,10 @@ export const LINK_FIXUPS = {
       if (s.sending) return;
       self.setState({ sending: true, sendErr: null });
       self.props.send({ linkId: self.props.linkId, wantsReply: !!replies, payload: body }).then(function (r) {
-        if (r && r.ok) self.setState({ sent: true, popup: false, wantReply: replies, sending: false });
+        if (r && r.ok) {
+          self.setState({ sent: true, popup: false, wantReply: replies, sending: false, receipt: r.receipt || null });
+          try { var saved = JSON.parse(window.localStorage.getItem('sk-receipts') || '[]'); if (r.receipt) window.localStorage.setItem('sk-receipts', JSON.stringify([r.receipt].concat(saved).slice(0, 30))); } catch (e) {}
+        }
         else self.setState({ sending: false, popup: false, sendErr: (r && r.error) || 'Couldn’t send. Try again.' });
       });
     };`,
@@ -81,6 +90,25 @@ export const LINK_FIXUPS = {
     ],
     // photo/video attachments arrive with uploads (next phase); until then the buttons stay hidden
     [`showTools: topic === 'confess' || topic === 'ama' || topic === 'custom',`, `showTools: false,`],
+    // the sender's optional hint goes with the message (only where the owner allows hints)
+    [`    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';`, `    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';
+    body.hint = hintTxt || undefined;`],
+    [
+      `<div style="margin-top: 14px; padding: 10px 12px; border-radius: 16px; background: {{th.chipBg}}">
+                  <button class="tap" onClick="{{toggleHintBox}}"`,
+      `<div style="margin-top: 14px; padding: 10px 12px; border-radius: 16px; background: {{th.chipBg}}; display: {{hintDisplay}}">
+                  <button class="tap" onClick="{{toggleHintBox}}"`,
+    ],
+    [`      hintBox: s.sHintBox,`, `      hintDisplay: this.props.send && this.props.allowHints === false ? 'none' : 'block',
+      hintBox: s.sHintBox,`],
+    // the receipt card shows the real code from the send
+    [`>SK-7Q4M-2J</div>`, `>{{receiptCode}}</div>`],
+    [
+      `      showReceipt: !member && !s.wantReply && !embed,
+      copyReceipt: function () { try { navigator.clipboard.writeText('SK-7Q4M-2J'); } catch (e) {} self.setState({ rcCopied: true }); },`,
+      `      showReceipt: !member && !s.wantReply && !embed && !!s.receipt, receiptCode: s.receipt || '',
+      copyReceipt: function () { try { navigator.clipboard.writeText(s.receipt || ''); } catch (e) {} self.setState({ rcCopied: true }); },`,
+    ],
     [
       `  quiz() {`,
       `  // asks the server whether a popup username is free (debounced) and remembers each answer

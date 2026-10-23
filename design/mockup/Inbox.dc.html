@@ -174,7 +174,20 @@ body{margin:0;background:#0c0811}
 
         <sc-if value="{{selOne}}" hint-placeholder-val="{{ false }}">
           <div class="rise" style="flex: 1; overflow-y: auto; padding: 18px 16px 24px; display: flex; flex-direction: column; align-items: center">
-            <div class="{{sel.th}}" style="width: 100%; max-width: 460px; border-radius: 30px; padding: 22px; min-height: 300px; display: flex; flex-direction: column">
+            <sc-if value="{{selHeld}}" hint-placeholder-val="{{ false }}">
+              <div class="card" style="width: 100%; max-width: 460px; margin-bottom: 12px; padding: 14px; border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.08)">
+                <div class="row" style="gap: 10px; align-items: flex-start">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--warn); flex: none; margin-top: 2px"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg>
+                  <span style="flex: 1; font-size: 13.5px; line-height: 1.45"><b>Kind mode held this · {{heldReason}}</b><br><span class="muted">It never pinged you. Look only if you want to.</span></span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+                  <button class="btn btn-sm tap" onClick="{{toggleHeldShow}}">{{heldShowLabel}}</button>
+                  <button class="btn btn-sm tap" onClick="{{releaseHeld}}">Not mean</button>
+                  <button class="btn btn-sm btn-danger tap" onClick="{{openReport}}">Report</button>
+                </div>
+              </div>
+            </sc-if>
+            <div class="{{sel.th}}" style="width: 100%; max-width: 460px; border-radius: 30px; padding: 22px; min-height: 300px; display: flex; flex-direction: column; filter: {{selBlur}}; transition: filter .3s">
               <div style="font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .85">{{sel.topic}}</div>
               <sc-if value="{{selHasMedia}}" hint-placeholder-val="{{ false }}">
                 <div class="media {{mediaCls}}" style="margin-top: 14px; height: 230px">
@@ -227,6 +240,11 @@ body{margin:0;background:#0c0811}
                   <button class="icon-btn tap" onClick="{{pageNext}}" disabled="{{atLast}}" aria-label="Next card" style="width: 42px; height: 42px; border: 0; background: rgba(255,255,255,.9); color: #211a2c; opacity: {{nextOp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
                 </div>
               </sc-if>
+              <sc-if value="{{selHasSenderHint}}" hint-placeholder-val="{{ false }}">
+                <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 7px 11px; border-radius: 99px; background: rgba(255,255,255,.92); color: #2a0a1c; font-size: 13px; font-weight: 800">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Their hint: {{senderHint}}
+                </span>
+              </sc-if>
               <div style="margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; font-size: 13px; opacity: .9"><span>anonymous · {{sel.ago}}</span><span>gone in {{sel.left}}</span></div>
             </div>
             <div style="width: 100%; max-width: 460px; margin-top: 14px; display: flex; flex-direction: column; gap: 8px">
@@ -239,6 +257,28 @@ body{margin:0;background:#0c0811}
                 <button class="btn btn-lg btn-block tap" onClick="{{replyPrivately}}" style="gap: 8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"></path></svg>{{replyLabel}}</button>
               </sc-if>
               <sc-if value="{{noReply}}" hint-placeholder-val="{{ false }}"><div class="muted" style="font-size: 13px; text-align: center; line-height: 1.45">They didn’t turn on replies, so you can’t answer privately.<br>Share it to your story instead.</div></sc-if>
+              <sc-if value="{{canReact}}" hint-placeholder-val="{{ false }}">
+                <div class="card" style="padding: 12px 14px">
+                  <div class="row" style="justify-content: space-between"><b style="font-size: 14.5px">React</b><span class="muted" style="font-size: 12.5px">{{reactNote}}</span></div>
+                  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 10px">
+                    <sc-for list="{{reacts}}" as="rx" hint-placeholder-count="5">
+                      <button class="tap" onClick="{{rx.pick}}" aria-pressed="{{rx.on}}" aria-label="{{rx.name}}" style="aspect-ratio: 1; border-radius: 16px; border: 2px solid {{rx.ring}}; background: {{rx.bg}}; display: grid; place-items: center; padding: 0"><img src="{{rx.icon}}" alt="" style="width: 58%; height: 58%"></button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{canGuess}}" hint-placeholder-val="{{ false }}">
+                <div class="card" style="padding: 12px 14px">
+                  <div class="row" style="gap: 10px">
+                    <img src="/_blob/9fa11a307ccc8cbf33b563a8df193335" alt="" style="width: 30px; height: 30px; flex: none">
+                    <span style="flex: 1; font-size: 13.5px; line-height: 1.4"><b>Guess who</b> <span class="muted">{{guessSub}}</span></span>
+                    <sc-if value="{{guessIdle}}" hint-placeholder-val="{{ true }}"><button class="btn btn-sm btn-cta tap" onClick="{{openGuess}}" disabled="{{guessOut}}">Guess</button></sc-if>
+                  </div>
+                  <sc-if value="{{guessPending}}" hint-placeholder-val="{{ false }}"><div class="row pop" style="margin-top: 10px; gap: 8px; font-size: 13.5px"><span class="live" style="width: 9px; height: 9px; border-radius: 50%; background: #ffb020"></span>You guessed <b>@{{guessName}}</b>. Waiting for them to decide…</div></sc-if>
+                  <sc-if value="{{guessYes}}" hint-placeholder-val="{{ false }}"><div class="pop" style="margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(135deg,#22b36f,#127a80); color: #ffffff; font-size: 14px"><b>It was @{{guessName}}.</b> They chose to reveal.</div></sc-if>
+                  <sc-if value="{{guessNo}}" hint-placeholder-val="{{ false }}"><div class="pop" style="margin-top: 10px; font-size: 13.5px"><b>Not confirmed.</b> <span class="muted">Wrong guess, or they’re keeping the mystery.</span> <button class="pink tap" onClick="{{guessAgain}}" style="border: 0; background: transparent; font-weight: 800; padding: 0; min-height: 32px">Guess again</button></div></sc-if>
+                </div>
+              </sc-if>
               <div class="card row" style="padding: 12px 14px; gap: 10px">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--pink); flex: none"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
                 <sc-if value="{{hintLocked}}" hint-placeholder-val="{{ true }}"><span style="flex: 1; font-size: 13px; line-height: 1.4"><b>Curious who sent it?</b> <span class="muted">Watch a short ad for one vague clue, like “Lagos, late at night”. Never a name.</span></span></sc-if>
@@ -432,6 +472,26 @@ body{margin:0;background:#0c0811}
     </div>
   </sc-if>
 
+  <sc-if value="{{guessOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Guess who sent it">
+        <div class="row"><h2 style="flex: 1; font-size: 22px">Who do you think?</h2><button class="icon-btn tap" onClick="{{closeGuess}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+        <p class="muted" style="font-size: 13.5px; margin-top: 4px; line-height: 1.45">{{guessHelp}}</p>
+        <label for="ib-gq" class="sr">Search usernames</label>
+        <input id="ib-gq" class="field" value="{{gq}}" onChange="{{onGq}}" placeholder="Search a username" style="margin-top: 12px">
+        <div style="margin-top: 6px">
+          <sc-for list="{{guessPeople}}" as="gp" hint-placeholder-count="5">
+            <button class="list-row tap" onClick="{{gp.pick}}" style="width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; padding-left: 0; padding-right: 0">
+              <span class="av" style="width: 40px; height: 40px; border-radius: 13px; background: {{gp.bg}}"><img src="{{gp.icon}}" alt=""></span>
+              <span style="flex: 1"><b style="font-size: 15px">@{{gp.handle}}</b><span class="muted" style="display: block; font-size: 12.5px">{{gp.from}}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <p class="muted" style="font-size: 12.5px; margin-top: 10px">They get asked privately. Wrong guesses are never shown to anyone.</p>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
     <div class="toast" role="status"><img src="{{toastIcon}}" alt="" style="width: 34px; height: 34px; flex: none"><span style="font-size: 14px; line-height: 1.35"><b>{{toastTitle}}</b><br><span class="muted">{{toastSub}}</span></span></div>
   </sc-if>
@@ -444,19 +504,25 @@ class Component extends DCLogic {
     var m = null;
     try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
     var E = { fox: '/_blob/a1feeb887ae498080201d5cedfa0036a', moon: '/_blob/1df7299954a782c5de8338339634a8e6' };
+    // other screens (Home, Settings) can open the inbox on a filter, e.g. Held
+    var f0 = null;
+    try { f0 = window.localStorage.getItem('sk-ibf'); window.localStorage.removeItem('sk-ibf'); } catch (e) {}
     this.state = {
-      mode: m || props.mode || 'dark', filter: 'all', openId: props.startOpen || null, share: false, draft: '', typing: false, toast: null,
+      reacts: {}, guess: {}, guessOpen: false, gq: '', heldShown: {}, released: {},
+      mode: m || props.mode || 'dark', filter: f0 || 'all', openId: props.startOpen || null, share: false, draft: '', typing: false, toast: null,
       shown: {}, page: 0, selMode: false, chosen: {}, archived: {}, menu: null, del: null, quick: null, chatSel: false, chatChosen: {}, deletedBubbles: {}, ama: {}, hints: {}, hint: null, hintT: 0, report: false, result: null, picked: null, other: false, otherText: '', seed: 3,
       items: [
-        { id: 'm0', kind: 'one', link: 'describe', text: 'Funny · Loyal · Chaotic', ago: '2m', left: '23h', pct: 0.96, unread: true, warns: 0, acct: false, replyOk: false },
+        { id: 'm0', kind: 'one', link: 'describe', text: 'Funny · Loyal · Chaotic', ago: '2m', left: '23h', pct: 0.96, unread: true, warns: 0, acct: false, replyOk: false, senderHint: 'we’re in the same class', receipt: true, sender: 'kayy' },
         { id: 'm5', kind: 'one', link: 'confess', text: 'I need to say this before we graduate, and I can’t say it to your face. Remember the departmental dinner in 300L, when NEPA took the light and everybody started screaming? I was the one holding your hand. You thought it was Tunde. I let you think that, and I have regretted it every single day since. I watched you laugh about it with him the next morning and I just smiled like a mumu. I tried to stop liking you after that. I joined a different reading group. I muted your status for two whole weeks. It didn’t work. Every time you post a sunset, I check who viewed it before me like a crazy person. I’m not telling you this so you’ll like me back. I know you’re talking to someone, and I hope he treats you well. I’m telling you because you once said nobody ever notices you. That’s not true. Somebody noticed everything: the way you hum when you’re reading, how you always give away the last piece of chin chin, how you remember everybody’s birthday. You are not invisible. You never were. Okay. That’s it. Please don’t try to guess.', ago: '1m', left: '24h', pct: 0.99, unread: true, warns: 0, acct: true, replyOk: true },
         { id: 'q1', kind: 'one', link: 'quiz', text: 'You know me so well it’s scary', quiz: { score: 4, rank: 2, rows: [['What’s my go-to food?', 'Suya', ''], ['Where am I on a Friday night?', 'In bed by 10', ''], ['What’s my love language?', 'Gifts', 'Quality time'], ['Who’s my celebrity crush?', 'Rema', ''], ['What annoys me the most?', 'Late replies', '']] }, ago: '9m', left: '23h', pct: 0.95, unread: true, warns: 0, acct: true, replyOk: true },
         { id: 't1', kind: 'chat', link: 'describe', who: 'Fox', av: E.fox, avBg: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', ago: '14m', left: '21h', pct: 0.88, unread: true, warns: 3, acct: true,
           thread: [{ me: false, text: 'Describe you? Funny, loyal, and lowkey a menace.' }, { me: true, text: 'lowkey?? be serious' }, { me: false, media: 'video' }, { gone: true }, { me: false, text: 'ok but who do you keep posting on your story?' }] },
         { id: 'p1', kind: 'one', link: 'custom', media: 'photo', text: 'saw this and thought of you', ago: '40m', left: '22h', pct: 0.92, unread: true, warns: 1, acct: true, replyOk: true },
-        { id: 'm4', kind: 'one', link: 'describe', text: 'Smart · Calm · Ludo', ago: '50m', left: '22h', pct: 0.9, unread: false, warns: 0, acct: false, replyOk: false },
-        { id: 'a1', kind: 'one', link: 'ama', text: 'What’s the most spontaneous thing you’ve ever done?', ago: '55m', left: '22h', pct: 0.9, unread: true, warns: 0, acct: false, replyOk: false },
-        { id: 'm2', kind: 'one', link: 'rate', rate: 9, cat: 'Overall', text: 'Minus one for always being late.', ago: '1h', left: '20h', pct: 0.83, unread: false, warns: 0, acct: true, replyOk: true },
+        { id: 'm4', kind: 'one', link: 'describe', text: 'Smart · Calm · Ludo', ago: '50m', left: '22h', pct: 0.9, unread: false, warns: 0, acct: false, replyOk: false, receipt: true, sender: 'bigsam' },
+        { id: 'a1', kind: 'one', link: 'ama', text: 'What’s the most spontaneous thing you’ve ever done?', ago: '55m', left: '22h', pct: 0.9, unread: true, warns: 0, acct: false, replyOk: false, senderHint: 'we met this year', receipt: true, sender: 'zee' },
+        { id: 'm2', kind: 'one', link: 'rate', rate: 9, cat: 'Overall', text: 'Minus one for always being late.', ago: '1h', left: '20h', pct: 0.83, unread: false, warns: 0, acct: true, replyOk: true, senderHint: 'same hostel', sender: 'dami_x' },
+        { id: 'h1', kind: 'one', link: 'rate', rate: 2, cat: 'Overall', text: 'Honestly a 2. Nobody actually likes you, they just tolerate you.', ago: '2h', left: '19h', pct: 0.8, unread: false, warns: 0, acct: false, replyOk: false, held: 'Insult' },
+        { id: 'h2', kind: 'one', link: 'describe', text: 'Loud · Bossy · Annoying', ago: '4h', left: '17h', pct: 0.7, unread: false, warns: 0, acct: false, replyOk: false, held: 'Maybe rude' },
         { id: 't2', kind: 'chat', link: 'rate', who: 'Moon', av: E.moon, avBg: 'linear-gradient(135deg,#7f8cff,#2b2f7a)', ago: '3h', left: '18h', pct: 0.75, unread: false, warns: 0, acct: true,
           thread: [{ me: false, text: 'Can I tell you something in person one day?' }, { me: true, text: 'depends. is it good or bad' }, { me: false, text: 'good. very good. ok bye' }] },
         { id: 'm3', kind: 'one', link: 'confess', text: 'I copied your assignment in 200L and I am still sorry. Not just once, the whole semester. You stayed up doing it and I just changed the font. When you got a B and I got an A, I wanted to tell you so many times, but I was scared you would hate me. You helped me pass and you didn’t even know it. If you ever need anything, I owe you, for real.', ago: '5h', left: '6h', pct: 0.25, unread: false, warns: 0, acct: true, replyOk: true }
@@ -521,9 +587,13 @@ class Component extends DCLogic {
     var hintOf = function (id) { var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 997; return HINTS[h % HINTS.length]; };
     var line = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
     var inArchive = s.filter === 'archived';
+    var isHeld = function (m) { return !!m.held && !s.released[m.id]; };
+    var heldCount = s.items.filter(isHeld).length;
     var shown = s.items.filter(function (m) {
       if (inArchive) return !!s.archived[m.id];
       if (s.archived[m.id]) return false;
+      if (s.filter === 'held') return isHeld(m);
+      if (isHeld(m)) return false;
       if (s.filter === 'unread') return m.unread;
       if (s.filter === 'chats') return m.kind === 'chat';
       if (s.filter === 'blocked') return m.warns >= 4;
@@ -536,8 +606,9 @@ class Component extends DCLogic {
       var link = L[m.link], isOpen = s.openId === m.id, blocked = m.warns >= 4;
       var last = m.kind === 'chat' ? m.thread[m.thread.length - 1] : null;
       var preview = m.kind === 'chat' ? (last.gone ? 'Message disappeared' : last.from ? last.from : (last.media ? (last.me ? 'You sent a ' : '') + (last.media === 'video' ? '▶ Video' : '📷 Photo') : (last.me ? 'You: ' : '') + last.text)) : (m.quiz ? 'Scored ' + m.quiz.score + '/5 on your quiz' : m.rate ? m.rate + '/10 · ' + (m.text || m.cat) : m.media ? '📷 Photo · ' + m.text : m.text);
+      if (isHeld(m)) preview = 'Hidden by Kind mode · ' + m.held;
       return {
-        who: m.kind === 'chat' ? m.who : 'Anonymous', kindLabel: m.kind === 'chat' ? '· chat' : '',
+        who: m.kind === 'chat' ? m.who : isHeld(m) ? 'Held' : 'Anonymous', kindLabel: m.kind === 'chat' ? '· chat' : (m.senderHint && !isHeld(m) ? '· left a hint' : ''),
         av: m.kind === 'chat' ? m.av : GHOST, avBg: m.kind === 'chat' ? m.avBg : '', avCls: m.kind === 'chat' ? '' : link.th,
         preview: preview, italic: 'normal', weight: m.unread ? 800 : 500,
         ago: m.ago, left: m.left, unread: m.unread,
@@ -696,7 +767,7 @@ class Component extends DCLogic {
       chatNoPublic: chatPublic.length === 0,
       chatQuick: function () { if (chatPublic.length) self.setState({ quick: { list: chatPublic } }); },
       chatDelete: function () { var d = Object.assign({}, s.deletedBubbles); chatKeys.forEach(function (k) { d[k] = true; }); self.setState({ deletedBubbles: d, chatSel: false, chatChosen: {} }); },
-      filters: [['all', 'All'], ['unread', 'Unread'], ['chats', 'Chats'], ['blocked', 'Blocked']].map(function (f) { var a = s.filter === f[0]; return { label: f[1], on: a ? 'true' : 'false', cls: a ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
+      filters: [['all', 'All'], ['unread', 'Unread'], ['chats', 'Chats'], ['held', 'Held · ' + heldCount], ['blocked', 'Blocked']].map(function (f) { var a = s.filter === f[0]; return { label: f[1], on: a ? 'true' : 'false', cls: a ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
       groups: groups,
       listClass: open ? 'ib-list hide' : 'ib-list', detailClass: open ? 'ib-detail open' : 'ib-detail', navClass: open || s.selMode ? 'bnav hide' : 'bnav',
       empty: !open, hasSel: open, sel: sel,
@@ -740,6 +811,37 @@ class Component extends DCLogic {
         self.setState({ items: s.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: true, media: kind, url: url }]) }) : x; }) });
         try { e.target.value = ''; } catch (x) {}
       },
+      // Kind mode: held messages
+      selHeld: open && isHeld(selRaw), heldReason: open && selRaw.held ? selRaw.held : '',
+      selBlur: open && isHeld(selRaw) && !s.heldShown[selRaw.id] ? 'blur(10px)' : 'none',
+      heldShowLabel: open && s.heldShown[selRaw.id] ? 'Hide' : 'Show',
+      toggleHeldShow: function () { var o = Object.assign({}, s.heldShown); o[selRaw.id] = !o[selRaw.id]; self.setState({ heldShown: o }); },
+      releaseHeld: function () { var o = Object.assign({}, s.released); o[selRaw.id] = true; self.setState({ released: o, filter: 'all', toast: { t: 'Moved to your inbox', s: 'Kind mode will learn from that.', i: '/_blob/727ac58e5046d6eefbb35427eff3c1df' } }); clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3200); },
+      // sender's own hint, reactions they see on their receipt, guess who
+      selHasSenderHint: open && !!selRaw.senderHint && !isHeld(selRaw), senderHint: open ? selRaw.senderHint || '' : '',
+      canReact: open && selRaw.kind === 'one' && !isHeld(selRaw),
+      reactNote: !open ? '' : s.reacts[selRaw.id] !== undefined ? 'Sent · they’ll see it' : (selRaw.receipt || selRaw.acct ? 'They’ll see it on their receipt' : 'Only you see this one'),
+      reacts: [['Love it', '/_blob/727ac58e5046d6eefbb35427eff3c1df'], ['Laughing', '/_blob/ea3a1403d8fe6d1943450cfacf059348'], ['Shook', '/_blob/9fa11a307ccc8cbf33b563a8df193335'], ['Secret safe', '/_blob/7666419731f56fe89d876dc6bf2dcdb2'], ['Touched', '/_blob/ee2791bdeac805bec379541426d39014']].map(function (r, k) {
+        var on = open && s.reacts[selRaw.id] === k;
+        return { name: r[0], icon: r[1], on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'transparent', bg: on ? 'rgba(255,59,141,.14)' : 'var(--card2)', pick: function () { var o = Object.assign({}, s.reacts); if (on) delete o[selRaw.id]; else o[selRaw.id] = k; self.setState({ reacts: o }); } };
+      }),
+      canGuess: open && selRaw.kind === 'one' && !isHeld(selRaw) && (!!selRaw.receipt || !!selRaw.acct),
+      guessSub: !open ? '' : (3 - ((s.guess[selRaw.id] || {}).used || 0)) + ' of 3 guesses left on this message',
+      guessIdle: open && !(s.guess[selRaw.id] || {}).res, guessPending: open && (s.guess[selRaw.id] || {}).res === 'wait',
+      guessYes: open && (s.guess[selRaw.id] || {}).res === 'yes', guessNo: open && (s.guess[selRaw.id] || {}).res === 'no',
+      guessName: open ? (s.guess[selRaw.id] || {}).who || '' : '', guessOut: open && ((s.guess[selRaw.id] || {}).used || 0) >= 3,
+      guessAgain: function () { var o = Object.assign({}, s.guess); o[selRaw.id] = Object.assign({}, o[selRaw.id], { res: null }); self.setState({ guess: o }); },
+      guessOpen: s.guessOpen, gq: s.gq, onGq: function (e) { self.setState({ gq: e.target.value.toLowerCase() }); },
+      openGuess: function () { self.setState({ guessOpen: true, gq: '' }); }, closeGuess: function () { self.setState({ guessOpen: false }); },
+      guessHelp: open && selRaw.senderHint ? 'Their hint: ' + selRaw.senderHint + '. Pick from people in your crews and chats.' : 'Pick from people in your crews and chats. If you’re right, they choose whether to reveal.',
+      guessPeople: [['kayy', 'Hostel B gang', '/_blob/a1feeb887ae498080201d5cedfa0036a', 'linear-gradient(135deg,#ffb35c,#ff5f8f)'], ['zee', 'Class of 2027', '/_blob/4b5463ad60ec0a1915c9b60ecf54e134', 'linear-gradient(135deg,#7ef0c1,#3aa0ff)'], ['dami_x', 'Hostel B gang', '/_blob/f0e10078eb17fce65ae1a0a64d3fed2b', 'linear-gradient(135deg,#ffe48a,#ff8a5c)'], ['mango.moon', 'Chats with you', '/_blob/e910746badea9d78c41ac4aa913de4a6', 'linear-gradient(135deg,#ffd0f0,#a46bff)'], ['bigsam', 'Sunday brunch crew', '/_blob/7ee69e13b899e048010df41d0cf87143', 'linear-gradient(135deg,#9fe7ff,#ff9ad5)']].filter(function (p) { return !s.gq || p[0].indexOf(s.gq.replace('@', '')) >= 0; }).map(function (p) {
+        return { handle: p[0], from: p[1], icon: p[2], bg: p[3], pick: function () {
+          var id = selRaw.id, right = selRaw.sender === p[0], prev = s.guess[id] || {}, o = Object.assign({}, s.guess);
+          o[id] = { who: p[0], res: 'wait', used: (prev.used || 0) + 1 };
+          self.setState({ guess: o, guessOpen: false });
+          setTimeout(function () { var g = Object.assign({}, self.state.guess); g[id] = Object.assign({}, g[id], { res: right ? 'yes' : 'no' }); self.setState({ guess: g }); }, 2200);
+        } };
+      }),
       hintBtn: open && s.hints[selRaw.id] ? 'Hint ✓' : 'Hint',
       hintLocked: open && !s.hints[selRaw.id], hintUnlocked: open && !!s.hints[selRaw.id], hintText: open ? hintOf(selRaw.id) : '',
       hintSheet: !!s.hint, hintOffer: s.hint === 'offer', hintWatching: s.hint === 'watching', hintDone: s.hint === 'done',

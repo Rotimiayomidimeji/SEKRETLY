@@ -94,6 +94,12 @@ body{margin:0;background:#0c0811}
               <span style="flex: 1"><b>Public profile</b><div class="muted" style="font-size: 13px">Show avatar, bio and active links</div></span>
               <button class="switch" role="switch" aria-checked="{{publicStr}}" aria-label="Public profile" onClick="{{togglePublic}}"></button>
             </div>
+            <div class="card" style="margin-top: 10px; overflow: hidden">
+              <div style="padding: 14px 16px 4px"><b>Mystery features</b></div>
+              <sc-for list="{{mystery}}" as="my" hint-placeholder-count="3">
+                <div class="list-row"><span style="flex: 1"><b style="font-size: 15px">{{my.label}}</b><div class="muted" style="font-size: 12.5px">{{my.sub}}</div></span><button class="switch" role="switch" aria-checked="{{my.on}}" aria-label="{{my.label}}" onClick="{{my.toggle}}"></button></div>
+              </sc-for>
+            </div>
           </sc-if>
 
           <sc-if value="{{secMessages}}" hint-placeholder-val="{{ false }}">
@@ -113,6 +119,13 @@ body{margin:0;background:#0c0811}
           </sc-if>
 
           <sc-if value="{{secSafety}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="padding: 16px; margin-bottom: 10px">
+              <b>Kind mode</b>
+              <p class="muted" style="font-size: 13px; margin-top: 4px; line-height: 1.45">Decides what lands in your inbox and what gets held for you to review first.</p>
+              <div class="seg" style="margin-top: 10px"><sc-for list="{{kindOpts}}" as="ko" hint-placeholder-count="3"><button aria-pressed="{{ko.on}}" onClick="{{ko.pick}}">{{ko.label}}</button></sc-for></div>
+              <div style="margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: var(--card2); font-size: 13.5px; line-height: 1.45"><b>{{kindTitle}}</b><br><span class="muted">{{kindText}}</span></div>
+              <a href="Inbox.dc.html" onClick="{{openHeld}}" class="btn btn-sm btn-block tap" style="margin-top: 10px">See held messages (2)</a>
+            </div>
             <div class="card row" style="padding: 16px; margin-bottom: 10px">
               <span style="flex: 1"><b>Blur photos and videos until I tap</b><div class="muted" style="font-size: 12.5px">Anything sent to you anonymously starts blurred</div></span>
               <button class="switch" role="switch" aria-checked="{{blurStr}}" aria-label="Blur media" onClick="{{toggleBlur}}"></button>
@@ -276,8 +289,9 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     var m = null;
-    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
-    this.state = { mode: m || props.mode || 'dark', look: m || 'system', sec: props.startSection || null, chats: 'everyone', visitors: true, pub: true, inbox: 0, chat: 0, words: ['ugly', 'fake'], newWord: '', blocked: ['b1', 'b2'], blur: true, notif: { msg: true, reply: true, join: true, turn: true, paused: true, warn: true, push: false }, invites: true, listing: true, delOpen: false, installPrompt: false, installed: false };
+    var sec0 = null;
+    try { m = window.localStorage.getItem('sk-mode'); sec0 = window.localStorage.getItem('sk-set-sec'); window.localStorage.removeItem('sk-set-sec'); } catch (e) {}
+    this.state = { kind: 1, mys: { hints: true, receipts: true, guess: true }, mode: m || props.mode || 'dark', look: m || 'system', sec: sec0 || props.startSection || null, chats: 'everyone', visitors: true, pub: true, inbox: 0, chat: 0, words: ['ugly', 'fake'], newWord: '', blocked: ['b1', 'b2'], blur: true, notif: { msg: true, reply: true, join: true, turn: true, paused: true, warn: true, push: false, drop: true, streak: true, wrap: true, quiet: true }, invites: true, listing: true, delOpen: false, installPrompt: false, installed: false };
   }
   componentDidMount() {
     var self = this;
@@ -295,7 +309,7 @@ class Component extends DCLogic {
       ['account', 'Account', 'Username, password, install, delete', I.frog],
       ['privacy', 'Privacy', 'Who can reach you', I.eyes],
       ['messages', 'Messages', 'Disappearing timers', I.hg],
-      ['safety', 'Safety', 'Blocked senders, blur, warnings', I.lock],
+      ['safety', 'Safety', 'Kind mode, hidden words, blocked senders', I.lock],
       ['links', 'Links', 'Pause, resume, reset', I.letter],
       ['notif', 'Notifications', 'Push and in-app', I.bell],
       ['look', 'Appearance', 'Light, dark or system', I.moon],
@@ -304,7 +318,7 @@ class Component extends DCLogic {
     ];
     var cur = s.sec || 'account';
     var curRow = S.filter(function (x) { return x[0] === cur; })[0];
-    var N = [['msg', 'New anonymous message', 'Someone answers your link'], ['reply', 'Chat replies', 'In two-way chats'], ['join', 'Someone joins your game', ''], ['turn', 'Your turn in a game', ''], ['paused', 'Link paused', 'When a limit is hit'], ['warn', 'Account warnings', 'Always recommended'], ['push', 'Push on this device', 'Needs browser permission']];
+    var N = [['msg', 'New anonymous message', 'Someone answers your link'], ['reply', 'Chat replies', 'In two-way chats'], ['join', 'Someone joins your game', ''], ['turn', 'Your turn in a game', ''], ['paused', 'Link paused', 'When a limit is hit'], ['warn', 'Account warnings', 'Always recommended'], ['drop', 'Daily drop', 'A new question every evening at 7pm'], ['streak', 'Streak reminders', 'Turn off for no streak pressure'], ['wrap', 'Weekly wrap', 'Sundays at 6pm'], ['quiet', 'Quiet hours', 'Nothing between 11pm and 7am'], ['push', 'Push on this device', 'Needs browser permission']];
     var BL = {
       b1: { name: 'Fox (chat) · reported 4 times', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', bg: 'linear-gradient(135deg,#ffb35c,#ff5f8f)' },
       b2: { name: 'Visitor on Rate me 1–10 · reported 4 times', icon: I.ghost, bg: 'linear-gradient(135deg,#7f8cff,#2b2f7a)' }
@@ -359,6 +373,11 @@ class Component extends DCLogic {
       noBlocked: s.blocked.length === 0,
       blurStr: s.blur ? 'true' : 'false', toggleBlur: function () { self.setState({ blur: !s.blur }); },
       myWarnings: MW.map(function (w) { return { to: w[0], label: w[1] >= 4 ? 'Blocked by them' : w[1] + ' of 3 warnings', steps: [1, 2, 3, 4].map(function (i) { return { c: i <= w[1] ? (i === 4 ? '#c4213a' : '#ffb020') : lineC }; }) }; }),
+      kindOpts: [['Off', 0], ['Standard', 1], ['Kind only', 2]].map(function (k) { return { label: k[0], on: s.kind === k[1] ? 'true' : 'false', pick: function () { self.setState({ kind: k[1] }); } }; }),
+      kindTitle: ['Everything comes straight in', 'Insults and harassment are held', 'Only kind things get through'][s.kind],
+      kindText: ['Only threats and illegal content are blocked. Not recommended for public links.', 'Clear insults, slurs, body shaming and spam wait in Inbox › Held. Jokes and honest opinions still come through.', 'Anything negative or unclear is held, even teasing. Best for big public links.'][s.kind],
+      openHeld: function () { try { window.localStorage.setItem('sk-ibf', 'held'); } catch (e) {} },
+      mystery: [['hints', 'Let senders leave a hint', 'An optional clue on their message, never a name'], ['receipts', 'Show my reactions on receipts', 'Senders see your reaction and private reply'], ['guess', 'Guess who', 'Guess senders; they choose whether to reveal']].map(function (x) { var on = !!s.mys[x[0]]; return { label: x[1], sub: x[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.mys); o[x[0]] = !on; self.setState({ mys: o }); } }; }),
       notifs: N.map(function (n) { var on = !!s.notif[n[0]]; return { label: n[1], sub: n[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.notif); o[n[0]] = !on; self.setState({ notif: o }); } }; }),
       lookOpts: [['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(function (o) { return { label: o[1], on: s.look === o[0] ? 'true' : 'false', pick: function () {
         var n = o[0] === 'system' ? 'dark' : o[0];

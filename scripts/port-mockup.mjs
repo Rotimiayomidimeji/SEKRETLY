@@ -13,8 +13,11 @@ import { fileURLToPath } from "node:url";
 
 import { FIXUPS as BASE_FIXUPS } from "./port-fixups.mjs";
 import { LINK_FIXUPS } from "./port-fixups-links.mjs";
+import { INBOX_FIXUPS } from "./port-fixups-inbox.mjs";
+import { HOME_FIXUPS } from "./port-fixups-home.mjs";
+import { MYSTERY_FIXUPS } from "./port-fixups-mystery.mjs";
 
-const FIXUPS = { ...BASE_FIXUPS, ...LINK_FIXUPS };
+const FIXUPS = { ...BASE_FIXUPS, ...LINK_FIXUPS, ...INBOX_FIXUPS, ...HOME_FIXUPS, ...MYSTERY_FIXUPS };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MOCK = path.join(ROOT, "design/mockup");
@@ -224,6 +227,18 @@ function gen(node, scope, imports, parentTag, ind) {
   return `${pad}${open}>\n${kids(scope)}${pad}</${tag}>\n`;
 }
 
+/**
+ * The mockup's menus carry sample counts (Inbox 4, Notifications 3). In the app every screen shows the real
+ * unread counts from the navInbox / navNotif props, and nothing at all when there's nothing new.
+ */
+function liveNavCounts(src) {
+  const show = (cls, key) => `<sc-if value="{{${key}}}" hint-placeholder-val="{{ false }}"><span class="${cls}">{{${key}}}</span></sc-if>`;
+  return src
+    .replace(/Inbox<span class="(count|badge)">(?:\d+|\{\{\w+\}\})<\/span>/g, (_, cls) => "Inbox" + show(cls, "navInbox"))
+    .replace(/Notifications<span class="count">\d+<\/span>/g, "Notifications" + show("count", "navNotif"))
+    .replace(/<span class="badge">\d+<\/span>/g, show("badge", "navNotif"));
+}
+
 function port(board) {
   const file = path.join(MOCK, board + ".dc.html");
   let src = rewrite(fs.readFileSync(file, "utf8"));
@@ -237,6 +252,7 @@ function port(board) {
     if (!src.includes(a)) throw new Error(board + " fixup not found: " + a.slice(0, 60));
     src = src.replace(a, b);
   }
+  src = liveNavCounts(src);
   const xdc = src.slice(src.indexOf("<x-dc>") + 6, src.indexOf("</x-dc>"));
   const helmet = /<helmet>([\s\S]*?)<\/helmet>/.exec(xdc);
   const css = helmet ? [...helmet[1].matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1].trim()).join("\n") : "";

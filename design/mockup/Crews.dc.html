@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Crew</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">4</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>Settings</a>
+  </nav>
+
+  <div class="main">
+    <div class="wrap" style="max-width: 760px">
+      <header class="topbar">
+        <a href="GamesHub.dc.html" class="icon-btn tap" aria-label="Back to games"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+        <div class="grow"><h1 style="font-size: 24px">Crews</h1><div class="muted" style="font-size: 13px">Saved tables you play with again</div></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+
+      <div class="rail" role="group" aria-label="Your crews" style="display: flex; gap: 8px; margin: 0 -16px; padding: 0 16px 4px">
+        <sc-for list="{{crewTabs}}" as="ct" hint-placeholder-count="3">
+          <button class="chip tap {{ct.cls}}" aria-pressed="{{ct.on}}" onClick="{{ct.pick}}">{{ct.name}}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{justSaved}}" hint-placeholder-val="{{ false }}">
+        <div class="card pop row" style="margin-top: 12px; padding: 12px 14px; gap: 10px; border-color: rgba(91,224,160,.45)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--ok); flex: none"><path d="m5 12 5 5 9-10"></path></svg>
+          <span style="font-size: 14px"><b>Crew saved.</b> <span class="muted">Everyone got an invite to join it.</span></span>
+        </div>
+      </sc-if>
+
+      <section class="rise" style="margin-top: 12px; padding: 18px; border-radius: 26px; color: #ffffff; background: {{c.bg}}; position: relative; overflow: hidden">
+        <img class="float2" src="{{c.icon}}" alt="" style="position: absolute; right: 12px; top: 12px; width: 64px; height: 64px">
+        <h2 style="font-size: 28px; max-width: 12ch; line-height: 1">{{c.name}}</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+          <sc-for list="{{c.members}}" as="mb" hint-placeholder-count="6">
+            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 99px; background: rgba(0,0,0,.24); font-size: 13px; font-weight: 700"><span style="width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: {{mb.c}}; color: #1a0b14; font-size: 12px; font-weight: 800">{{mb.i}}</span>{{mb.n}}</span>
+          </sc-for>
+        </div>
+        <div class="row" style="gap: 8px; margin-top: 14px; flex-wrap: wrap">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 99px; background: rgba(0,0,0,.25); font-weight: 800; font-size: 13px"><svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-4-1-6 1-9.5z"></path></svg>{{c.streak}}-week crew streak</span>
+          <button class="tap" onClick="{{copyInvite}}" style="min-height: 36px; padding: 0 12px; border-radius: 99px; border: 0; background: rgba(255,255,255,.92); color: #2a0a1c; font-weight: 800; font-size: 13px">{{inviteLabel}}</button>
+        </div>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+        <a href="CreateGame.dc.html" onClick="{{playNow}}" class="btn btn-cta btn-lg tap">Play now</a>
+        <a href="CrewDaily.dc.html" class="btn btn-lg tap">Crew question</a>
+      </div>
+
+      <div class="card" style="margin-top: 12px; padding: 16px">
+        <div class="row" style="justify-content: space-between; gap: 10px">
+          <div><div class="muted" style="font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase">Next game night</div><b class="d" style="font-size: 20px">{{c.nightTitle}}</b><div class="muted" style="font-size: 13.5px">{{c.nightSub}}</div></div>
+          <a href="CreateGame.dc.html" onClick="{{playNow}}" class="btn btn-sm tap">Change</a>
+        </div>
+        <div class="seg" role="group" aria-label="Are you coming?" style="margin-top: 12px">
+          <sc-for list="{{rsvp}}" as="r" hint-placeholder-count="3"><button aria-pressed="{{r.on}}" onClick="{{r.pick}}">{{r.name}}</button></sc-for>
+        </div>
+        <div class="muted" style="font-size: 13px; margin-top: 8px">{{goingText}}</div>
+      </div>
+
+      <div class="seg" role="group" aria-label="Crew sections" style="margin-top: 18px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button aria-pressed="{{t.on}}" onClick="{{t.pick}}">{{t.name}}</button></sc-for>
+      </div>
+
+      <sc-if value="{{tabBoard}}" hint-placeholder-val="{{ true }}">
+        <div class="rise" style="margin-top: 12px">
+          <div class="muted" style="font-size: 13px; margin-bottom: 8px">October season · points from games and crew questions</div>
+          <ol class="card" style="list-style: none; margin: 0; padding: 0; overflow: hidden">
+            <sc-for list="{{board}}" as="b" hint-placeholder-count="5">
+              <li class="list-row" style="background: {{b.bg}}">
+                <span class="d" style="width: 22px; font-weight: 800; font-size: 18px; color: {{b.rankInk}}">{{b.rank}}</span>
+                <span style="width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: {{b.c}}; color: #1a0b14; font-weight: 800; flex: none">{{b.i}}</span>
+                <div style="flex: 1; min-width: 0"><b style="font-size: 15px">{{b.n}}</b><div class="muted" style="font-size: 12.5px">{{b.title}}</div></div>
+                <b class="d" style="font-size: 17px">{{b.pts}}</b>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{tabHistory}}" hint-placeholder-val="{{ false }}">
+        <ul class="rise" style="list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{history}}" as="h" hint-placeholder-count="4">
+            <li class="card" style="padding: 14px">
+              <div class="row" style="justify-content: space-between"><b style="font-size: 15px">{{h.game}}</b><span class="muted" style="font-size: 12.5px">{{h.when}}</span></div>
+              <p style="font-size: 14px; margin-top: 6px; line-height: 1.45">{{h.highlight}}</p>
+              <div class="muted" style="font-size: 12.5px; margin-top: 6px">{{h.meta}}</div>
+            </li>
+          </sc-for>
+        </ul>
+      </sc-if>
+
+      <sc-if value="{{tabJokes}}" hint-placeholder-val="{{ false }}">
+        <div class="rise" style="margin-top: 12px">
+          <form onSubmit="{{addJoke}}" style="display: flex; gap: 8px">
+            <label for="cr-joke" class="sr">Pin an inside joke</label>
+            <input id="cr-joke" class="field" value="{{draft}}" onChange="{{onDraft}}" maxlength="120" placeholder="Pin something only the crew gets" style="flex: 1; min-width: 0">
+            <button type="submit" class="btn btn-cta tap" style="flex: none">Pin</button>
+          </form>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+            <sc-for list="{{jokes}}" as="j" hint-placeholder-count="4">
+              <div class="{{j.cls}}" style="padding: 14px; border-radius: 20px; min-height: 116px; display: flex; flex-direction: column; background: {{j.bg}}; color: #2a0a1c; transform: rotate({{j.rot}})">
+                <p class="d" style="font-size: 15.5px; font-weight: 700; line-height: 1.2">{{j.text}}</p>
+                <span style="margin-top: auto; padding-top: 8px; font-size: 12px; font-weight: 700; opacity: .8">{{j.from}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p class="muted" style="font-size: 12.5px; margin-top: 10px">Game moments pin themselves here. Only crew members see this wall.</p>
+        </div>
+      </sc-if>
+      <p class="muted" style="font-size: 12.5px; margin-top: 16px; line-height: 1.5">Everyone stays under their game nickname inside a crew. Leave any time from the ⋯ menu; reports and warnings work the same as in games.</p>
+    </div>
+  </div>
+</div>
+
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+    <a href="CreateGame.dc.html" onClick="{{playNow}}" class="fab" aria-label="Create game"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+
+  <sc-if value="{{naming}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Save this table as a crew">
+        <h2 style="font-size: 22px">Save this table as a crew</h2>
+        <p class="muted" style="font-size: 13.5px; margin-top: 4px">From {{fromGame}}. Everyone you keep gets an invite and stays under their nickname.</p>
+        <label for="cr-name" class="label" style="margin-top: 14px">Crew name</label>
+        <input id="cr-name" class="field" value="{{newName}}" onChange="{{onNewName}}" maxlength="30" placeholder="e.g. Room 204 survivors">
+        <label class="label" style="margin-top: 14px">Who’s in?</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{invitees}}" as="iv" hint-placeholder-count="4">
+            <button class="chip tap {{iv.cls}}" aria-pressed="{{iv.on}}" onClick="{{iv.pick}}">{{iv.name}}</button>
+          </sc-for>
+        </div>
+        <button class="btn btn-cta btn-lg btn-block tap" onClick="{{createCrew}}" style="margin-top: 16px">Save crew</button>
+        <button class="btn btn-ghost btn-block tap" onClick="{{closeNaming}}" style="margin-top: 6px; border: 0">Not now</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null, pickName = null, fresh = null;
+    try {
+      m = window.localStorage.getItem('sk-mode');
+      pickName = window.localStorage.getItem('sk-crew'); window.localStorage.removeItem('sk-crew');
+      fresh = JSON.parse(window.localStorage.getItem('sk-crew-new') || 'null'); window.localStorage.removeItem('sk-crew-new');
+    } catch (e) {}
+    var names = ['Hostel B gang', 'Class of 2027', 'Sunday brunch crew'];
+    var inv = {};
+    ((fresh && fresh.players) || []).forEach(function (p) { inv[p] = true; });
+    this.state = { mode: m || props.mode || 'dark', crew: Math.max(0, names.indexOf(pickName)), tab: 0, rsvp: 0, copied: false, draft: '', extra: [],
+      naming: !!fresh, fromGame: fresh && fresh.game ? String(fresh.game).replace('Sekretly · ', '') : 'tonight’s game', players: (fresh && fresh.players) || [], inv: inv, newName: '', made: null, saved: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var COL = ['#ffd23d', '#7ef0c1', '#7fb2ff', '#ff9ad5', '#ffb35c', '#b78bff', '#5be0a0', '#ff8b98'];
+    var C = [
+      { name: 'Hostel B gang', icon: '/_blob/ea3a1403d8fe6d1943450cfacf059348', bg: 'radial-gradient(130% 110% at 100% 0%,#ffb347 0%,#ff4f6d 45%,#7a1fa2 100%)', who: ['You', 'Fox', 'KolaNut', 'PixelOwl', 'Zobo', 'MangoMoon'], streak: 4, nightTitle: 'Friday · 9:00pm', nightSub: 'Most Likely To · every week' },
+      { name: 'Class of 2027', icon: '/_blob/9fa11a307ccc8cbf33b563a8df193335', bg: 'radial-gradient(130% 110% at 100% 0%,#22e1ff 0%,#3a6bff 50%,#22337d 100%)', who: ['You', 'Moon', 'PixelOwl', 'ChinChin', 'Suya', 'Zobo', 'Fox', 'KolaNut'], streak: 2, nightTitle: 'Saturday · 8:30pm', nightSub: 'Would You Rather · this week only' },
+      { name: 'Sunday brunch crew', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', bg: 'radial-gradient(130% 110% at 100% 0%,#ff9ad5 0%,#d81b72 50%,#5d1785 100%)', who: ['You', 'KolaNut', 'Moon', 'Zobo'], streak: 7, nightTitle: 'Sunday · 2:00pm', nightSub: 'Hot Takes rematch' }
+    ];
+    if (s.made) C.push(s.made);
+    var c = C[s.crew] || C[0];
+    var going = Math.max(1, c.who.length - 2) - 1 + (s.rsvp === 0 ? 1 : 0);
+    var J = s.extra.concat([
+      { text: 'Zobo has been “most likely to sleep through an exam” 4 weeks running', from: 'auto · Most Likely To' },
+      { text: 'The jollof incident of Oct 3. We don’t talk about it.', from: 'pinned by KolaNut' },
+      { text: 'Fox picked dare 11 times in a row', from: 'auto · Truth or Dare' },
+      { text: '“I’m just choosing who gets the gist” became the crew motto', from: 'pinned by you' }
+    ]);
+    var BGS = ['#ffe48a', '#ffd0f0', '#bff3dd', '#cfe3ff', '#ffc9b5'];
+    var titles = { Fox: 'Dare devil', You: 'Knows everyone’s secrets', KolaNut: 'Hot take queen', PixelOwl: 'Quiet but deadly', Zobo: 'Always late, always there', MangoMoon: 'Wildcard', Moon: 'Poll prophet', ChinChin: 'Chaos agent', Suya: 'Never has, never will' };
+    var crewPlay = function () { try { window.localStorage.setItem('sk-crew', c.name); window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} };
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      crewTabs: C.map(function (x, i) { var on = s.crew === i; return { name: x.name, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ crew: i, tab: 0, saved: false }); } }; }),
+      justSaved: s.saved,
+      c: { name: c.name, icon: c.icon, bg: c.bg, streak: c.streak, nightTitle: c.nightTitle, nightSub: c.nightSub,
+        members: c.who.map(function (n, k) { return { n: n, i: n.charAt(0), c: COL[k % COL.length] }; }) },
+      copyInvite: function () { try { navigator.clipboard.writeText('https://sekretly.com/crew/invite'); } catch (e) {} self.setState({ copied: true }); },
+      inviteLabel: s.copied ? 'Invite link copied' : 'Invite someone',
+      playNow: crewPlay,
+      rsvp: ['Going', 'Maybe', 'Can’t'].map(function (n, i) { return { name: n, on: s.rsvp === i ? 'true' : 'false', pick: function () { self.setState({ rsvp: i }); } }; }),
+      goingText: Math.max(0, going) + ' of ' + c.who.length + ' going · reminder 1 hour before',
+      tabs: ['Leaderboard', 'History', 'Inside jokes'].map(function (n, i) { return { name: n, on: s.tab === i ? 'true' : 'false', pick: function () { self.setState({ tab: i }); } }; }),
+      tabBoard: s.tab === 0, tabHistory: s.tab === 1, tabJokes: s.tab === 2,
+      board: c.who.map(function (n, k) { return { n: n, pts: 1240 - k * 110 - (n === 'You' ? -60 : 0) }; }).sort(function (a, b) { return b.pts - a.pts; }).map(function (b, k) {
+        return { rank: k + 1, n: b.n, i: b.n.charAt(0), c: COL[c.who.indexOf(b.n) % COL.length], pts: b.pts, title: titles[b.n] || 'New to the crew', bg: b.n === 'You' ? 'rgba(255,59,141,.10)' : 'transparent', rankInk: k === 0 ? '#ffb020' : 'var(--ink)' };
+      }),
+      history: [
+        { game: 'Most Likely To', when: 'Last Friday', highlight: 'You got “most likely to cry at a wedding”. 5 of 6 votes. No defence was accepted.', meta: '6 played · 42 rounds · Fox won' },
+        { game: 'Truth or Dare', when: 'Oct 11', highlight: 'Zobo’s dare proof is still the most viewed thing in this crew.', meta: '4 played · 18 rounds' },
+        { game: 'Never Have I Ever', when: 'Oct 4', highlight: 'Turns out 5 of 6 have never cooked rice without burning it.', meta: '6 played · 30 rounds · you won' },
+        { game: 'Crew saved', when: 'Oct 1', highlight: 'Saved from “Friday Night Never” with Fox and KolaNut.', meta: 'Day one' }
+      ],
+      draft: s.draft, onDraft: function (e) { self.setState({ draft: e.target.value.slice(0, 120) }); },
+      addJoke: function (e) { if (e && e.preventDefault) e.preventDefault(); if (!s.draft.trim()) return; self.setState({ extra: [{ text: s.draft.trim(), from: 'pinned by you · just now', fresh: true }].concat(s.extra), draft: '' }); },
+      jokes: J.map(function (j, i) { return { text: j.text, from: j.from, bg: BGS[i % BGS.length], rot: (i % 2 ? 1.2 : -1.2) + 'deg', cls: j.fresh ? 'pop' : '' }; }),
+      naming: s.naming, fromGame: s.fromGame, closeNaming: function () { self.setState({ naming: false }); },
+      newName: s.newName, onNewName: function (e) { self.setState({ newName: e.target.value.slice(0, 30) }); },
+      invitees: s.players.map(function (n) { var on = !!s.inv[n]; return { name: n, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { var v = Object.assign({}, s.inv); v[n] = !on; self.setState({ inv: v }); } }; }),
+      createCrew: function () {
+        var who = ['You'].concat(s.players.filter(function (k) { return s.inv[k]; }));
+        var made = { name: s.newName.trim() || 'Friday table', icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', bg: 'radial-gradient(130% 110% at 100% 0%,#5be0a0 0%,#127a80 50%,#0a2b3a 100%)', who: who, streak: 0, nightTitle: 'No game night yet', nightSub: 'Tap Change to pick a weekly time' };
+        self.setState({ made: made, crew: 3, naming: false, tab: 0, saved: true });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

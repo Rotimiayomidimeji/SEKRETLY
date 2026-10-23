@@ -3,6 +3,7 @@ import "server-only";
 import { Prisma } from "@prisma/client";
 
 import { newLinkKey } from "@/features/links/topics";
+import { notify } from "@/features/notifications/notify";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 
@@ -32,6 +33,7 @@ export async function createAccount(data: { username: string; password: string; 
         },
         select: { id: true },
       });
+      await notify(user.id, "WELCOME", "Welcome to Sekretly, @" + data.username, "/create", "Make your first link");
       return { ok: true as const, id: user.id };
     } catch (e) {
       if (!(e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002")) throw e;

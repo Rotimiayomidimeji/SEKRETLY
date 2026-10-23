@@ -47,5 +47,12 @@
   "AdminCategories": "/admin/categories",
   "AdminAds": "/admin/ads",
   "AdsMap": "/admin/ads/map",
-  "Themes": "/themes"
+  "Themes": "/themes",
+  "Receipt": "/receipt",
+  "DropAnswer": "/drop",
+  "Streak": "/streak",
+  "Badges": "/badges",
+  "WeeklyWrap": "/wrap",
+  "Crews": "/crews",
+  "CrewDaily": "/crews/daily"
 }

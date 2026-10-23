@@ -20,6 +20,16 @@
 @import "./sk/boards/Create.css";
 @import "./sk/boards/MyLinks.css";
 @import "./sk/boards/LinkDetail.css";
+@import "./sk/boards/Inbox.css";
+@import "./sk/boards/Home.css";
+@import "./sk/boards/Notifications.css";
+@import "./sk/boards/DropAnswer.css";
+@import "./sk/boards/Receipt.css";
+@import "./sk/boards/Streak.css";
+@import "./sk/boards/Badges.css";
+@import "./sk/boards/WeeklyWrap.css";
+@import "./sk/boards/Crews.css";
+@import "./sk/boards/CrewDaily.css";
 
 html {
   -webkit-text-size-adjust: 100%;

@@ -91,9 +91,13 @@ export default class MyLinks extends React.Component<Record<string, any>, any> {
                 <path d="M5.5 5h13L22 12v7H2v-7z" />
               </svg>
               Inbox
-              <span className="count">
-                4
-              </span>
+              {v.navInbox ? (
+                <>
+                <span className="count">
+                  {v.navInbox}
+                </span>
+                </>
+              ) : null}
             </SkLink>
             {" "}
             <SkLink href="/create" className="nav-i">
@@ -125,9 +129,13 @@ export default class MyLinks extends React.Component<Record<string, any>, any> {
                 <path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" />
               </svg>
               Notifications
-              <span className="count">
-                3
-              </span>
+              {v.navNotif ? (
+                <>
+                <span className="count">
+                  {v.navNotif}
+                </span>
+                </>
+              ) : null}
             </SkLink>
             {" "}
             <SkLink href="/profile" className="nav-i">
@@ -190,9 +198,13 @@ export default class MyLinks extends React.Component<Record<string, any>, any> {
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                     <path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" />
                   </svg>
-                  <span className="badge">
-                    3
-                  </span>
+                  {v.navNotif ? (
+                    <>
+                    <span className="badge">
+                      {v.navNotif}
+                    </span>
+                    </>
+                  ) : null}
                 </SkLink>
                 {" "}
               </header>
@@ -337,9 +349,13 @@ export default class MyLinks extends React.Component<Record<string, any>, any> {
               <path d="M5.5 5h13L22 12v7H2v-7z" />
             </svg>
             Inbox
-            <span className="badge">
-              4
-            </span>
+            {v.navInbox ? (
+              <>
+              <span className="badge">
+                {v.navInbox}
+              </span>
+              </>
+            ) : null}
           </SkLink>
           {" "}
           <SkLink href="/create" className="fab" aria-label="Create link">
