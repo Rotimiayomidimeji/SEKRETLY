@@ -1,2 +1,9 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function PrivacyPage() { return <FoundationPage title="Privacy, by design." description="Privacy policy content will be added before production launch." />; }
+import type { Metadata } from "next";
+import Legal from "@/components/sk/Legal";
+import { getMode } from "@/lib/sk/mode";
+
+export const metadata: Metadata = { title: "Sekretly · Privacy policy" };
+
+export default async function PrivacyPage() {
+  return <Legal mode={await getMode()} tab="privacy" />;
+}

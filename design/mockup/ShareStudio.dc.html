@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Share studio</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+/* stage: the focused card big in the middle, neighbours peeking, swipe or tap to move */
+.ss-stage{--cw:250px;position:relative;height:calc(var(--cw) * 16 / 9 + 40px);margin:4px -16px 0;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-mask-image:linear-gradient(transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(transparent,#000 5%,#000 95%,transparent)}
+@container (min-width:700px){.ss-stage{--cw:290px;margin:4px 0 0;border-radius:32px}}
+.ss-glow{position:absolute;left:50%;top:50%;width:calc(var(--cw) * 1.5);height:calc(var(--cw) * 1.5);margin:calc(var(--cw) * -.75) 0 0 calc(var(--cw) * -.75);border-radius:50%;filter:blur(70px);opacity:.42;transition:background .6s;animation:ssBreathe 6s ease-in-out infinite;pointer-events:none}
+@keyframes ssBreathe{50%{transform:scale(1.12);opacity:.55}}
+.ss-slot{position:absolute;left:50%;top:20px;width:var(--cw);margin-left:calc(var(--cw) / -2);transform:translateX(calc(var(--cw) * var(--d) * .8)) scale(var(--s)) rotate(calc(var(--d) * 3.5deg));transition:transform .55s cubic-bezier(.2,.9,.25,1.12),opacity .4s,filter .4s;cursor:pointer}
+.ss-slot.is-focus{cursor:default}
+.ss-slot.is-far{pointer-events:none}
+/* one story card (9:16). Everything inside .ss-face is what gets posted. */
+.ss-card{position:relative;container-type:inline-size;aspect-ratio:9/16;border-radius:26px;overflow:hidden;box-shadow:0 22px 50px rgba(0,0,0,.35);transition:filter .35s,opacity .35s,box-shadow .35s}
+.ss-off .ss-card{filter:saturate(.25) brightness(.8);opacity:.55}
+.ss-face{position:absolute;inset:0;display:flex;flex-direction:column;padding:21cqi 7.5cqi 6.5cqi}
+.ss-quote{position:absolute;left:5cqi;top:26cqi;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:34cqi;font-weight:800;line-height:1;opacity:.16;pointer-events:none}
+.ss-topic{display:flex;align-items:center;gap:2.4cqi;font-size:4.2cqi;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.88}
+.ss-topic img{width:7.5cqi;height:7.5cqi}
+.sk .ss-text{margin:auto 0;padding:4cqi 0 6cqi;overflow-wrap:anywhere}
+.sk .ss-t-xl{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:10.6cqi;font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.sk .ss-t-l{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:8.2cqi;font-weight:800;line-height:1.14;letter-spacing:-.015em}
+.sk .ss-t-m{font-family:'DM Sans',system-ui,sans-serif;font-size:6.9cqi;font-weight:700;line-height:1.36}
+.sk .ss-t-s{font-family:'DM Sans',system-ui,sans-serif;font-size:5.7cqi;font-weight:700;line-height:1.36}
+.sk .ss-top .ss-text{margin:0;padding:3.5cqi 0 3cqi}
+.ss-top .ss-quote{display:none}
+.ss-top .ss-foot{margin-top:auto}
+.ss-wm{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-28deg);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:17cqi;font-weight:800;letter-spacing:.12em;white-space:nowrap;opacity:.07;pointer-events:none;user-select:none}
+.ss-foot{display:flex;flex-direction:column;gap:3cqi}
+.ss-pages{display:flex;align-items:center;gap:1.6cqi;font-size:4.2cqi;font-weight:800}
+.ss-pages i{width:2.4cqi;height:2.4cqi;border-radius:50%;background:currentColor;opacity:.3}
+.ss-pages i.on{width:6cqi;border-radius:3cqi;opacity:1}
+.ss-brand{display:flex;justify-content:space-between;align-items:center;font-size:3.9cqi;opacity:.85}
+.ss-brand b{letter-spacing:.14em}
+.ss-lock{display:inline-flex;align-items:center;gap:1.6cqi;align-self:flex-start;font-size:3.9cqi;font-weight:800;padding:1.4cqi 3cqi;border-radius:99px;background:rgba(0,0,0,.35)}
+/* controls on top of the card (never posted) */
+.ss-ctl{position:absolute;top:10px;left:10px;right:10px;z-index:3;display:flex;align-items:center;gap:6px}
+.sk .ss-circle{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(0,0,0,.22);display:grid;place-items:center;padding:0;color:#1a0b14;transition:background .25s,border-color .25s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.sk .ss-circle.on{background:#ffffff}
+.sk .ss-circle.posted{background:#5be0a0;border-color:#5be0a0;animation:ssTick .5s cubic-bezier(.3,1.7,.5,1)}
+.sk .ss-circle.lock{background:rgba(0,0,0,.4);border-color:rgba(255,255,255,.45)}
+.ss-circle:active{transform:scale(.86)}
+@keyframes ssTick{0%{transform:scale(.4)}100%{transform:scale(1)}}
+.ss-num{margin-left:auto;min-width:34px;height:34px;padding:0 9px;border-radius:12px;display:grid;place-items:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:16px;background:rgba(0,0,0,.3);color:#ffffff;backdrop-filter:blur(8px)}
+.sk .ss-paint{width:34px;height:34px;border-radius:12px;border:0;background:rgba(0,0,0,.3);display:grid;place-items:center;padding:0;backdrop-filter:blur(8px)}
+.ss-paint img{width:22px;height:22px;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ss-paint:hover img,.ss-paint[aria-expanded="true"] img{transform:rotate(-16deg) scale(1.12)}
+.ss-sent .ss-card{animation:ssSend .7s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes ssSend{0%{transform:none}35%{transform:translateY(-16px) scale(1.03);box-shadow:0 30px 60px rgba(91,224,160,.35)}100%{transform:none}}
+.ss-arrow{position:absolute;top:50%;z-index:20;width:44px;height:44px;margin-top:-22px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--ink);display:none;place-items:center;box-shadow:var(--shadow)}
+.ss-arrow--l{left:14px}.ss-arrow--r{right:14px}
+@container (min-width:700px){.ss-arrow{display:grid}}
+.ss-progress{position:absolute;left:0;right:0;margin:0 auto;width:max-content;top:4px;z-index:30;display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:#211a2c;color:#ffffff;font-size:13px;font-weight:800;box-shadow:var(--shadow);white-space:nowrap;animation:up .3s both}
+.ss-progress i{width:8px;height:8px;border-radius:50%;background:#5be0a0;animation:ssBlink 1s infinite}
+@keyframes ssBlink{50%{opacity:.25}}
+/* caption + paint row */
+.ss-cap{display:flex;align-items:center;gap:10px;margin-top:6px}
+.ss-nav{width:42px;height:42px;border-radius:14px;flex:none}
+.ss-swrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding:12px;border-radius:20px;background:var(--card);border:1px solid var(--line);animation:up .3s both}
+.sk .ss-sw{width:36px;height:36px;border-radius:50%;border:3px solid transparent;padding:0;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.ss-sw:hover{transform:scale(1.12)}
+/* filmstrip: posting order */
+.ss-film{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 8px;scrollbar-width:none}
+.ss-film::-webkit-scrollbar{display:none}
+.ss-grp{flex:none;display:flex;flex-direction:column;gap:6px}
+.ss-grp-h{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap}
+.ss-grp-h img{width:16px;height:16px}
+.ss-thumbs{display:flex;gap:6px}
+.sk .ss-thumb{position:relative;width:38px;height:66px;border-radius:10px;border:2px solid transparent;padding:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:15px;color:#ffffff;text-shadow:0 1px 4px rgba(0,0,0,.55);transition:transform .25s cubic-bezier(.3,1.6,.5,1),border-color .2s,opacity .2s}
+.sk .ss-thumb.focus{border-color:var(--ink);transform:translateY(-4px)}
+.sk .ss-thumb.off{opacity:.35}
+.ss-thumb .ok{position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:#5be0a0;color:#0b2a1c;font-size:11px;display:grid;place-items:center;animation:ssTick .4s cubic-bezier(.3,1.7,.5,1)}
+/* where to post */
+.ss-dest{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sk .ss-d{min-height:64px;border-radius:18px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:800;padding:6px 2px;transition:border-color .2s,transform .2s}
+.sk .ss-d[aria-pressed="true"]{border-color:var(--pink);transform:translateY(-2px)}
+.ss-d span{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:900}
+.ss-step{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 980px; padding: 0 16px">
+      <header class="topbar">
+        <a href="Inbox.dc.html" class="icon-btn tap" aria-label="Back to inbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+        <div class="grow"><h1 style="font-size: 22px">Share studio</h1><div class="muted" style="font-size: 13px">{{summary}}</div></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+
+      <section class="ss-stage" aria-label="Cards to share" aria-roledescription="carousel" onPointerDown="{{down}}" onPointerUp="{{up}}">
+        <div class="ss-glow {{focusTh}}" aria-hidden="true"></div>
+        <sc-if value="{{isPosting}}" hint-placeholder-val="{{ false }}"><div class="ss-progress" role="status"><i></i>{{progressText}}</div></sc-if>
+        <sc-for list="{{cards}}" as="c" hint-placeholder-count="4">
+          <div class="ss-slot {{c.slotCls}}" style="--d: {{c.d}}; --s: {{c.s}}; z-index: {{c.z}}; opacity: {{c.op}}" onClick="{{c.focusMe}}" aria-hidden="{{c.hidden}}">
+            <div class="ss-card {{c.th}}">
+              <div class="ss-ctl">
+                <sc-if value="{{c.isPublic}}" hint-placeholder-val="{{ true }}">
+                  <button class="ss-circle {{c.circleCls}}" onClick="{{c.toggle}}" role="checkbox" aria-checked="{{c.selStr}}" aria-label="{{c.circleAria}}">
+                    <sc-if value="{{c.showTick}}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                  </button>
+                </sc-if>
+                <sc-if value="{{c.own}}" hint-placeholder-val="{{ false }}">
+                  <button class="ss-circle {{c.circleCls}}" onClick="{{c.toggle}}" role="checkbox" aria-checked="{{c.selStr}}" aria-label="Your own message, in-app only. {{c.circleAria}}"><img src="/_blob/7356090e8cd14d77123c7e2f69c92dcb" alt="" style="width: 19px; height: 19px"></button>
+                </sc-if>
+                <span class="ss-num" aria-label="Posts {{c.numWord}}">{{c.num}}</span>
+                <button class="ss-paint tap" onClick="{{c.paint}}" aria-label="Change colour of this card" aria-expanded="{{c.paintStr}}"><img src="/_blob/673479127a4cade2098454dddd5a650c" alt=""></button>
+              </div>
+              <div class="ss-face {{c.faceCls}}">
+                <span class="ss-wm" aria-hidden="true">SEKRETLY</span>
+                <span class="ss-quote" aria-hidden="true">“</span>
+                <div class="ss-topic"><img src="{{c.icon}}" alt="">{{c.topic}}</div>
+                <p class="ss-text {{c.size}}">{{c.text}}</p>
+                <div class="ss-foot">
+                  <sc-if value="{{c.own}}" hint-placeholder-val="{{ false }}"><span class="ss-lock">🔒 In-app only</span></sc-if>
+                  <sc-if value="{{c.multi}}" hint-placeholder-val="{{ false }}">
+                    <div class="ss-pages"><sc-for list="{{c.dots}}" as="dt" hint-placeholder-count="3"><i class="{{dt}}"></i></sc-for><span style="margin-left: 4px">{{c.partNo}}</span><span style="margin-left: auto">{{c.more}}</span></div>
+                  </sc-if>
+                  <div class="ss-brand"><b>SEKRETLY</b><span>sekretly.com/peach</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <button class="ss-arrow ss-arrow--l tap" onClick="{{prev}}" aria-label="Previous card"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+        <button class="ss-arrow ss-arrow--r tap" onClick="{{next}}" aria-label="Next card"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+      </section>
+
+      <div class="ss-cap">
+        <button class="icon-btn ss-nav tap" onClick="{{prev}}" disabled="{{atFirst}}" aria-label="Previous card" style="opacity: {{prevOp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+        <div style="flex: 1; min-width: 0; text-align: center">
+          <b style="font-size: 15px">{{capTitle}}</b>
+          <div class="muted" style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{capSub}}</div>
+        </div>
+        <button class="icon-btn ss-nav tap" onClick="{{next}}" disabled="{{atLast}}" aria-label="Next card" style="opacity: {{nextOp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+      </div>
+
+      <sc-if value="{{paintOpen}}" hint-placeholder-val="{{ false }}">
+        <div class="ss-swrow" role="group" aria-label="Card colour">
+          <b style="font-size: 13px; width: 100%">{{paintTitle}}</b>
+          <sc-for list="{{swatches}}" as="sw" hint-placeholder-count="6"><button class="ss-sw tap {{sw.cls}}" onClick="{{sw.pick}}" aria-label="{{sw.name}}" aria-pressed="{{sw.on}}" style="border-color: {{sw.ring}}"></button></sc-for>
+          <sc-if value="{{canApplyAll}}" hint-placeholder-val="{{ false }}"><button class="btn btn-sm tap" onClick="{{applyAll}}" style="margin-left: auto">{{applyAllLabel}}</button></sc-if>
+        </div>
+      </sc-if>
+
+      <div class="row" style="justify-content: space-between; margin-top: 18px">
+        <b style="font-size: 15px">Posting order</b>
+        <button class="chip tap {{allCls}}" onClick="{{toggleAll}}" aria-pressed="{{allStr}}" style="min-height: 36px">{{allLabel}}</button>
+      </div>
+      <div class="ss-film" style="margin-top: 8px" aria-label="All cards in posting order">
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <div class="ss-grp">
+            <div class="ss-grp-h"><img src="{{g.icon}}" alt="">{{g.label}}</div>
+            <div class="ss-thumbs">
+              <sc-for list="{{g.thumbs}}" as="t" hint-placeholder-count="3">
+                <button class="ss-thumb {{t.cls}}" onClick="{{t.go}}" aria-label="{{t.aria}}">{{t.num}}<sc-if value="{{t.posted}}" hint-placeholder-val="{{ false }}"><span class="ok">✓</span></sc-if></button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <p class="muted" style="font-size: 12.5px; margin-top: 2px">{{orderHint}}</p>
+
+      <b style="display: block; font-size: 15px; margin-top: 16px">Post to</b>
+      <div class="ss-dest" role="radiogroup" aria-label="Where to post" style="margin-top: 8px">
+        <sc-for list="{{dests}}" as="d" hint-placeholder-count="4">
+          <button class="ss-d tap" onClick="{{d.pick}}" role="radio" aria-checked="{{d.on}}" aria-pressed="{{d.on}}"><span style="background: {{d.bg}}; color: {{d.ink}}">{{d.mark}}</span>{{d.name}}</button>
+        </sc-for>
+      </div>
+      <button class="btn btn-cta btn-lg btn-block tap" onClick="{{post}}" disabled="{{cantPost}}" style="margin-top: 12px; opacity: {{postOp}}">{{postLabel}}</button>
+      <button class="btn btn-block tap" onClick="{{openFriends}}" disabled="{{noAny}}" style="margin-top: 8px; gap: 8px"><img src="/_blob/faee0cc7c58ac8fcd872c32ba90d5d84" alt="" style="width: 22px; height: 22px">{{friendsLabel}}</button>
+      <sc-if value="{{hasOwn}}" hint-placeholder-val="{{ false }}">
+        <p class="muted" style="margin-top: 10px; font-size: 13px; line-height: 1.45">🔒 cards are your own words. They can go to friends on Sekretly, but never to public stories.</p>
+      </sc-if>
+
+      <div class="sec-h"><h2>Add more to this share</h2><span class="muted" style="font-size: 13px">{{poolCount}} available</span></div>
+      <div class="card" style="overflow: hidden">
+        <sc-for list="{{pool}}" as="pm" hint-placeholder-count="4">
+          <div class="list-row">
+            <span class="av {{pm.th}}" style="width: 40px; height: 40px; border-radius: 13px"><img src="{{pm.icon}}" alt=""></span>
+            <span style="flex: 1; min-width: 0"><span class="muted" style="font-size: 12px; font-weight: 700">{{pm.meta}}</span><span style="display: block; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{pm.text}}</span></span>
+            <sc-if value="{{pm.own}}" hint-placeholder-val="{{ false }}"><span class="pill" style="font-size: 11px">🔒</span></sc-if>
+            <button class="btn btn-sm tap" onClick="{{pm.add}}">+ Add</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{doneOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Posted">
+        <div style="text-align: center">
+          <img class="pop" src="/_blob/b19edf31ee997601c75c6d70586dc173" alt="" style="width: 64px; height: 64px">
+          <h2 style="font-size: 22px; margin-top: 6px">{{doneTitle}}</h2>
+          <p class="muted" style="margin-top: 4px; font-size: 14px">One after another, so friends read them in the right order.</p>
+        </div>
+        <div style="margin-top: 10px; max-height: 200px; overflow-y: auto">
+          <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+            <div class="ss-step"><span class="ss-num" style="margin-left: 0; background: #5be0a0; color: #0b2a1c; min-width: 30px; height: 30px; font-size: 14px">{{st.num}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{st.label}}</span><span style="color: #5be0a0; font-weight: 800">✓</span></div>
+          </sc-for>
+        </div>
+        <div class="ad" style="width: 100%; max-width: 320px; height: 100px; margin: 12px auto 0"><b>Banner ad</b>320 × 100 · after posting</div>
+        <div class="row" style="gap: 8px; margin-top: 12px">
+          <button class="btn btn-lg tap" onClick="{{again}}" style="flex: 1">Post elsewhere</button>
+          <a href="Inbox.dc.html" class="btn btn-ink btn-lg tap" style="flex: 1">Done</a>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{friends}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Send in app">
+        <div class="row"><h2 style="flex: 1; font-size: 21px">Send to friends on Sekretly</h2><button class="icon-btn tap" onClick="{{closeFriends}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+        <p class="muted" style="margin-top: 4px; font-size: 13.5px">{{friendsSub}}</p>
+        <div style="margin-top: 10px">
+          <sc-for list="{{friendList}}" as="fr" hint-placeholder-count="4">
+            <div class="list-row" style="padding-left: 0; padding-right: 0">
+              <span class="av" style="background: {{fr.bg}}; width: 42px; height: 42px; border-radius: 14px; color: #1a0b14; font-weight: 800">{{fr.initial}}</span>
+              <span style="flex: 1"><b>{{fr.name}}</b><div class="muted" style="font-size: 12.5px">{{fr.sub}}</div></span>
+              <button class="btn btn-sm tap {{fr.cls}}" onClick="{{fr.send}}">{{fr.label}}</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = this.arrive(m || props.mode || 'dark');
+  }
+  // the inbox hands over the message(s) in sk-share and stamps sk-nav
+  arrive(mode) {
+    var ids = null;
+    try { ids = JSON.parse(window.localStorage.getItem('sk-share') || 'null'); this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (e) { this.nav = ''; }
+    this.extra = {};
+    var base = this.msgs(), extra = {};
+    (ids || []).forEach(function (x) { if (x && typeof x === 'object') extra[x.id] = { topic: x.topic, th: x.th, text: x.text, own: !!x.own, icon: x.own ? '/_blob/7356090e8cd14d77123c7e2f69c92dcb' : (x.icon || (base[x.id] && base[x.id].icon) || '/_blob/facd9191837d9eba7e7cedf471a11301') }; });
+    this.extra = extra;
+    var all = this.msgs();
+    var picked = (ids || []).map(function (x) { return x && typeof x === 'object' ? x.id : x; }).filter(function (id) { return !!all[id]; });
+    return { mode: mode, tray: picked.length ? picked : ['m5', 'm0', 'o1'], off: {}, theme: {}, paint: false, focus: 0, dest: 'wa', posting: null, posted: {}, sent: null, done: false, friends: false, sentTo: {} };
+  }
+  msgs() {
+    return Object.assign({
+      m5: { topic: 'Confess something', th: 'bubblegum', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', text: 'I need to say this before we graduate, and I can’t say it to your face. Remember the departmental dinner in 300L, when NEPA took the light and everybody started screaming? I was the one holding your hand. You thought it was Tunde. I let you think that, and I have regretted it every single day since. I watched you laugh about it with him the next morning and I just smiled like a mumu. I tried to stop liking you after that. I joined a different reading group. I muted your status for two whole weeks. It didn’t work. Every time you post a sunset, I check who viewed it before me like a crazy person. I’m not telling you this so you’ll like me back. I know you’re talking to someone, and I hope he treats you well. I’m telling you because you once said nobody ever notices you. That’s not true. Somebody noticed everything: the way you hum when you’re reading, how you always give away the last piece of chin chin, how you remember everybody’s birthday. You are not invisible. You never were. Okay. That’s it. Please don’t try to guess.' },
+      m3: { topic: 'Confess something', th: 'bubblegum', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', text: 'I copied your assignment in 200L and I am still sorry. Not just once, the whole semester. You stayed up doing it and I just changed the font. When you got a B and I got an A, I wanted to tell you so many times, but I was scared you would hate me. You helped me pass and you didn’t even know it. If you ever need anything, I owe you, for real.' },
+      m0: { topic: 'Describe me in 3 words', th: 'sunset', icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', text: 'Funny · Loyal · Chaotic' },
+      m2: { topic: 'Rate me 1–10', th: 'midnight', icon: '/_blob/ea3a1403d8fe6d1943450cfacf059348', text: '9/10. Minus one for always being late.' },
+      q1: { topic: 'How well do you know me?', th: 'ocean', icon: '/_blob/886899060459eafd6bc4284897539947', text: 'Someone scored 4/5 on my quiz. “You know me so well it’s scary”' },
+      a1: { topic: 'Ask me anything', th: 'neon', icon: '/_blob/facd9191837d9eba7e7cedf471a11301', text: 'What’s the most spontaneous thing you’ve ever done?' },
+      m4: { topic: 'Describe me in 3 words', th: 'sunset', icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', text: 'Smart · Calm · Ludo' },
+      c1: { topic: 'Chat · Fox', th: 'default', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', text: 'ok but who do you keep posting on your story?' },
+      o1: { topic: 'Your reply to Fox', th: 'default', icon: '/_blob/7356090e8cd14d77123c7e2f69c92dcb', text: 'lowkey?? be serious', own: true },
+      o2: { topic: 'Your reply to Moon', th: 'midnight', icon: '/_blob/7356090e8cd14d77123c7e2f69c92dcb', text: 'depends. is it good or bad', own: true }
+    }, this.extra || {});
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.nt = setInterval(function () { var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {} if (nv !== self.nav) { clearInterval(self.tk); clearTimeout(self.dt); self.setState(self.arrive(self.state.mode)); } }, 700);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); clearInterval(this.nt); clearTimeout(this.dt); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  // long text fills each card top to bottom (about 390 characters) and carries on in the next one.
+  // The inbox pages through the same cards.
+  split(t, max) {
+    var out = [], rest = (t || '').trim();
+    while (rest.length > max) {
+      var cut = -1;
+      for (var i = max; i >= Math.floor(max * 0.92); i--) { if (/[.!?]/.test(rest.charAt(i - 1)) && rest.charAt(i) === ' ') { cut = i; break; } }
+      if (cut < 0) cut = rest.lastIndexOf(' ', max);
+      if (cut <= 0) cut = max;
+      out.push(rest.slice(0, cut).trim()); rest = rest.slice(cut).trim();
+    }
+    if (rest) out.push(rest);
+    if (out.length > 1 && out[out.length - 1].length < max * 0.3) {
+      var both = out.splice(out.length - 2, 2).join(' '), mid = both.indexOf(' ', Math.floor(both.length / 2));
+      if (mid < 0) mid = Math.floor(both.length / 2);
+      out.push(both.slice(0, mid).trim(), both.slice(mid).trim());
+    }
+    return out;
+  }
+  // posting plays out on the stage: each card comes to the middle, lifts, and its circle turns into a green tick
+  runPost(keys, dest) {
+    var self = this, k = 0;
+    clearInterval(this.tk); clearTimeout(this.dt);
+    this.setState({ posting: { dest: dest, keys: keys, k: 0 }, posted: {}, done: false, paint: false });
+    this.tk = setInterval(function () {
+      var s = self.state; if (!s.posting) { clearInterval(self.tk); return; }
+      var key = keys[k], idx = self.keyIndex[key], posted = Object.assign({}, s.posted); posted[key] = true;
+      k++;
+      self.setState({ focus: idx === undefined ? s.focus : idx, posted: posted, posting: Object.assign({}, s.posting, { k: k }), sent: key });
+      if (k >= keys.length) { clearInterval(self.tk); self.dt = setTimeout(function () { self.setState({ posting: null, done: true }); }, 1000); }
+    }, 950);
+  }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var M = this.msgs();
+    var TH = [['default', 'Default'], ['sunset', 'Sunset'], ['midnight', 'Midnight'], ['bubblegum', 'Bubblegum'], ['neon', 'Neon'], ['ocean', 'Ocean']];
+    var flat = [], groups = [], order = 0, pubSel = 0, anySel = 0;
+    var ends = function (x) { return /[.!?”"]$/.test(x); };
+    s.tray.forEach(function (id) {
+      var m = M[id]; if (!m) return;
+      var parts = self.split(m.text, 390);
+      groups.push({ id: id, icon: m.icon, label: (m.topic.length > 18 ? m.topic.slice(0, 17) + '…' : m.topic) + (parts.length > 1 ? ' · ' + parts.length : ''), thumbs: [] });
+      parts.forEach(function (txt, pi) {
+        var key = id + ':' + pi, on = !s.off[key];
+        if (on) { order++; anySel++; if (!m.own) pubSel++; }
+        var text = (pi > 0 && !ends(parts[pi - 1]) ? '…' : '') + txt + (pi < parts.length - 1 && !ends(txt) ? '…' : '');
+        var len = text.length;
+        flat.push({ key: key, id: id, m: m, pi: pi, parts: parts, on: on, num: on ? order : null, th: s.theme[key] || m.th, text: text,
+          size: parts.length > 1 || len > 150 ? 'ss-t-s' : len <= 42 ? 'ss-t-xl' : len <= 90 ? 'ss-t-l' : 'ss-t-m', top: parts.length > 1 || len > 150 });
+      });
+    });
+    var total = flat.length, focus = Math.max(0, Math.min(s.focus, total - 1)), fc = flat[focus] || null;
+    this.keyIndex = {}; flat.forEach(function (c, i) { self.keyIndex[c.key] = i; });
+    var go = function (i) { self.setState({ focus: Math.max(0, Math.min(total - 1, i)) }); };
+    var nth = function (n) { return ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'][n - 1] || ('number ' + n); };
+    var cards = flat.map(function (c, i) {
+      var d = i - focus, ad = Math.abs(d), posted = !!s.posted[c.key];
+      return {
+        d: d, s: d === 0 ? 1 : 0.84, z: 20 - ad, op: ad > 2 ? 0 : ad === 2 ? 0.5 : 1, hidden: d === 0 ? 'false' : 'true',
+        slotCls: (d === 0 ? 'is-focus' : '') + (ad > 2 ? ' is-far' : '') + (c.on ? '' : ' ss-off') + (s.sent === c.key && posted ? ' ss-sent' : ''),
+        focusMe: function () { if (self.swiped) { self.swiped = false; return; } if (d !== 0) go(i); },
+        th: 'th-' + c.th, icon: c.m.icon, topic: c.m.topic, text: c.text, size: c.size, faceCls: c.top ? 'ss-top' : '',
+        own: !!c.m.own, isPublic: !c.m.own, selStr: c.on ? 'true' : 'false',
+        circleCls: posted ? 'posted' : c.m.own ? 'lock' : (c.on ? 'on' : ''), showTick: posted || (c.on && !c.m.own),
+        circleAria: posted ? 'Posted' : c.on ? 'Included, tap to skip this card' : 'Skipped, tap to include this card',
+        toggle: function (e) { if (e && e.stopPropagation) e.stopPropagation(); if (s.posting) return; var o = Object.assign({}, s.off); o[c.key] = c.on; self.setState({ off: o, focus: i }); },
+        num: c.on ? c.num : '–', numWord: c.on ? nth(c.num) : 'never, skipped',
+        paint: function (e) { if (e && e.stopPropagation) e.stopPropagation(); self.setState({ focus: i, paint: !(s.paint && i === focus) }); },
+        paintStr: s.paint && i === focus ? 'true' : 'false',
+        multi: c.parts.length > 1, partNo: (c.pi + 1) + '/' + c.parts.length, more: c.pi < c.parts.length - 1 ? 'next →' : '',
+        dots: c.parts.map(function (x, k) { return k === c.pi ? 'on' : ''; })
+      };
+    });
+    flat.forEach(function (c, i) {
+      var g = groups.filter(function (x) { return x.id === c.id; })[0];
+      g.thumbs.push({ num: c.on ? c.num : '–', cls: 'th-' + c.th + (i === focus ? ' focus' : '') + (c.on ? '' : ' off'), posted: !!s.posted[c.key],
+        aria: (c.on ? 'Card ' + c.num : 'Skipped card') + ', ' + c.m.topic, go: function () { go(i); } });
+    });
+    var DEST = [['wa', 'WhatsApp', 'WhatsApp Status', '#25d366', '#0b2a1c', 'W'], ['ig', 'Instagram', 'your Instagram story', 'linear-gradient(135deg,#7a2ff7,#d81b72 55%,#f29b38)', '#ffffff', 'IG'], ['sc', 'Snapchat', 'your Snapchat story', '#fffc00', '#111111', 'S'], ['save', 'Save', 'your photos', 'var(--card2)', 'var(--ink)', '↓']];
+    var dest = DEST.filter(function (x) { return x[0] === s.dest; })[0] || DEST[0];
+    var pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });
+    var allOn = anySel === total && total > 0;
+    var pool = Object.keys(M).filter(function (id) { return s.tray.indexOf(id) < 0; });
+    var FR = [['Fox', '#ffb35c', 'chatting now'], ['Moon', '#9db8ff', 'active 2h ago'], ['KolaNut', '#ff9ad5', 'from Friday Night Never'], ['PixelOwl', '#7ef0c1', 'from Hostel B confessions']];
+    var postedList = flat.filter(function (c) { return !!s.posted[c.key]; });
+    var fParts = fc ? fc.parts.length : 0;
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      summary: total + ' card' + (total === 1 ? '' : 's') + ' from ' + s.tray.length + ' message' + (s.tray.length === 1 ? '' : 's') + ' · swipe to check each one',
+      cards: cards, focusTh: fc ? 'th-' + fc.th : '',
+      down: function (e) { self.px = e ? e.clientX : null; self.swiped = false; },
+      up: function (e) { if (self.px == null || !e) return; var dx = e.clientX - self.px; self.px = null; if (Math.abs(dx) > 40) { self.swiped = true; go(focus + (dx < 0 ? 1 : -1)); } },
+      prev: function () { go(focus - 1); }, next: function () { go(focus + 1); },
+      atFirst: focus <= 0, atLast: focus >= total - 1, prevOp: focus <= 0 ? 0.4 : 1, nextOp: focus >= total - 1 ? 0.4 : 1,
+      capTitle: !fc ? '' : !fc.on ? 'Skipped' : fc.m.own ? 'Card ' + fc.num + ' · friends only' : 'Card ' + fc.num + ' of ' + anySel,
+      capSub: !fc ? '' : (fParts > 1 ? 'Part ' + (fc.pi + 1) + ' of ' + fParts + ' · ' : '') + fc.m.topic + (fc.on ? '' : ' · tap the circle to add it back'),
+      isPosting: !!s.posting, progressText: s.posting ? 'Posting ' + Math.max(1, s.posting.k) + ' of ' + s.posting.keys.length + ' to ' + dest[1] + '…' : '',
+      paintOpen: !!s.paint && !!fc, paintTitle: fc && fc.on ? 'Colour for card ' + fc.num : 'Colour for this card',
+      swatches: TH.map(function (t) { var on = !!fc && fc.th === t[0]; return { cls: 'th-' + t[0], name: t[1], on: on ? 'true' : 'false', ring: on ? 'var(--ink)' : 'transparent', pick: function () { var o = Object.assign({}, s.theme); o[fc.key] = t[0]; self.setState({ theme: o }); } }; }),
+      canApplyAll: fParts > 1, applyAllLabel: 'Use on all ' + fParts + ' parts',
+      applyAll: function () { var o = Object.assign({}, s.theme); fc.parts.forEach(function (x, k) { o[fc.id + ':' + k] = fc.th; }); self.setState({ theme: o, paint: false }); },
+      groups: groups,
+      orderHint: anySel + ' of ' + total + ' cards will post, in this order. Tap a number to jump to that card.',
+      allStr: allOn ? 'true' : 'false', allCls: allOn ? 'on' : '', allLabel: allOn ? '✓ All selected' : 'Select all',
+      toggleAll: function () { var o = {}; if (allOn) flat.forEach(function (c) { o[c.key] = true; }); self.setState({ off: o }); },
+      dests: DEST.map(function (x) { var on = s.dest === x[0]; return { name: x[1], bg: x[3], ink: x[4], mark: x[5], on: on ? 'true' : 'false', pick: function () { self.setState({ dest: x[0] }); } }; }),
+      cantPost: pubSel === 0 || !!s.posting, postOp: pubSel === 0 || s.posting ? 0.55 : 1,
+      postLabel: s.posting ? 'Posting…' : pubSel === 0 ? 'Select a card to post' : s.dest === 'save' ? 'Save ' + pubSel + ' image' + (pubSel === 1 ? '' : 's') + ' in order' : 'Post ' + pubSel + ' card' + (pubSel === 1 ? '' : 's') + ' to ' + dest[2],
+      post: function () { if (pubSel && !s.posting) self.runPost(pubKeys, s.dest); },
+      doneOpen: s.done, doneTitle: postedList.length + ' card' + (postedList.length === 1 ? '' : 's') + (s.dest === 'save' ? ' saved to ' : ' posted to ') + dest[2],
+      steps: postedList.map(function (c) { return { num: c.num, label: (c.parts.length > 1 ? 'Part ' + (c.pi + 1) + ' · ' : '') + c.text }; }),
+      again: function () { self.setState({ done: false, posted: {}, sent: null }); },
+      noAny: anySel === 0, hasOwn: flat.some(function (c) { return !!c.m.own; }),
+      friendsLabel: anySel ? 'Send ' + anySel + ' card' + (anySel === 1 ? '' : 's') + ' to friends in the app' : 'Send in app',
+      friends: s.friends, openFriends: function () { self.setState({ friends: true }); }, closeFriends: function () { self.setState({ friends: false }); },
+      friendsSub: anySel + ' card' + (anySel === 1 ? '' : 's') + ', in order. Your own messages are fine here: only friends you pick will see them.',
+      friendList: FR.map(function (f) { var done = !!s.sentTo[f[0]]; return { name: f[0], initial: f[0].charAt(0), bg: f[1], sub: f[2], label: done ? 'Sent ✓' : 'Send', cls: done ? '' : 'btn-cta', send: function () { var o = Object.assign({}, s.sentTo); o[f[0]] = true; self.setState({ sentTo: o }); } }; }),
+      poolCount: pool.length,
+      pool: pool.map(function (id) { var m = M[id], n = self.split(m.text, 390).length; return { th: 'th-' + m.th, icon: m.icon, meta: m.topic + ' · ' + n + ' card' + (n === 1 ? '' : 's'), text: m.text, own: !!m.own, add: function () { self.setState({ tray: s.tray.concat([id]), focus: total }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

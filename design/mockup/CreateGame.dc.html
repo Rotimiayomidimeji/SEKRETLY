@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Create a game</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.cg-wrap{max-width:1180px;margin:0 auto;padding:12px 14px 8px}
+.cg-grid{display:flex;flex-direction:column-reverse;gap:14px}
+@container (min-width:900px){.cg-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start}.cg-prev{position:sticky;top:12px}}
+.cg-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:560px){.cg-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cg-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cg-row:last-child{border-bottom:0}
+.cg-row > span{flex:1;min-width:0}
+.cg-scene{position:relative;height:84px;border-radius:18px;border:2px solid transparent;overflow:hidden;display:flex;align-items:flex-end;padding:8px 10px;color:#fff;font-weight:800;font-size:13px;text-align:left}
+.cg-scene[aria-pressed="true"]{border-color:#ff3b8d;box-shadow:0 0 0 3px rgba(255,59,141,.25)}
+.cg-scene i{position:absolute;left:50%;top:44%;width:64%;height:34%;transform:translate(-50%,-50%) perspective(200px) rotateX(55deg);border-radius:50%}
+.cg-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.cg-steps button{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;font-size:12px;font-weight:800;color:var(--muted);text-align:left}
+.cg-steps button span{height:6px;border-radius:9px;transition:background .3s}
+.cg-steps button[aria-current="step"]{color:var(--ink)}
+.cg-steps button:disabled{opacity:.55;cursor:default}
+.cg-foot{position:sticky;left:0;right:0;bottom:0;z-index:20;padding:12px 14px 16px;background:var(--nav);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.cg-foot > div{max-width:1180px;margin:0 auto;display:flex;gap:10px}
+.cg-pack{display:inline-flex;align-items:center;gap:6px}
+.cg-poll{display:flex;gap:6px;margin-top:6px}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="cg-wrap">
+    <header class="topbar">
+      <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}"><button class="icon-btn tap" onClick="{{back}}" aria-label="Previous step"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button></sc-if>
+      <sc-if value="{{noBack}}" hint-placeholder-val="{{ true }}"><a href="GamesHub.dc.html" class="icon-btn tap" aria-label="Back to games"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a></sc-if>
+      <div class="grow"><h1 style="font-size: 22px">New game</h1><div class="muted" style="font-size: 13px">Step {{stepNo}} of 4 · {{stepName}}</div></div>
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      </button>
+    </header>
+    <nav class="cg-steps" aria-label="Steps"><sc-for list="{{steps}}" as="sp" hint-placeholder-count="4"><button class="tap" onClick="{{sp.go}}" disabled="{{sp.locked}}" aria-current="{{sp.cur}}"><span style="background: {{sp.c}}"></span>{{sp.label}}</button></sc-for></nav>
+
+    <div class="cg-grid">
+      <div>
+        <sc-if value="{{s1}}" hint-placeholder-val="{{ true }}">
+          <section class="rise">
+            <h2 style="font-size: 24px">Pick a game</h2>
+            <p class="muted" style="margin-top: 4px; font-size: 14.5px">Every game has its own 3D table. Players join with random nicknames.</p>
+            <div class="cg-tiles" style="margin-top: 14px">
+              <sc-for list="{{games}}" as="g" hint-placeholder-count="6">
+                <button class="gm-tile tap" onClick="{{g.pick}}" aria-pressed="{{g.on}}">
+                  <img src="{{g.icon}}" alt="">
+                  <b class="d" style="font-size: 16px; line-height: 1.1">{{g.name}}</b>
+                  <span class="muted" style="font-size: 12.5px; line-height: 1.35">{{g.hook}}</span>
+                  <span class="pill" style="margin-top: auto; align-self: flex-start; font-size: 11px">{{g.players}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+          <section class="rise">
+            <h2 style="font-size: 24px">Set it up</h2>
+            <div class="card row" style="margin-top: 12px; padding: 12px 14px; gap: 12px"><img src="{{gicon}}" alt="" style="width: 40px; height: 40px"><span style="flex: 1"><span class="muted" style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Game</span><b class="d" style="display: block; font-size: 18px">{{gname}}</b></span><button class="btn btn-sm tap" onClick="{{changeGame}}">Change</button></div>
+            <div class="card" style="padding: 4px 16px; margin-top: 12px">
+              <div class="cg-row"><span><b>Room name</b><input class="field" value="{{room}}" onChange="{{onRoom}}" maxlength="32" aria-label="Room name" style="margin-top: 8px; min-height: 46px"></span><button class="icon-btn tap" onClick="{{rollRoom}}" aria-label="Random room name" style="align-self: flex-end"><img src="/_blob/c31fcca8682736cc92ca4f3073f8c7dd" alt="" style="width: 26px; height: 26px"></button></div>
+              <div class="cg-row" style="display: block"><b>Who can join</b><div class="seg" style="margin-top: 8px"><sc-for list="{{joinOpts}}" as="j" hint-placeholder-count="3"><button onClick="{{j.pick}}" aria-pressed="{{j.on}}" style="color: var(--ink)">{{j.label}}</button></sc-for></div></div>
+              <div class="cg-row"><span><b>Max players</b><div class="muted" style="font-size: 12.5px">{{maxHint}}</div></span><span class="num-step" style="flex: none"><button onClick="{{maxDown}}" aria-label="Fewer" style="color: var(--ink)">−</button><b>{{max}}</b><button onClick="{{maxUp}}" aria-label="More" style="color: var(--ink)">+</button></span></div>
+              <div class="cg-row" style="display: block"><b>Turns each</b><div class="muted" style="font-size: 12.5px">{{lapHint}}</div><div class="seg" style="margin-top: 8px"><sc-for list="{{roundOpts}}" as="ro" hint-placeholder-count="3"><button onClick="{{ro.pick}}" aria-pressed="{{ro.on}}" style="color: var(--ink)">{{ro.label}}</button></sc-for></div></div>
+              <div class="cg-row" style="display: block"><b>Turn timer</b><div class="seg" style="margin-top: 8px"><sc-for list="{{timerOpts}}" as="tm" hint-placeholder-count="3"><button onClick="{{tm.pick}}" aria-pressed="{{tm.on}}" style="color: var(--ink)">{{tm.label}}</button></sc-for></div></div>
+              <div class="cg-row" style="display: block"><b>Spice</b><div class="muted" style="font-size: 12.5px">{{spiceHint}}</div><div class="seg" style="margin-top: 8px"><sc-for list="{{spiceOpts}}" as="sp2" hint-placeholder-count="3"><button onClick="{{sp2.pick}}" aria-pressed="{{sp2.on}}" style="color: var(--ink)">{{sp2.label}}</button></sc-for></div></div>
+              <div class="cg-row"><span><b>Get spicier each round</b><div class="muted" style="font-size: 12.5px">Mild → Spicy → Unhinged keeps people hooked</div></span><button class="switch" role="switch" aria-checked="{{escStr}}" aria-label="Escalate spice" onClick="{{toggleEsc}}"></button></div>
+            </div>
+
+            <div class="sec-h"><h2 style="font-size: 18px">Card packs</h2><span class="muted" style="font-size: 12.5px">{{packCount}} on</span></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{packs}}" as="pk" hint-placeholder-count="6"><button class="chip tap cg-pack {{pk.cls}}" onClick="{{pk.pick}}" aria-pressed="{{pk.on}}" disabled="{{pk.locked}}">{{pk.label}}</button></sc-for>
+            </div>
+
+            <div class="sec-h"><h2 style="font-size: 18px">{{gname}} rules</h2></div>
+            <div class="card" style="padding: 4px 16px">
+              <sc-for list="{{special}}" as="sx" hint-placeholder-count="2">
+                <div class="cg-row"><span><b>{{sx.label}}</b><div class="muted" style="font-size: 12.5px">{{sx.hint}}</div></span><button class="switch" role="switch" aria-checked="{{sx.on}}" aria-label="{{sx.label}}" onClick="{{sx.toggle}}"></button></div>
+              </sc-for>
+              <sc-if value="{{isPoll}}" hint-placeholder-val="{{ false }}">
+                <div class="cg-row" style="display: block">
+                  <b>Your first poll</b>
+                  <input class="field" value="{{pollQ}}" onChange="{{onPollQ}}" aria-label="Poll question" style="margin-top: 8px; min-height: 46px">
+                  <sc-for list="{{pollOpts}}" as="po" hint-placeholder-count="3"><div class="cg-poll"><input class="field" value="{{po.text}}" onChange="{{po.edit}}" aria-label="Option {{po.n}}" style="min-height: 42px; font-size: 15px"><button class="icon-btn tap" onClick="{{po.remove}}" aria-label="Remove option {{po.n}}" style="width: 42px; height: 42px">×</button></div></sc-for>
+                  <button class="btn btn-sm tap" onClick="{{addPollOpt}}" disabled="{{pollFull}}" style="margin-top: 8px">+ Add option</button>
+                </div>
+              </sc-if>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+          <section class="rise">
+            <h2 style="font-size: 24px">Choose the table</h2>
+            <p class="muted" style="margin-top: 4px; font-size: 14.5px">Where your crew sits. Drag the preview to look around.</p>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px">
+              <sc-for list="{{scenes}}" as="scn" hint-placeholder-count="6">
+                <button class="cg-scene tap" onClick="{{scn.pick}}" aria-pressed="{{scn.on}}" style="background: {{scn.sky}}"><i style="background: {{scn.table}}"></i><span style="position: relative">{{scn.name}}</span></button>
+              </sc-for>
+            </div>
+            <div class="card" style="padding: 4px 16px; margin-top: 12px">
+              <div class="cg-row" style="display: block"><b>Table shape</b><div class="seg" style="margin-top: 8px"><sc-for list="{{shapes}}" as="sh" hint-placeholder-count="2"><button onClick="{{sh.pick}}" aria-pressed="{{sh.on}}" style="color: var(--ink)">{{sh.label}}</button></sc-for></div></div>
+              <div class="cg-row"><span><b>Ambient sound</b><div class="muted" style="font-size: 12.5px">Soft room tone and a drumroll on reveals</div></span><button class="switch" role="switch" aria-checked="{{soundStr}}" aria-label="Ambient sound" onClick="{{toggleSound}}"></button></div>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{s4}}" hint-placeholder-val="{{ false }}">
+          <section class="rise">
+            <h2 style="font-size: 24px">Ready to open?</h2>
+            <div class="card" style="padding: 16px; margin-top: 12px">
+              <div class="row"><img src="{{gicon}}" alt="" style="width: 44px; height: 44px"><span style="flex: 1"><b class="d" style="font-size: 20px; display: block">{{room}}</b><span class="muted" style="font-size: 13px">{{gname}} · {{sceneName}}</span></span></div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px"><sc-for list="{{summary}}" as="su" hint-placeholder-count="6"><span class="pill">{{su}}</span></sc-for></div>
+            </div>
+            <div class="card" style="padding: 4px 16px; margin-top: 12px">
+              <div class="cg-row" style="display: block"><b>When</b><div class="seg" style="margin-top: 8px"><sc-for list="{{whenOpts}}" as="wh" hint-placeholder-count="2"><button onClick="{{wh.pick}}" aria-pressed="{{wh.on}}" style="color: var(--ink)">{{wh.label}}</button></sc-for></div></div>
+            </div>
+            <div class="card" style="padding: 12px 14px; margin-top: 12px; display: flex; gap: 10px; align-items: center; font-size: 13.5px; line-height: 1.4">
+              <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 30px; height: 30px; flex: none">
+              <span>You host as a nickname too. Nobody sees that you made the room. Players can report each other, same warning rules as links.</span>
+            </div>
+          </section>
+        </sc-if>
+      </div>
+
+      <div class="cg-prev">
+        <section class="g3" aria-label="Table preview" onPointerDown="{{orbStart}}" onPointerMove="{{orbMove}}" onPointerUp="{{orbEnd}}" onPointerLeave="{{orbEnd}}">
+          <div class="g3-sky" style="background: {{sc.sky}}"></div>
+          <div class="g3-glow" style="background: {{sc.glow}}"></div>
+          <div class="g3-hud"><span class="g3-chip">{{room}}</span><span class="g3-chip">{{max}} seats</span></div>
+          <div class="g3-cam">
+            <div class="g3-floor" style="background-image: {{sc.floor}}"></div>
+            <div class="g3-table" style="background: {{sc.table}}; {{tableShape}}"></div>
+            <div class="g3-at" style="transform: translate3d(0, 40px, 0)"><div class="g3-bb"><div class="g3-holo g3-flip" style="margin-bottom: 14px"><img src="{{gicon}}" alt="" style="width: 26px; height: 26px"><b>{{gname}}</b><span style="font-size: 11px; font-weight: 700; opacity: .85">{{spiceLabel}}</span></div></div></div>
+            <sc-for list="{{seats}}" as="p" hint-placeholder-count="6">
+              <div class="g3-at" style="transform: translate3d({{p.x}}px, {{p.y}}px, 0)"><div class="g3-shadow"></div><div class="g3-bb"><div class="g3-fig {{p.cls}}" style="opacity: {{p.op}}"><span class="g3-name">{{p.label}}</span><div class="g3-head" style="background: {{p.color}}">{{p.initial}}</div><div class="g3-body" style="background: {{p.color}}"></div></div></div></div>
+            </sc-for>
+          </div>
+          <div class="g3-hint">{{sceneName}} · drag to look around</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="cg-foot"><div>
+    <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}"><button class="btn btn-lg tap" onClick="{{back}}">← {{backLabel}}</button></sc-if>
+    <sc-if value="{{notLast}}" hint-placeholder-val="{{ true }}"><button class="btn btn-cta btn-lg tap" onClick="{{next}}" style="flex: 1">{{nextLabel}} →</button></sc-if>
+    <sc-if value="{{isLast}}" hint-placeholder-val="{{ false }}"><a href="{{lobbyHref}}" onClick="{{open}}" class="btn btn-cta btn-lg tap" style="flex: 1">{{openLabel}}</a></sc-if>
+  </div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"game":{"editor":"enum","options":["nhie","tod","wyr","mlt","hot","poll"],"default":"nhie"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = this.arrive(m || props.mode || 'dark');
+  }
+  // what to show on arrival: a game picked in the hub, settings coming back from the lobby, or a blank wizard
+  arrive(mode) {
+    var pick = null, edit = null, saved = null;
+    try {
+      pick = window.localStorage.getItem('sk-pick'); edit = window.localStorage.getItem('sk-edit'); saved = JSON.parse(window.localStorage.getItem('sk-wiz') || 'null');
+      this.nav = window.localStorage.getItem('sk-nav') || '';
+      window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit');
+    } catch (e) { this.nav = ''; }
+    if (edit && saved) return Object.assign({}, saved, { mode: mode, step: edit === 'review' ? 3 : 1, reached: 3 });
+    var game = pick || this.props.game || 'nhie';
+    return { mode: mode, step: pick ? 1 : 0, reached: pick ? 1 : 0, game: game, room: '', roomSeed: 0, join: 'both', max: 6, laps: 1, timer: 15, spice: 'mild', esc: true,
+      packs: { campus: true, situationship: true }, special: this.defaults(game), scene: null, shape: 'round', sound: true, when: 'now',
+      pollQ: 'Best place to hang out after exams?', pollOpts: ['Beach', 'Mall', 'Owambe'] };
+  }
+  defaults(game) { return { nhie: {}, tod: { proof: true, pass: true }, wyr: { bonus: true }, mlt: { full: true, titles: true }, hot: { avg: true }, poll: { bonus: true, anyone: true } }[game] || {}; }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    // a new link (hub tile, lobby Edit, New game) restarts the wizard instead of showing the last one
+    this.tk = setInterval(function () { var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {} if (nv !== self.nav) self.setState(self.arrive(self.state.mode)); }, 700);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var SC = {
+      neon: { name: 'Neon lounge', sky: 'radial-gradient(120% 90% at 50% 0%,#4a1263 0%,#160a22 55%,#08050c 100%)', glow: '#ff3b8d', floor: 'linear-gradient(rgba(255,59,141,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(255,59,141,.55) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#8a2a7a,#3a0f3a 70%)' },
+      bonfire: { name: 'Bonfire night', sky: 'radial-gradient(90% 80% at 50% 80%,#7a2d0b 0%,#2a0d05 50%,#0b0503 100%)', glow: '#ff7a1a', floor: 'linear-gradient(rgba(255,160,70,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,160,70,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#b0703a,#5a2b14 70%)' },
+      arena: { name: 'Split arena', sky: 'radial-gradient(120% 90% at 50% 0%,#0d2a5a 0%,#071229 55%,#04060d 100%)', glow: '#22e1ff', floor: 'linear-gradient(rgba(34,225,255,.4) 2px,transparent 2px),linear-gradient(90deg,rgba(34,225,255,.4) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#2a2f4a,#11142a 70%)' },
+      awards: { name: 'Award show', sky: 'radial-gradient(120% 90% at 50% 0%,#3a2a08 0%,#150d22 55%,#07050b 100%)', glow: '#ffd23d', floor: 'linear-gradient(rgba(255,210,61,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,210,61,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#2b2333,#0d0a12 70%)' },
+      hotseat: { name: 'Hot seat', sky: 'linear-gradient(110deg,#0b2a4a 0%,#170a18 50%,#4a0b12 100%)', glow: '#ff4f6d', floor: 'linear-gradient(rgba(255,120,120,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(120,200,255,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#45404f,#17141d 70%)' },
+      studio: { name: 'Live studio', sky: 'radial-gradient(120% 90% at 50% 0%,#0b3a3a 0%,#081a1f 55%,#04090b 100%)', glow: '#5be0a0', floor: 'linear-gradient(rgba(91,224,160,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(91,224,160,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#1d3a3a,#0a1719 70%)' }
+    };
+    var GM = {
+      nhie: { name: 'Never Have I Ever', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', hook: 'Tip a cup every time you have. Last one standing wins.', players: '3–10 players', scene: 'neon', min: 3, cap: 10,
+        special: [['lives5', 'Start with 5 cups', 'Longer games, more chances to confess'], ['write', 'Players write statements', 'Each round someone writes their own']] },
+      tod: { name: 'Truth or Dare', icon: '/_blob/dabc1dc3b2ca85f511896f5fe287b1b4', hook: 'Spin the bottle. Truth, dare, or wear the chicken.', players: '2–8 players', scene: 'bonfire', min: 2, cap: 8,
+        special: [['proof', 'Photos &amp; videos for every player', 'Dares need a photo or video. Truths can add one. Blurred until tapped'], ['pass', 'One “pass” card each', 'Skip one turn without the chicken']] },
+      wyr: { name: 'Would You Rather', icon: '/_blob/bb98c97874bd7846658816dcbbdb7780', hook: 'Pick a side and watch the table split in two.', players: '2–20 players', scene: 'arena', min: 2, cap: 20,
+        special: [['bonus', 'Guess the winner bonus', '+2 for calling the bigger side'], ['custom', 'Players add questions', 'Mix your own in with the deck']] },
+      mlt: { name: 'Most Likely To', icon: '/_blob/886899060459eafd6bc4284897539947', hook: 'Vote a nickname. The crown drops on the winner.', players: '3–15 players', scene: 'awards', min: 3, cap: 15,
+        special: [['full', 'Show full vote counts', 'Off: only the winner is revealed'], ['titles', 'Shareable title cards', '“Most likely to…” cards for the winners']] },
+      hot: { name: 'Hot Takes', icon: '/_blob/69f665bc7243f1656e9ff91e0af97d91', hook: 'Rate spicy opinions. Read the room to score.', players: '2–20 players', scene: 'hotseat', min: 2, cap: 20,
+        special: [['avg', 'Show the room average', 'The thermometer rises live'], ['submit', 'Players submit takes', 'Anonymous, reviewed by you']] },
+      poll: { name: 'Anonymous Polls', icon: '/_blob/669adcdde8b5d16eac1dc87c5115c4c0', hook: 'Drop polls, guess the winner, watch columns rise.', players: '2–50 players', scene: 'studio', min: 2, cap: 50,
+        special: [['multi', 'Allow multiple answers', 'Players can tick more than one'], ['anyone', 'Anyone can add a poll', 'Off: only you post polls']] }
+    };
+    var gm = GM[s.game] || GM.nhie;
+    var sceneId = s.scene || gm.scene, sc = SC[sceneId];
+    var ROOMS = ['Friday Night Never', 'Hostel B after dark', 'Class of 2027 chaos', 'Owambe aftermath', 'No chickens allowed', 'Sunday vibes only'];
+    var room = s.room || ROOMS[(s.roomSeed + Object.keys(GM).indexOf(s.game)) % ROOMS.length];
+    var opt = function (list, cur, key) { return list.map(function (x) { return { label: x[1], on: cur === x[0] ? 'true' : 'false', pick: function () { var o = {}; o[key] = x[0]; self.setState(o); } }; }); };
+    var PK = [['campus', 'Campus life'], ['situationship', 'Situationship'], ['owambe', 'Owambe'], ['hostel', 'Hostel secrets'], ['exam', 'Exam szn'], ['unhinged', 'Unhinged 🔒']];
+    var STEP = ['Pick a game', 'Set it up', 'Choose the table', 'Review'];
+    var seats = [], n = s.max > 8 ? 8 : s.max, R = 182, C = ['#ffd23d', '#7ef0c1', '#7fb2ff', '#ff9ad5', '#ffb35c', '#b78bff', '#5be0a0', '#ff8b98'];
+    for (var i = 0; i < n; i++) { var a = (90 + i * 360 / n) * Math.PI / 180; seats.push({ x: Math.round(R * Math.cos(a) * (s.shape === 'long' ? 1.12 : 1)), y: Math.round(R * Math.sin(a) * (s.shape === 'long' ? 0.8 : 1)), label: i === 0 ? 'You' : 'open', initial: i === 0 ? 'Y' : '+', color: i === 0 ? C[0] : C[i % C.length], cls: i === 0 ? 'g3-me' : '', op: i === 0 ? 1 : 0.4 }); }
+    var spiceLabel = s.esc ? { mild: 'Mild → Unhinged', spicy: 'Spicy → Unhinged', unhinged: 'Unhinged all night' }[s.spice] : { mild: 'Mild', spicy: 'Spicy', unhinged: 'Unhinged' }[s.spice];
+    var packsOn = PK.filter(function (p) { return s.packs[p[0]]; }).map(function (p) { return p[1]; });
+    var summary = [(s.max * s.laps) + ' turns', spiceLabel, s.timer + 's turns', 'Up to ' + s.max, { link: 'Public link', friends: 'Friends only', both: 'Link + friends' }[s.join]].concat(packsOn);
+    var last = s.step === 3;
+    var LOBBY = { nhie: 'NHIELobby', tod: 'TruthDareLobby', wyr: 'WYRLobby', mlt: 'MostLikelyLobby', hot: 'HotTakesLobby', poll: 'PollsLobby' };
+    var stash = function () {
+      try {
+        window.localStorage.setItem('sk-wiz', JSON.stringify(Object.assign({}, s, { room: room })));
+        window.localStorage.setItem('sk-game', JSON.stringify({ game: s.game, room: room, max: s.max, laps: s.laps, timer: s.timer, spice: s.spice, esc: s.esc, special: s.special, packs: packsOn, join: s.join, when: s.when, settings: summary.slice(0, 5).concat([sc.name]) }));
+        window.localStorage.removeItem('sk-join');
+        window.localStorage.setItem('sk-nav', String(Date.now()));
+      } catch (e) {}
+    };
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var x = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', x); } catch (e) {} self.setState({ mode: x }); },
+      stepNo: s.step + 1, stepName: STEP[s.step], steps: STEP.map(function (x, k) { var reached = Math.max(s.reached || 0, s.step); return { label: (k + 1) + ' · ' + ['Game', 'Setup', 'Table', 'Review'][k], c: k <= s.step ? '#ff3b8d' : 'var(--line)', cur: k === s.step ? 'step' : 'false', locked: k > reached, go: function () { if (k <= reached) self.setState({ step: k }); } }; }),
+      s1: s.step === 0, s2: s.step === 1, s3: s.step === 2, s4: s.step === 3,
+      games: Object.keys(GM).map(function (k) { var g = GM[k]; return { name: g.name, icon: g.icon, hook: g.hook, players: g.players, on: s.game === k ? 'true' : 'false', pick: function () { self.setState({ game: k, scene: null, special: self.defaults(k), step: 1, reached: Math.max(s.reached || 0, 1), max: Math.min(Math.max(s.max, g.min), g.cap) }); } }; }),
+      room: room, onRoom: function (e) { self.setState({ room: e.target.value }); }, rollRoom: function () { self.setState({ room: '', roomSeed: s.roomSeed + 1 }); },
+      joinOpts: opt([['link', 'Public link'], ['friends', 'Friends'], ['both', 'Both']], s.join, 'join'),
+      max: s.max, maxHint: gm.min + '–' + gm.cap + ' for ' + gm.name,
+      maxDown: function () { self.setState({ max: Math.max(gm.min, s.max - 1) }); }, maxUp: function () { self.setState({ max: Math.min(gm.cap, s.max + 1) }); },
+      roundOpts: opt([[1, 'Once'], [2, 'Twice'], [3, '3 times']], s.laps, 'laps'), lapHint: 'Everyone leads ' + ['', 'once', 'twice', '3 times'][s.laps] + ': ' + (s.max * s.laps) + ' turns with ' + s.max + ' players',
+      timerOpts: opt([[10, '10s'], [15, '15s'], [30, '30s']], s.timer, 'timer'),
+      spiceOpts: opt([['mild', 'Mild'], ['spicy', 'Spicy'], ['unhinged', 'Unhinged']], s.spice, 'spice'), spiceHint: 'Where the deck starts',
+      escStr: s.esc ? 'true' : 'false', toggleEsc: function () { self.setState({ esc: !s.esc }); },
+      packCount: packsOn.length,
+      packs: PK.map(function (p) { var on = !!s.packs[p[0]], locked = p[0] === 'unhinged'; return { label: p[1], cls: on ? 'on' : '', on: on ? 'true' : 'false', locked: locked, pick: function () { var o = Object.assign({}, s.packs); o[p[0]] = !on; self.setState({ packs: o }); } }; }),
+      gname: gm.name, gicon: gm.icon,
+      special: gm.special.map(function (x) { var on = !!s.special[x[0]]; return { label: x[1], hint: x[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.special); o[x[0]] = !on; self.setState({ special: o }); } }; }),
+      isPoll: s.game === 'poll', pollQ: s.pollQ, onPollQ: function (e) { self.setState({ pollQ: e.target.value }); },
+      pollOpts: s.pollOpts.map(function (t, k) { return { text: t, n: k + 1, edit: function (e) { var o = s.pollOpts.slice(); o[k] = e.target.value; self.setState({ pollOpts: o }); }, remove: function () { if (s.pollOpts.length > 2) self.setState({ pollOpts: s.pollOpts.filter(function (x, j) { return j !== k; }) }); } }; }),
+      addPollOpt: function () { if (s.pollOpts.length < 6) self.setState({ pollOpts: s.pollOpts.concat(['']) }); }, pollFull: s.pollOpts.length >= 6,
+      scenes: Object.keys(SC).map(function (k) { return { name: SC[k].name, sky: SC[k].sky, table: SC[k].table, on: sceneId === k ? 'true' : 'false', pick: function () { self.setState({ scene: k }); } }; }),
+      shapes: opt([['round', 'Round'], ['long', 'Long']], s.shape, 'shape'),
+      soundStr: s.sound ? 'true' : 'false', toggleSound: function () { self.setState({ sound: !s.sound }); },
+      whenOpts: opt([['now', 'Start now'], ['later', 'Schedule for 9pm']], s.when, 'when'),
+      summary: summary, sceneName: sc.name, sc: sc, seats: seats, spiceLabel: spiceLabel,
+      tableShape: s.shape === 'long' ? 'border-radius: 999px; transform: scaleX(1.25) scaleY(.75)' : '',
+      hasBack: s.step > 0, back: function () { self.setState({ step: s.step - 1 }); },
+      notLast: !last, isLast: last, nextLabel: ['Set it up', 'Choose the table', 'Review'][s.step] || 'Next',
+      next: function () { var nx = Math.min(3, s.step + 1); self.setState({ step: nx, reached: Math.max(s.reached || 0, nx) }); },
+      noBack: s.step === 0, backLabel: ['', 'Game', 'Setup', 'Table'][s.step] || 'Back',
+      lobbyHref: LOBBY[s.game] + '.dc.html', openLabel: s.when === 'later' ? 'Schedule the room' : 'Open the room',
+      changeGame: function () { self.setState({ step: 0 }); },
+      open: stash,
+      orbStart: function (e) { self.drag = { x: e.clientX, o: self.orb || 0 }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      orbMove: function (e) { if (!self.drag) return; var o = Math.max(-40, Math.min(40, self.drag.o + (e.clientX - self.drag.x) * 0.35)); e.currentTarget.style.setProperty('--orb', o.toFixed(1) + 'deg'); self.drag.cur = o; },
+      orbEnd: function () { if (!self.drag) return; if (self.drag.cur !== undefined) self.orb = self.drag.cur; self.drag = null; }
+    };
+  }
+}
+</script>
+</body>
+</html>

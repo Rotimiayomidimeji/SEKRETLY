@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Link insights</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.ld-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@container (min-width:640px){.ld-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ld-stat{padding:14px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.sk .ld-stat b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.sk .ld-stat span{font-size:12.5px;color:var(--muted);font-weight:700}
+.ld-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:130px;margin-top:12px}
+.ld-week i{display:block;border-radius:10px 10px 4px 4px;background:var(--cta);animation:ldGrow .7s cubic-bezier(.2,.8,.2,1) both;transform-origin:bottom}
+.ld-week small{display:block;text-align:center;font-size:11px;font-weight:700;color:var(--muted);margin-top:6px}
+@keyframes ldGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.ld-bar{height:10px;border-radius:10px;background:var(--card2);overflow:hidden}
+.ld-bar i{display:block;height:100%;border-radius:10px;animation:ldWide .8s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+@keyframes ldWide{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.ld-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ld-row:last-child{border-bottom:0}
+.ld-cloud{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.ld-cloud span{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;padding:4px 12px;border-radius:99px;background:var(--card2)}
+.ld-dist{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;align-items:end;height:110px}
+.ld-dist i{display:block;border-radius:8px 8px 3px 3px;animation:ldGrow .7s cubic-bezier(.2,.8,.2,1) both;transform-origin:bottom}
+.ld-dist small{display:block;text-align:center;font-size:11px;font-weight:800;margin-top:5px}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div class="wrap" style="max-width: 860px; padding: 14px 16px 40px">
+    <header class="topbar">
+      <a href="MyLinks.dc.html" class="icon-btn tap" aria-label="Back to My links"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+      <h1 class="grow" style="font-size: 24px">Link insights</h1>
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      </button>
+    </header>
+
+    <div class="{{l.th}} rise" style="border-radius: 28px; padding: 18px; display: flex; align-items: center; gap: 14px">
+      <img class="float" src="{{l.emoji}}" alt="" style="width: 58px; height: 58px">
+      <div style="flex: 1; min-width: 0">
+        <div class="d" style="font-size: 22px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em">{{l.topic}}</div>
+        <div style="font-size: 12.5px; opacity: .88; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{url}}</div>
+      </div>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.26)">{{status}}</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px">
+      <button class="btn tap" onClick="{{copy}}">{{copyLabel}}</button>
+      <button class="btn tap" onClick="{{share}}">Share card</button>
+      <button class="btn tap" onClick="{{togglePause}}">{{pauseLabel}}</button>
+    </div>
+
+    <div class="ld-stats rise" style="margin-top: 16px; animation-delay: .05s">
+      <sc-for list="{{stats}}" as="st" hint-placeholder-count="4"><div class="ld-stat"><b>{{st.v}}</b><span>{{st.k}}</span></div></sc-for>
+    </div>
+
+    <section class="card rise" style="margin-top: 12px; padding: 16px; animation-delay: .1s">
+      <div class="row" style="justify-content: space-between"><b style="font-size: 16px">Messages this week</b><span class="muted" style="font-size: 13px">{{weekTotal}}</span></div>
+      <div class="ld-week" aria-label="Messages per day this week">
+        <sc-for list="{{week}}" as="w" hint-placeholder-count="7"><div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end"><i style="height: {{w.h}}; animation-delay: {{w.d}}"></i><small>{{w.day}}</small></div></sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{isQuiz}}" hint-placeholder-val="{{ true }}">
+      <div>
+        <section class="card rise" style="margin-top: 12px; padding: 16px">
+          <div class="row" style="justify-content: space-between"><b style="font-size: 16px">Leaderboard</b><span class="muted" style="font-size: 13px">{{takers}} took your quiz</span></div>
+          <div style="margin-top: 6px">
+            <sc-for list="{{board}}" as="b" hint-placeholder-count="6">
+              <div class="ld-row"><span style="width: 28px; text-align: center; font-size: 18px">{{b.medal}}</span><b style="flex: 1">{{b.name}}</b><span class="muted" style="font-size: 12.5px">{{b.when}}</span><b style="min-width: 36px; text-align: right">{{b.score}}</b></div>
+            </sc-for>
+          </div>
+          <p class="muted" style="margin-top: 8px; font-size: 12.5px; line-height: 1.45">Names are the random nicknames friends picked. You never see who they really are.</p>
+        </section>
+        <section class="card rise" style="margin-top: 12px; padding: 16px">
+          <b style="font-size: 16px">How many got each question right</b>
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px">
+            <sc-for list="{{qStats}}" as="q" hint-placeholder-count="5">
+              <div><div class="row" style="justify-content: space-between; font-size: 13.5px; gap: 10px"><span style="min-width: 0">{{q.q}}</span><b style="flex: none; color: {{q.c}}">{{q.pct}}</b></div><div class="ld-bar" style="margin-top: 6px"><i style="width: {{q.pct}}; background: {{q.c}}"></i></div></div>
+            </sc-for>
+          </div>
+          <div class="card row" style="margin-top: 12px; padding: 12px; gap: 10px; background: var(--card2)"><img src="/_blob/2f66c946c04eb79ed39e9012c4c9f37e" alt="" style="width: 34px; height: 34px"><span style="font-size: 13.5px; line-height: 1.4"><b>Hardest question:</b> {{hardest}}</span></div>
+          <a href="Create.dc.html" class="btn btn-block tap" style="margin-top: 10px">Make a new quiz</a>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDescribe}}" hint-placeholder-val="{{ false }}">
+      <section class="card rise" style="margin-top: 12px; padding: 16px">
+        <b style="font-size: 16px">Words people picked most</b>
+        <div class="ld-cloud" style="margin-top: 12px">
+          <sc-for list="{{cloud}}" as="c" hint-placeholder-count="8"><span style="font-size: {{c.fs}}; color: {{c.col}}">{{c.w}} <small style="font-size: 12px; opacity: .7">×{{c.n}}</small></span></sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isRate}}" hint-placeholder-val="{{ false }}">
+      <section class="card rise" style="margin-top: 12px; padding: 16px">
+        <div class="row" style="justify-content: space-between"><b style="font-size: 16px">Your ratings</b><span class="pill">Average {{avgRate}}</span></div>
+        <div class="ld-dist" style="margin-top: 14px">
+          <sc-for list="{{dist}}" as="d" hint-placeholder-count="10"><div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end"><i style="height: {{d.h}}; background: {{d.c}}; animation-delay: {{d.dl}}"></i><small>{{d.n}}</small></div></sc-for>
+        </div>
+        <p class="muted" style="margin-top: 10px; font-size: 13px">Most said <b style="color: var(--ink)">“{{topCat}}”</b> when they picked what they were rating.</p>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isText}}" hint-placeholder-val="{{ false }}">
+      <section class="card rise" style="margin-top: 12px; padding: 16px">
+        <b style="font-size: 16px">{{textTitle}}</b>
+        <p class="muted" style="margin-top: 6px; font-size: 14px; line-height: 1.5">{{textBody}}</p>
+        <a href="Inbox.dc.html" class="btn btn-cta btn-block tap" style="margin-top: 12px">Read them in your inbox</a>
+      </section>
+    </sc-if>
+
+    <section class="card rise" style="margin-top: 12px; padding: 16px">
+      <b style="font-size: 16px">Where visitors came from</b>
+      <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{sources}}" as="so" hint-placeholder-count="4">
+          <div><div class="row" style="justify-content: space-between; font-size: 13.5px"><span>{{so.name}}</span><b>{{so.pct}}</b></div><div class="ld-bar" style="margin-top: 6px"><i style="width: {{so.pct}}; background: {{so.c}}"></i></div></div>
+        </sc-for>
+      </div>
+      <p class="muted" style="margin-top: 10px; font-size: 12.5px">Counts only. We never show you who visited.</p>
+    </section>
+
+    <div class="ad ad-banner" style="margin-top: 16px"><b>Banner ad</b>link insights · bottom</div>
+
+    <button class="btn btn-ghost btn-block tap" onClick="{{askDelete}}" style="margin-top: 14px; color: var(--bad); border: 0">Delete this link</button>
+  </div>
+
+  <sc-if value="{{delOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Delete this link">
+        <h2 style="font-size: 22px">Delete this link?</h2>
+        <p class="muted" style="margin-top: 6px; font-size: 14.5px; line-height: 1.5">It stops working right away and visitors see “This link no longer exists”. Messages you already got stay in your inbox.</p>
+        <a href="MyLinks.dc.html" class="btn btn-lg btn-block tap" style="margin-top: 14px; background: #c4213a; color: #ffffff; border: 0">Delete link</a>
+        <button class="btn btn-ghost btn-block" onClick="{{closeDelete}}" style="margin-top: 6px; border: 0">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><img src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 30px; height: 30px; flex: none"><b style="font-size: 14px">{{toastText}}</b></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"link":{"editor":"enum","options":["know","describe","rate","confess","ama"],"default":"know"},"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = Object.assign({ mode: m || props.mode || 'dark' }, this.arrive());
+  }
+  // MyLinks hands over which link to show (sk-link) and stamps sk-nav
+  arrive() {
+    var id = null;
+    try { id = window.localStorage.getItem('sk-link'); this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (e) { this.nav = ''; }
+    return { id: id || this.props.link || 'know', paused: false, copied: false, delOpen: false, toast: '' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.nt = setInterval(function () { var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {} if (nv !== self.nav) self.setState(self.arrive()); }, 700);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.nt); clearTimeout(this.t); }
+  componentDidUpdate(prev) {
+    if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
+    if (prev.link !== this.props.link && this.props.link) this.setState({ id: this.props.link });
+  }
+  flash(msg) { var self = this; this.setState({ toast: msg }); clearTimeout(this.t); this.t = setTimeout(function () { self.setState({ toast: '' }); }, 2400); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var E = { peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', moon: '/_blob/1df7299954a782c5de8338339634a8e6', unicorn: '/_blob/7ee69e13b899e048010df41d0cf87143', octopus: '/_blob/e910746badea9d78c41ac4aa913de4a6', crown: '/_blob/886899060459eafd6bc4284897539947' };
+    var LINKS = {
+      know: { topic: 'How well do you know me?', th: 'th-default', theme: 'default', slug: 'know-me', emoji: E.crown, msgs: 31, visits: 140, week: [3, 6, 4, 9, 5, 2, 2] },
+      describe: { topic: 'Describe me in 3 words', th: 'th-sunset', theme: 'sunset', slug: 'describe-3', emoji: E.peach, msgs: 23, visits: 118, week: [2, 4, 3, 5, 6, 2, 1] },
+      rate: { topic: 'Rate me 1–10', th: 'th-midnight', theme: 'midnight', slug: 'rate-me', emoji: E.moon, msgs: 12, visits: 64, week: [1, 2, 1, 3, 2, 2, 1] },
+      confess: { topic: 'Confess something', th: 'th-bubblegum', theme: 'bubblegum', slug: 'confess', emoji: E.unicorn, msgs: 8, visits: 31, week: [0, 1, 2, 1, 3, 1, 0] },
+      ama: { topic: 'Ask me anything', th: 'th-ocean', theme: 'ocean', slug: 'ama', emoji: E.octopus, msgs: 0, visits: 5, week: [0, 0, 0, 0, 0, 0, 0] }
+    };
+    var id = LINKS[s.id] ? s.id : 'know', l = LINKS[id];
+    var max = Math.max.apply(null, l.week.concat([1]));
+    var DAYS = ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed'];
+    var stats = [[l.visits, 'visits'], [l.msgs, id === 'know' ? 'quiz takers' : 'messages'], [l.visits ? Math.round(l.msgs / l.visits * 100) + '%' : '0%', 'of visitors sent'], [l.week[6], 'today']];
+    if (id === 'know') stats[2] = ['3.4', 'average score /5'];
+    if (id === 'rate') stats[2] = ['8.2', 'average rating'];
+    var Q = null;
+    try { Q = JSON.parse(window.localStorage.getItem('sk-quiz') || 'null'); } catch (e) {}
+    var qs = (Q && Q.length >= 3 ? Q.map(function (q) { return q[0]; }) : ['What’s my go-to food?', 'Where am I on a Friday night?', 'What’s my love language?', 'Who’s my celebrity crush?', 'What annoys me the most?']);
+    var PCT = [81, 64, 38, 72, 55, 47, 69, 58, 43, 66];
+    var qStats = qs.map(function (q, i) { var p = PCT[i % PCT.length]; return { q: q, pct: p + '%', c: p < 45 ? '#ff8b98' : p < 65 ? '#ffd23d' : '#5be0a0', p: p }; });
+    var hard = qStats.slice().sort(function (a, b) { return a.p - b.p; })[0];
+    var MED = ['🥇', '🥈', '🥉', '4', '5', '6'];
+    var n = qs.length;
+    var board = [['SuyaStar', n, '2h'], ['BlueFox', n - 1, '9m'], ['KolaNut', n - 1, '1d'], ['MangoMoon', n - 2, '3h'], ['PixelOwl', 2, '5h'], ['ZoboQueen', 1, '2d']].map(function (b, i) { return { medal: MED[i], name: b[0], score: b[1] + '/' + n, when: b[2] }; });
+    var WORDS = [['Funny', 9], ['Loyal', 7], ['Chaotic', 6], ['Smart', 5], ['Kind', 4], ['Petty', 3], ['Iconic', 3], ['Calm', 2], ['Extra', 2]];
+    var COL = ['#ff5fa2', '#ffd23d', '#22e1ff', '#7ef0c1', '#b78bff'];
+    var DIST = [0, 0, 1, 0, 1, 1, 2, 3, 2, 2];
+    var dmax = Math.max.apply(null, DIST);
+    var hue = function (k) { return 'hsl(' + (220 - k * 19) + ',90%,62%)'; };
+    var url = 'sekretly.com/peach/k7x2m9/' + l.theme + '/' + l.slug;
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var nm = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', nm); } catch (e) {} self.setState({ mode: nm }); },
+      l: l, url: url, status: s.paused ? 'Paused' : 'Live', pauseLabel: s.paused ? 'Resume' : 'Pause',
+      togglePause: function () { self.setState({ paused: !s.paused }); self.flash(s.paused ? 'Link resumed' : 'Link paused'); },
+      copyLabel: s.copied ? 'Copied' : 'Copy link', copy: function () { self.setState({ copied: true }); self.flash('Link copied'); },
+      share: function () { self.flash('Story card ready to share'); },
+      stats: stats.map(function (x) { return { v: x[0], k: x[1] }; }),
+      weekTotal: l.week.reduce(function (a, b) { return a + b; }, 0) + ' this week',
+      week: l.week.map(function (v, i) { return { h: Math.max(4, Math.round(v / max * 100)) + '%', day: DAYS[i], d: (i * 0.05).toFixed(2) + 's' }; }),
+      isQuiz: id === 'know', isDescribe: id === 'describe', isRate: id === 'rate', isText: id === 'confess' || id === 'ama',
+      takers: l.msgs, board: board, qStats: qStats, hardest: hard.q + ' Only ' + hard.pct + ' got it.',
+      cloud: WORDS.map(function (w, i) { return { w: w[0], n: w[1], fs: (14 + w[1] * 2) + 'px', col: COL[i % COL.length] }; }),
+      avgRate: '8.2', topCat: 'Vibe',
+      dist: DIST.map(function (v, i) { return { n: i + 1, h: Math.max(4, Math.round(v / dmax * 100)) + '%', c: hue(i + 1), dl: (i * 0.04).toFixed(2) + 's' }; }),
+      textTitle: id === 'confess' ? l.msgs + ' confessions so far' : 'No questions yet',
+      textBody: id === 'confess' ? 'Long ones arrive as numbered cards. Share them to your story in order with one tap.' : 'Share your link to your story. Questions you answer can go straight back to your story.',
+      sources: [['WhatsApp Status', 62, '#25d366'], ['Instagram', 21, '#d81b72'], ['Snapchat', 11, '#ffd23d'], ['Other', 6, '#9a8fb0']].map(function (x) { return { name: x[0], pct: x[1] + '%', c: x[2] }; }),
+      delOpen: s.delOpen, askDelete: function () { self.setState({ delOpen: true }); }, closeDelete: function () { self.setState({ delOpen: false }); },
+      toast: !!s.toast, toastText: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

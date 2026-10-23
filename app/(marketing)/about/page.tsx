@@ -1,2 +1,9 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function AboutPage() { return <FoundationPage title="A better place for the unsaid." description="The SEKRETLY story and product principles will live here." />; }
+import type { Metadata } from "next";
+import About from "@/components/sk/About";
+import { getMode } from "@/lib/sk/mode";
+
+export const metadata: Metadata = { title: "About Sekretly" };
+
+export default async function AboutPage() {
+  return <About mode={await getMode()} />;
+}

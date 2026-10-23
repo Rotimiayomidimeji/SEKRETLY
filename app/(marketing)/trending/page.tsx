@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function TrendingPage() { return <FoundationPage title="See what is moving through the room." description="Trending will bring together public interactions and responses without exposing private inbox content." />; }
+import { redirect } from "next/navigation";
+
+// Not part of the designed product (see design/mockup); kept as a redirect so old links still land somewhere useful.
+export default function Page() {
+  redirect("/");
+}

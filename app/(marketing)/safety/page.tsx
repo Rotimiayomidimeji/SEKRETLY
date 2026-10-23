@@ -1,2 +1,9 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function SafetyPage() { return <FoundationPage title="Anonymous should still feel safe." description="Reporting, filtering, blocking, visibility controls, and moderation workflows belong here as the safety system comes online." />; }
+import type { Metadata } from "next";
+import Safety from "@/components/sk/Safety";
+import { getMode } from "@/lib/sk/mode";
+
+export const metadata: Metadata = { title: "Sekretly · Safety and Community Rules" };
+
+export default async function SafetyPage() {
+  return <Safety mode={await getMode()} />;
+}

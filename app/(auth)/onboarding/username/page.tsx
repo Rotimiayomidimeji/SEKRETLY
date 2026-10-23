@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function UsernameOnboardingPage() { return <FoundationPage title="Choose your @." description="Username onboarding will connect to Profile creation in Phase 2." />; }
+import { redirect } from "next/navigation";
+
+// Onboarding is one screen now (see app/(auth)/onboarding/page.tsx).
+export default function Page() {
+  redirect("/onboarding");
+}

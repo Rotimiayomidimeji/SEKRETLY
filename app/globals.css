@@ -1,142 +1,26 @@
-@import "tailwindcss";
-
-@import "../styles/hero.css";
-@import "../styles/proof-strip.css";
-
-@import "../styles/experience.css";
-
-@import "../styles/reformation.css";
-
-@import "../styles/final-home.css";
-
-@import "../styles/scenes.css";
-
-@import "../styles/world.css";
-
-@import "../styles/demo-polish.css";
-
-@import "../styles/art-direction-recovery.css";
-
-:root {
-
-  --background: #08070b;
-
-  --foreground: #f8f4f5;
-
-  --surface: #250615;
-
-  --surface-elevated: #260b38;
-
-  --wine: #250615;
-
-  --burgundy: #3a071e;
-
-  --purple: #a855ff;
-
-  --electric-blue: #3d7bff;
-
-  --cyan-pop: #20e7ff;
-
-  --sekret-pink: #ff3b8d;
-
-  --ultraviolet: #7b3cff;
-
-  --acid-lime: #c7ff38;
-
-  --hot-coral: #ff624d;
-
-  --sun-yellow: #ffd83d;
-
-  --paper: #fff8f2;
-
-  --ash: #a99eaa;
-
-  --text-primary: #f8f4f5;
-
-  --text-secondary: #b9aeba;
-
-  --border: rgba(255, 255, 255, 0.12);
-
-  --glow: rgba(255, 59, 141, 0.32);
-
-  --danger: #ff6f91;
-
-  --success: #9ce6b1;
-
-  --radius-sm: 0.65rem;
-
-  --radius-md: 1.1rem;
-
-  --radius-lg: 1.8rem;
-
-  --shadow-deep: 0 28px 90px rgba(0, 0, 0, 0.42);
-
-}
-
-@theme inline {
-
-  --color-background: var(--background);
-
-  --color-foreground: var(--foreground);
-
-}
-
-* { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-
-  background: var(--background);
-
-  color: var(--foreground);
-
-  font-family: var(--font-body), sans-serif;
-
-  overflow-x: hidden;
-
-}
-
-button, input, textarea { font: inherit; }
-
-button, a { -webkit-tap-highlight-color: transparent; }
-
-::selection { background: var(--purple); color: white; }
-
-.glass-surface {
-
-  background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.025));
-
-  border: 1px solid var(--border);
-
-  box-shadow: var(--shadow-deep);
-
-  backdrop-filter: blur(22px);
-
-}
-
-.hero-grid {
-
-  background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
-
-  background-size: 4rem 4rem;
-
-  mask-image: linear-gradient(to bottom, black 0%, transparent 86%);
-
-}
-
-.text-gradient { background: linear-gradient(100deg, #fff 12%, #d5b9ff 48%, #75ddff 92%); background-clip: text; color: transparent; }
-
-@keyframes drift { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); } 50% { transform: translate3d(0, -14px, 0) rotate(2deg); } }
-
-@keyframes drift-reverse { 0%, 100% { transform: translate3d(0, 0, 0) rotate(2deg); } 50% { transform: translate3d(0, 12px, 0) rotate(-3deg); } }
-
-.animate-drift { animation: drift 7s ease-in-out infinite; }
-
-.animate-drift-reverse { animation: drift-reverse 8s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
-
+/* Tailwind without its preflight reset: the screens are ported 1:1 from the mockup, which styles every element itself. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* The Sekretly UI kit (tokens, light/dark, buttons, cards, sheets, nav, motion) and each screen's own styles. */
+@import "./sk/sk.css";
+@import "./sk/boards/Landing.css";
+@import "./sk/boards/Main.css";
+@import "./sk/boards/About.css";
+@import "./sk/boards/Safety.css";
+@import "./sk/boards/Help.css";
+@import "./sk/boards/Contact.css";
+@import "./sk/boards/Legal.css";
+@import "./sk/boards/NotFound.css";
+@import "./sk/boards/Signup.css";
+@import "./sk/boards/Login.css";
+@import "./sk/boards/Verify.css";
+@import "./sk/boards/Forgot.css";
+@import "./sk/boards/Onboarding.css";
+@import "./sk/boards/Create.css";
+@import "./sk/boards/MyLinks.css";
+@import "./sk/boards/LinkDetail.css";
+
+html {
+  -webkit-text-size-adjust: 100%;
 }

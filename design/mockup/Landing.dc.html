@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Say it. Stay unknown.</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.ln-sec{padding:84px 0}
+.ln-h2{font-size:clamp(36px,5.6cqi,64px);line-height:.98;font-weight:800}
+.ln-h2 em{font-style:normal;color:var(--pink)}
+.ln-eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--pink)}
+.ln-art{min-height:420px}
+.ln-mob{display:none}
+@container (max-width:899px){.ln-sec{padding:56px 0}.ln-art{min-height:340px}}
+@container (max-width:640px){.ln-mob{display:flex}}
+
+/* hero: same composition as the original landing (image behind, copy on one side) */
+.lh{position:relative;isolation:isolate;width:100%;min-height:760px;display:grid;grid-template-columns:minmax(400px,.82fr) minmax(620px,1.18fr);align-items:center;overflow:hidden;padding:110px max(26px,calc((100cqi - 1460px)/2)) 58px;background:#08060b;color:#ffffff;font-family:'DM Sans',system-ui,sans-serif}
+.lh-bg{position:absolute;inset:0;z-index:-5;overflow:hidden;background:radial-gradient(circle at 67% 53%,rgba(234,21,132,.22),transparent 31%),radial-gradient(circle at 87% 25%,rgba(117,59,255,.18),transparent 28%),radial-gradient(circle at 17% 76%,rgba(115,10,60,.18),transparent 36%),linear-gradient(112deg,#08070b 0%,#0c0710 43%,#130611 72%,#08070b 100%)}
+.lh-glow{position:absolute;border-radius:999px;filter:blur(115px);pointer-events:none}
+.lh-glow--pink{width:600px;height:600px;right:16%;bottom:-28%;background:rgba(255,31,137,.2)}
+.lh-glow--purple{width:470px;height:470px;right:-10%;top:0;background:rgba(105,60,255,.14)}
+.lh-grid{position:absolute;inset:0;opacity:.11;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(to bottom,black,rgba(0,0,0,.6) 65%,transparent)}
+.lh-vig{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,4,7,.45) 0%,transparent 40%,transparent 75%,rgba(5,4,7,.18) 100%);pointer-events:none}
+.lh-copy{position:relative;z-index:20;width:min(100%,610px)}
+.lh-eyebrow{position:relative;width:max-content;display:flex;align-items:center;gap:8px;margin-bottom:24px;padding:9px 14px;overflow:hidden;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:linear-gradient(100deg,rgba(255,255,255,.06),rgba(255,255,255,.025));backdrop-filter:blur(16px);color:rgba(255,255,255,.67);font-size:9px;font-weight:850;letter-spacing:.14em}
+.lh-eyebrow::after{content:"";position:absolute;width:80px;height:100%;left:-100px;top:0;transform:skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);animation:lhSweep 5.5s ease-in-out infinite}
+.lh-eyebrow i{color:rgba(255,255,255,.24);font-style:normal}
+.lh-dot{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#ff3192;animation:lhPulse 2.2s ease-out infinite}
+.lh-title{position:relative;z-index:4;display:flex;flex-direction:column;margin:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(5.1rem,7.25cqi,7.55rem);font-weight:800;line-height:.77;letter-spacing:-.075em}
+.lh-title > span{display:block;width:max-content}
+.lh-white{color:#faf7fa;text-shadow:0 12px 45px rgba(0,0,0,.22)}
+.lh-scribble{position:absolute;left:4%;right:-7%;bottom:-9px;height:11px;transform:rotate(-3deg);border-top:3px solid #ff3192;border-radius:50%;filter:drop-shadow(0 0 7px rgba(255,49,146,.42));transform-origin:left center;animation:lhScribble 1.1s cubic-bezier(.16,1,.3,1) .75s both}
+.lh-pink{position:relative;color:#ff3192;text-shadow:0 0 32px rgba(255,49,146,.12)}
+.lh-desc{width:min(100%,500px);margin:31px 0 0;color:rgba(241,234,242,.72);font-size:clamp(1rem,1.2cqi,1.13rem);line-height:1.65}
+.lh-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:27px}
+.lh-primary,.lh-secondary{position:relative;min-height:56px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 25px;overflow:hidden;border-radius:999px;font-size:13px;font-weight:850;color:#ffffff;text-decoration:none;transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s,background .3s,box-shadow .3s}
+.lh-primary{border:1px solid rgba(255,255,255,.18);background:linear-gradient(110deg,#ff2d91,#bc3fff 54%,#6e54ff);box-shadow:0 15px 42px rgba(223,35,142,.28),inset 0 1px 0 rgba(255,255,255,.28)}
+.lh-primary:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 21px 55px rgba(223,35,142,.37),inset 0 1px 0 rgba(255,255,255,.34)}
+.lh-primary svg{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.lh-primary:hover svg{transform:translate(3px,-3px) rotate(4deg)}
+.lh-shine{position:absolute;top:-40%;left:-45%;width:35%;height:180%;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transition:left .7s cubic-bezier(.16,1,.3,1)}
+.lh-primary:hover .lh-shine{left:125%}
+.lh-secondary{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.035);backdrop-filter:blur(14px)}
+.lh-secondary:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.31);background:rgba(255,255,255,.07)}
+.lh-secondary svg{transition:transform .25s}
+.lh-secondary:hover svg{transform:translateX(4px)}
+.lh-proof{display:flex;align-items:center;gap:15px;margin-top:25px}
+.lh-avatars{display:flex}
+.lh-avatars span{width:31px;height:31px;display:grid;place-items:center;margin-left:-7px;border:2px solid #0b080d;border-radius:50%;background:linear-gradient(145deg,#3c2546,#111019);color:#ffffff;font-size:9px;font-weight:850;box-shadow:0 8px 20px rgba(0,0,0,.18);transition:transform .25s}
+.lh-avatars span:first-child{margin-left:0}
+.lh-avatars span:nth-child(2){background:linear-gradient(145deg,#153f61,#10121a)}
+.lh-avatars span:nth-child(3){background:linear-gradient(145deg,#7b243e,#171016)}
+.lh-avatars span:last-child{background:#ff3192}
+.lh-proof:hover .lh-avatars span:nth-child(1){transform:translateY(-3px) rotate(-5deg)}
+.lh-proof:hover .lh-avatars span:nth-child(2){transform:translateY(-5px)}
+.lh-proof:hover .lh-avatars span:nth-child(3){transform:translateY(-3px) rotate(5deg)}
+.lh-proof-copy{display:flex;flex-direction:column;gap:4px}
+.lh-proof-copy strong{color:rgba(255,255,255,.88);font-size:11px}
+.lh-proof-copy small{display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.55);font-size:9px}
+.lh-art{position:absolute;z-index:10;right:max(-25px,calc((100cqi - 1560px)/2));bottom:0;width:min(72cqi,1100px);height:calc(100% - 75px);pointer-events:none}
+.lh-canvas{position:absolute;inset:0}
+.lh-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 38px 55px rgba(0,0,0,.48)) drop-shadow(0 0 34px rgba(255,32,139,.12))}
+.lh-halo{position:absolute;z-index:-1;left:24%;top:22%;width:57%;height:60%;border-radius:50%;background:radial-gradient(circle,rgba(244,31,142,.24),rgba(132,47,255,.08) 48%,transparent 72%);filter:blur(75px);animation:lhHalo 5s ease-in-out infinite}
+.lh-status{position:absolute;z-index:12;top:21%;right:5%;display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(10,7,13,.66);backdrop-filter:blur(16px);color:rgba(255,255,255,.58);font-size:7px;font-weight:850;letter-spacing:.13em;box-shadow:0 15px 40px rgba(0,0,0,.2);animation:lhBob 4s ease-in-out infinite}
+.lh-status span{width:6px;height:6px;border-radius:50%;background:#38f5ad;box-shadow:0 0 10px rgba(56,245,173,.7)}
+.lh-status b{color:#ffffff}
+.lh-note{position:absolute;z-index:12;left:27%;bottom:17%;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(20,8,22,.66);backdrop-filter:blur(16px);color:rgba(255,255,255,.75);font-size:9px;font-weight:750;box-shadow:0 15px 40px rgba(0,0,0,.2);animation:lhSway 5.5s ease-in-out infinite}
+.lh-scroll{position:absolute;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.45);font-size:8px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;text-decoration:none}
+.lh-scroll:hover{color:rgba(255,255,255,.8)}
+@keyframes lhSweep{0%,68%{left:-100px}100%{left:calc(100% + 100px)}}
+@keyframes lhPulse{0%{box-shadow:0 0 0 0 rgba(255,49,146,.45)}70%{box-shadow:0 0 0 8px rgba(255,49,146,0)}100%{box-shadow:0 0 0 0 rgba(255,49,146,0)}}
+@keyframes lhHalo{0%,100%{opacity:.72;transform:scale(.96)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes lhBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes lhScribble{from{scale:0 1;opacity:0}to{scale:1 1;opacity:1}}
+@keyframes lhSway{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+@container (min-width:901px) and (max-width:1200px){
+  .lh{grid-template-columns:minmax(350px,.78fr) minmax(540px,1.22fr);padding-left:25px;padding-right:25px}
+  .lh-title{font-size:clamp(4.4rem,7cqi,5.9rem)}
+  .lh-copy{max-width:480px}
+  .lh-art{right:-58px;width:min(76cqi,960px)}
+  .lh .lh-layer--light .lh-float{inset:auto 7% -4% auto;height:94%}
+}
+@container (max-width:900px){
+  .lh{min-height:auto;display:flex;flex-direction:column;align-items:stretch}
+  .lh-copy{width:100%;max-width:650px;margin:0 auto;text-align:center}
+  .lh-eyebrow{max-width:100%;margin-left:auto;margin-right:auto;white-space:nowrap}
+  .lh-title{align-items:center;font-size:clamp(4rem,14cqi,6.5rem)}
+  .lh .lh-desc{max-width:510px;margin-left:auto;margin-right:auto}
+  .lh-actions,.lh-proof{justify-content:center}
+  .lh-status,.lh-scroll{display:none}
+}
+@container (max-width:600px){
+  .lh{padding-left:17px;padding-right:17px}
+  .lh-eyebrow{gap:6px;padding:8px 11px;font-size:7.5px;letter-spacing:.1em}
+  .lh-title{width:100%;font-size:clamp(3.65rem,17.3cqi,5rem)}
+  .lh-desc{width:94%;margin-top:25px;font-size:14px;line-height:1.55}
+  .lh-actions{display:grid;grid-template-columns:1fr;width:100%;gap:8px;margin-top:22px}
+  .lh-primary,.lh-secondary{width:100%;min-height:52px;font-size:13px;padding:0 16px}
+  .lh-proof{margin-top:19px}
+}
+/* nav sign-in link, as in the original nav */
+.nav-signin{align-self:center;padding:0 8px;font-size:15px;font-weight:600;color:#d8deeb;text-decoration:none;transition:color .2s}
+.nav-signin:hover{color:#ffffff}
+.sk[data-mode="light"] .nav-signin{color:#4b4358}
+.sk[data-mode="light"] .nav-signin:hover{color:#211a2c}
+
+/* light mode hero: crossfade background, artwork and text */
+.lh{transition:background-color .7s ease}
+.lh-bg{transition:opacity .7s ease}
+.lh-bg-light{position:absolute;inset:0;z-index:-4;opacity:0;transition:opacity .7s ease;background:radial-gradient(circle at 68% 50%,rgba(214,92,160,.14),transparent 34%),radial-gradient(circle at 88% 18%,rgba(124,96,200,.16),transparent 30%),radial-gradient(circle at 15% 80%,rgba(150,130,190,.14),transparent 36%),linear-gradient(112deg,#ece9f2 0%,#e5e0ed 45%,#ddd6e9 100%)}
+.lh-white,.lh-desc,.lh-eyebrow,.lh-proof-copy strong,.lh-proof-copy small,.lh-status,.lh-note,.lh-scroll,.lh-halo{transition:color .6s,background-color .6s,border-color .6s,opacity .6s}
+.lh-secondary{transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .6s,background .6s,color .6s}
+.sk[data-mode="light"] .lh{background:#e8e4ef;color:#211a2c}
+.sk[data-mode="light"] .lh-bg{opacity:0}
+.sk[data-mode="light"] .lh-bg-light{opacity:1}
+.sk[data-mode="light"] .lh-halo{opacity:.35}
+.sk[data-mode="light"] .lh-white{color:#211a2c;text-shadow:none}
+.sk[data-mode="light"] .lh-scribble{border-top-color:#e0157c}
+.sk[data-mode="light"] .lh-pink{color:#e0157c}
+.sk[data-mode="light"] .lh-desc{color:rgba(31,15,27,.72)}
+.sk[data-mode="light"] .lh-eyebrow{border-color:rgba(48,34,72,.14);background:rgba(255,255,255,.75);color:#554c63}
+.sk[data-mode="light"] .lh-eyebrow i{color:rgba(48,34,72,.3)}
+.sk .lh-primary{color:#ffffff}
+.sk[data-mode="light"] .lh-secondary{border-color:rgba(48,34,72,.16);background:#f3f1f7;color:#211a2c}
+.sk[data-mode="light"] .lh-proof-copy strong{color:#211a2c}
+.sk[data-mode="light"] .lh-proof-copy small{color:#665e74}
+.sk[data-mode="light"] .lh-avatars span{border-color:#e8e4ef}
+.sk[data-mode="light"] .lh-status,.sk[data-mode="light"] .lh-note{background:rgba(255,255,255,.85);border-color:rgba(48,34,72,.12);color:#554c63}
+.sk[data-mode="light"] .lh-status b{color:#211a2c}
+.sk[data-mode="light"] .lh-scroll{color:rgba(31,15,27,.45)}
+
+/* hero art motion: pointer tilt, entrance, portal swap between modes,
+   dark = hover + glitch, light = bounce + sparkles, both = anonymous messages drifting up and dissolving */
+.lh-tilt{position:absolute;inset:0;transform:perspective(1400px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .7s cubic-bezier(.2,.8,.2,1);animation:lhEnter 1.4s cubic-bezier(.16,1,.3,1) .1s both}
+.lh-halo{translate:var(--hx,0) var(--hy,0);transition:translate .9s cubic-bezier(.2,.8,.2,1)}
+.lh-layer{position:absolute;inset:0;transition:clip-path 1.15s cubic-bezier(.77,0,.18,1),opacity .8s ease,filter .8s ease,scale 1s cubic-bezier(.2,.8,.2,1)}
+.lh-layer--dark{clip-path:circle(150% at var(--fx,46%) var(--fy,27%))}
+.lh-layer--light{clip-path:circle(0% at var(--fx,46%) var(--fy,27%));opacity:0;filter:blur(14px);scale:.9}
+.sk[data-mode="light"] .lh-layer--dark{clip-path:circle(0% at var(--fx,46%) var(--fy,27%));opacity:0;filter:blur(16px) hue-rotate(70deg);scale:1.1}
+.sk[data-mode="light"] .lh-layer--light{clip-path:circle(150% at var(--fx,46%) var(--fy,27%));opacity:1;filter:none;scale:1}
+.lh-float{position:absolute;inset:0}
+.lh-layer--dark .lh-float{bottom:-18px;animation:lhHover 7s ease-in-out infinite}
+.lh-img--dark{animation:lhJitter 6.5s steps(1,end) infinite}
+.lh-ghost{mix-blend-mode:screen;opacity:0;pointer-events:none}
+.lh-ghost--a{animation:lhGlitchA 6.5s steps(1,end) infinite}
+.lh-ghost--b{animation:lhGlitchB 6.5s steps(1,end) infinite}
+.lh-layer--light .lh-float{inset:auto auto -5% 4%;height:104%;aspect-ratio:1122/932;animation:lhBounce 5.4s ease-in-out infinite}
+.lh-img--light{object-position:center;transform-origin:50% 90%;filter:drop-shadow(0 30px 40px rgba(122,60,255,.2));animation:lhPop 5.4s cubic-bezier(.3,1.6,.5,1) infinite}
+.lh-spark{position:absolute;width:var(--s,18px);aspect-ratio:1;background:linear-gradient(135deg,#ff3192,#ffffff 50%,#8a5cff);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);opacity:0;animation:lhTwinkle 3s ease-in-out infinite}
+.lh-spark:nth-of-type(1){left:6%;top:30%;--s:22px}
+.lh-spark:nth-of-type(2){left:33%;top:5%;--s:16px;animation-delay:-.8s}
+.lh-spark:nth-of-type(3){right:3%;top:56%;--s:26px;animation-delay:-1.6s}
+.lh-spark:nth-of-type(4){left:17%;bottom:12%;--s:14px;animation-delay:-2.2s}
+.lh-spark:nth-of-type(5){right:24%;top:9%;--s:18px;animation-delay:-1.1s}
+.lh-drift{position:absolute;inset:0;z-index:4;pointer-events:none}
+.lh-msg{position:absolute;left:var(--x);top:var(--y);display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 7px;border-radius:17px 17px 17px 5px;background:rgba(24,12,34,.66);border:1px solid rgba(255,90,170,.38);color:#ffffff;font-family:'DM Sans',system-ui,sans-serif;font-size:13.5px;font-weight:700;white-space:nowrap;backdrop-filter:blur(10px);box-shadow:0 12px 30px rgba(0,0,0,.35),0 0 26px rgba(255,49,146,.2);opacity:0;animation:lhMsg 12.5s cubic-bezier(.2,.8,.2,1) var(--dl) infinite}
+.lh-msg i{font-style:normal;width:24px;height:24px;border-radius:9px;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,#ff3192,#8a5cff);font-size:12px}
+.lh-msg b{font-weight:800;color:#ff8cc4}
+.sk[data-mode="light"] .lh-msg{background:rgba(255,255,255,.8);border-color:rgba(138,92,255,.32);color:#211a2c;box-shadow:0 12px 30px rgba(80,50,120,.18)}
+.sk[data-mode="light"] .lh-msg b{color:#b0246a}
+@keyframes lhMsg{0%{opacity:0;translate:0 30px;scale:.72;filter:blur(8px)}5%{opacity:1;translate:0 0;scale:1;filter:blur(0)}20%{opacity:1;translate:0 -12px;scale:1;filter:blur(0)}27%{opacity:0;translate:0 -30px;scale:.92;filter:blur(12px)}100%{opacity:0;translate:0 -30px}}
+@media (prefers-reduced-motion:reduce){.lh-msg{animation:none}}
+@container (max-width:900px){.lh-msg{left:calc(var(--x) * .55 + 5%);top:calc(var(--y) * .22 + 3%);font-size:12.5px}}
+.lh-portal{position:absolute;z-index:3;left:var(--fx,46%);top:var(--fy,27%);width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;border:2px solid #ff3192;box-shadow:0 0 34px rgba(255,49,146,.85),inset 0 0 34px rgba(138,92,255,.65);opacity:0;pointer-events:none;animation:lhPortalD 1.15s cubic-bezier(.16,1,.3,1) both}
+.sk[data-mode="light"] .lh-portal{animation-name:lhPortalL;border-color:#8a5cff}
+/* phone + tablet: the art becomes a dimmed backdrop behind centred copy, so the words are the star.
+   Touch-drag tilts it; scrolling drifts and fades it (see --p below). */
+@container (max-width:900px){
+  .lh{min-height:clamp(680px,100svh,940px);justify-content:center;padding-top:112px;padding-bottom:92px}
+  .lh-art{position:absolute;inset:64px 0 0;width:auto;height:auto;--fx:50%;--fy:30%;-webkit-mask-image:radial-gradient(125% 80% at 50% 36%,#000 42%,transparent 90%);mask-image:radial-gradient(125% 80% at 50% 36%,#000 42%,transparent 90%)}
+  .lh-canvas{inset:0;opacity:.38}
+  .lh-tilt{animation-name:lhDrop}
+  .lh .lh-layer--dark .lh-float{bottom:-12px}
+  .lh .lh-layer--dark .lh-img{object-fit:cover;object-position:50% 22%}
+  .lh .lh-layer--light .lh-float{inset:3% auto auto 50%;height:84%;transform:translateX(-50%)}
+  .lh-halo{left:50%;top:20%;width:min(520px,110%);height:56%;transform:translateX(-50%)}
+  .lh-note,.lh-status{display:none}
+  .lh .lh-scroll{display:flex;bottom:26px}
+  .lh-copy::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:135%;height:125%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(8,6,11,.7),rgba(8,6,11,.32) 62%,transparent);pointer-events:none}
+  .sk[data-mode="light"] .lh-copy::before{background:radial-gradient(closest-side,rgba(232,228,239,.82),rgba(232,228,239,.4) 62%,transparent)}
+}
+@keyframes lhDrop{from{opacity:0;translate:0 -70px;scale:1.12;filter:blur(18px)}to{opacity:1;translate:0 0;scale:1;filter:none}}
+@keyframes lhEnter{from{opacity:0;translate:0 60px;scale:.88;filter:blur(18px)}to{opacity:1;translate:0 0;scale:1;filter:none}}
+@keyframes lhHover{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -14px;rotate:-.7deg}}
+@keyframes lhBounce{0%,100%{translate:0 0;rotate:-1deg}45%{translate:0 -18px;rotate:1deg}}
+@keyframes lhPop{0%,72%,100%{scale:1 1}76%{scale:1.05 .95}80%{scale:.97 1.04}84%{scale:1.015 .99}88%{scale:1 1}}
+@keyframes lhTwinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(90deg)}}
+@keyframes lhPortalD{0%{opacity:.95;transform:scale(.1)}100%{opacity:0;transform:scale(9)}}
+@keyframes lhPortalL{0%{opacity:.95;transform:scale(.1)}100%{opacity:0;transform:scale(9)}}
+@keyframes lhJitter{0%,86%,93%,100%{transform:none}87%{transform:translateX(5px) skewX(-5deg)}89%{transform:translateX(-7px) skewX(4deg)}91%{transform:translateX(3px)}}
+@keyframes lhGlitchA{0%,86%,93%,100%{opacity:0;transform:none;clip-path:inset(0 0 100% 0)}87%{opacity:.9;transform:translateX(-16px);clip-path:inset(20% 0 62% 0);filter:hue-rotate(-75deg) saturate(2.6)}89%{opacity:.9;transform:translateX(12px);clip-path:inset(46% 0 33% 0);filter:hue-rotate(-75deg) saturate(2.6)}91%{opacity:.75;transform:translateX(-8px);clip-path:inset(71% 0 10% 0);filter:hue-rotate(-75deg) saturate(2.6)}}
+@keyframes lhGlitchB{0%,86%,93%,100%{opacity:0;transform:none;clip-path:inset(0 0 100% 0)}87%{opacity:.85;transform:translateX(14px);clip-path:inset(55% 0 25% 0);filter:hue-rotate(150deg) saturate(2.2)}89%{opacity:.85;transform:translateX(-12px);clip-path:inset(8% 0 78% 0);filter:hue-rotate(150deg) saturate(2.2)}91%{opacity:.7;transform:translateX(9px);clip-path:inset(33% 0 50% 0);filter:hue-rotate(150deg) saturate(2.2)}}
+/* landing interaction: scroll parallax (JS writes --p: 0 at the top, 1 once the hero has scrolled away),
+   cursor torch, entrance, playful headline, magnetic buttons, reveal-on-scroll, card spotlight + tilt */
+.lh-art{translate:0 calc(var(--p,0) * 170px);opacity:calc(1 - var(--p,0) * 1.45)}
+.lh-copy{translate:0 calc(var(--p,0) * -80px);opacity:calc(1 - var(--p,0) * .85)}
+.lh-glow--pink{translate:0 calc(var(--p,0) * 260px)}
+.lh-glow--purple{translate:0 calc(var(--p,0) * 120px)}
+.lh-grid{translate:0 calc(var(--p,0) * 90px)}
+.lh::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;z-index:15;pointer-events:none;background:linear-gradient(180deg,transparent,var(--bg))}
+.lh-torch{position:absolute;inset:0;z-index:-3;pointer-events:none;background:radial-gradient(420px circle at var(--cx,70%) var(--cy,40%),rgba(255,49,146,.17),rgba(138,92,255,.07) 45%,transparent 70%);opacity:0;transition:opacity .5s}
+.sk[data-mode="light"] .lh-torch{background:radial-gradient(420px circle at var(--cx,70%) var(--cy,40%),rgba(255,92,170,.2),rgba(140,100,255,.08) 45%,transparent 70%)}
+.lh:hover .lh-torch{opacity:1}
+.pub-nav--float{animation:lhNav .9s cubic-bezier(.16,1,.3,1) backwards}
+.lh-eyebrow{animation:lhRise .7s cubic-bezier(.16,1,.3,1) .1s backwards}
+.lh-title > span{animation:lhLine 1s cubic-bezier(.16,1,.3,1) backwards;transition:scale .5s cubic-bezier(.3,1.6,.5,1),rotate .5s cubic-bezier(.3,1.6,.5,1),letter-spacing .6s cubic-bezier(.16,1,.3,1),filter .5s,opacity .5s,color .4s;transform-origin:left 70%;cursor:default;-webkit-tap-highlight-color:transparent}
+.lh-title > span:nth-child(1){animation-delay:.16s}
+.lh-title > span:nth-child(2){animation-delay:.26s}
+.lh-title > span:nth-child(3){animation-delay:.36s}
+.lh-title > span:nth-child(1):is(:hover,:active){scale:1.06;letter-spacing:-.04em}
+.lh-title > .lh-pink:is(:hover,:active){rotate:-4deg;scale:1.08}
+.lh-title > span:nth-child(3):is(:hover,:active){filter:blur(9px);opacity:.5;letter-spacing:-.02em}
+.lh-desc{animation:lhRise .8s cubic-bezier(.16,1,.3,1) .5s backwards}
+.lh-actions > *{animation:lhRise .8s cubic-bezier(.3,1.4,.5,1) backwards}
+.lh-actions > :nth-child(1){animation-delay:.6s}
+.lh-actions > :nth-child(2){animation-delay:.68s}
+.lh-proof{animation:lhRise .8s cubic-bezier(.16,1,.3,1) .8s backwards}
+.lh .lh-primary,.lh .lh-secondary{transition:transform .3s cubic-bezier(.2,.8,.2,1),translate .4s cubic-bezier(.3,1.5,.5,1),border-color .6s,background .6s,box-shadow .3s,color .6s}
+.lh-primary:active,.lh-secondary:active{transform:scale(.96)}
+.lh-scroll svg{animation:lhNudge 1.8s ease-in-out infinite}
+@keyframes lhNav{from{opacity:0;translate:0 -130%}}
+@keyframes lhRise{from{opacity:0;translate:0 26px;filter:blur(6px)}}
+@keyframes lhLine{from{opacity:0;translate:0 55%;clip-path:inset(0 0 100% 0);filter:blur(8px)}to{clip-path:inset(-30% -12% -45% -12%)}}
+@keyframes lhNudge{0%,100%{translate:0 0}50%{translate:3px 4px}}
+/* ---- phones: livelier, shorter page (desktop untouched) ---- */
+.ln-swipe-hint,.ln-feat-n{display:none}
+.ln-dock{position:fixed;left:12px;right:12px;bottom:12px;z-index:55;display:none;align-items:center;gap:10px;padding:8px 8px 8px 10px;border-radius:22px;background:rgba(22,12,32,.82);border:1px solid rgba(255,90,170,.3);color:#ffffff;backdrop-filter:blur(16px);box-shadow:0 18px 40px rgba(0,0,0,.4);transform:translateY(140%);transition:transform .45s cubic-bezier(.2,.9,.25,1.15)}
+.sk[data-mode="light"] .ln-dock{background:rgba(255,255,255,.88);color:#211a2c;border-color:rgba(138,92,255,.28);box-shadow:0 18px 40px rgba(80,50,120,.2)}
+.sk.show-dock .ln-dock{transform:none}
+.ln-dock-ghost{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,#ff3192,#8a5cff)}
+.ln-dock-ghost img{width:26px;height:26px;animation:lnWobble 3.2s ease-in-out infinite}
+@keyframes lnWobble{0%,100%{rotate:0deg}20%{rotate:-12deg}40%{rotate:9deg}60%{rotate:0deg}}
+.sk .ln-dock-btn{flex:none;min-height:44px;padding:0 16px;border-radius:15px;display:inline-flex;align-items:center;background:var(--cta);color:#ffffff;font-weight:800;font-size:14px;text-decoration:none}
+@container (max-width:700px){
+  .ln-dock{display:flex}
+  /* feature cards: a swipeable row that peeks the next card */
+  .ln-swipe-hint{display:flex;justify-content:flex-end;gap:6px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .ln-swipe-hint span{animation:lnNudge 1.6s ease-in-out infinite}
+  @keyframes lnNudge{50%{translate:5px 0}}
+  .sk .ln-feats{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px!important;margin:0 -20px;padding:4px 20px 10px;scrollbar-width:none}
+  .ln-feats::-webkit-scrollbar{display:none}
+  .sk .ln-feats > article{flex:0 0 78%;scroll-snap-align:center;position:relative;overflow:hidden;min-height:190px}
+  .ln-feat-n{display:block;position:absolute;right:14px;top:6px;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:64px;font-weight:800;letter-spacing:-.05em;line-height:1;opacity:.08}
+  /* how it spreads: a numbered timeline instead of four big boxes */
+  .sk .ln-steps{display:block!important;position:relative;margin-top:28px!important}
+  .ln-steps::before{content:"";position:absolute;left:23px;top:20px;bottom:30px;width:3px;border-radius:3px;background:linear-gradient(180deg,#ff3192,#8a5cff 70%,transparent)}
+  .sk .ln-steps > li{background:none!important;border:0!important;box-shadow:none!important;padding:0 0 26px 66px!important;min-height:0}
+  .sk .ln-steps > li:last-child{padding-bottom:0!important}
+  .sk .ln-steps .step-n{position:absolute;left:0;top:0;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:18px!important;color:#ffffff!important;background:linear-gradient(135deg,#ff3192,#8a5cff);box-shadow:0 0 0 5px var(--bg2),0 8px 20px rgba(255,49,146,.35)}
+  .sk .ln-steps h3{margin-top:2px!important;font-size:19px!important}
+  .sk .ln-steps p{font-size:14.5px!important}
+  /* games: tidy 2-up tiles */
+  .sk .ln-games{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .sk .ln-games > div{min-height:150px!important;padding:14px!important}
+  .sk .ln-games h3{font-size:16px!important}
+  .sk .ln-games .pill{top:10px!important;right:10px!important;font-size:10.5px;padding:3px 8px}
+  .sk .ln-games img{width:38px!important;height:38px!important}
+  /* cookie banner: compact */
+  .ck{padding:12px!important;border-radius:20px!important;bottom:10px!important}
+  .ck img{display:none}
+  .ck p{font-size:12.5px!important}
+  .ck .btn{min-height:42px;font-size:14px}
+}
+.marquee:hover{animation-play-state:paused}
+.ck{position:fixed;left:0;right:0;margin:0 auto;bottom:14px;width:min(94%,520px);box-sizing:border-box;z-index:60;padding:16px;border-radius:24px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);animation:up .45s cubic-bezier(.2,.8,.2,1) both}
+[data-rv="on"] .rv{opacity:0;translate:0 34px;transition:opacity .9s cubic-bezier(.16,1,.3,1),translate .9s cubic-bezier(.16,1,.3,1)}
+[data-rv="on"] .rv.in{opacity:1;translate:0 0}
+[data-rv="on"] .rv.ln-h2{transition-delay:.08s}
+[data-rv="on"] .rv.muted{transition-delay:.16s}
+[data-rv="on"] .rv-stag > *{--d:0s;opacity:0;translate:0 30px;scale:.96;transition:opacity .8s cubic-bezier(.16,1,.3,1) var(--d),translate .8s cubic-bezier(.16,1,.3,1) var(--d),scale .8s cubic-bezier(.16,1,.3,1) var(--d),transform .22s cubic-bezier(.3,1.5,.5,1),border-color .2s,box-shadow .25s,filter .35s}
+[data-rv="on"] .rv-stag.in > *{opacity:1;translate:0 0;scale:1}
+.rv-stag > :nth-child(2){--d:.07s}.rv-stag > :nth-child(3){--d:.14s}.rv-stag > :nth-child(4){--d:.21s}.rv-stag > :nth-child(5){--d:.28s}.rv-stag > :nth-child(n+6){--d:.35s}
+.spot{position:relative;overflow:hidden}
+.spot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(255,59,141,.16),transparent 65%);opacity:0;transition:opacity .35s;pointer-events:none}
+.spot:hover::before{opacity:1}
+.lift img{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.lift:hover img{transform:translateY(-4px) rotate(-9deg) scale(1.1)}
+.step-n{display:inline-block;transition:transform .5s cubic-bezier(.3,1.6,.5,1),color .3s}
+.lift:hover .step-n{transform:scale(1.18) rotate(-6deg);color:#8a5cff!important}
+.tilt3d{will-change:transform}
+.peek{cursor:pointer}
+.peek:is(:hover,:active){filter:none!important;opacity:1!important;translate:6px 0}
+.lift:hover .dot-pulse{animation:live 1.4s ease-in-out infinite;background:#5be0a0!important}
+.shimmer{background:linear-gradient(100deg,#ff6aa8 0%,#ff6aa8 35%,#ffffff 50%,#c9a6ff 62%,#ff6aa8 80%) 0 0/250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:lhShimmer 4.5s ease-in-out infinite}
+@keyframes lhShimmer{0%,30%{background-position:100% 0}70%,100%{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.lh *,.lh *::before,.lh *::after{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+
+  <div style="overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg2)" aria-hidden="true">
+    <div class="marquee" style="padding: 9px 0; font-size: 13px; font-weight: 700; color: var(--muted)">
+      <sc-for list="{{marquee}}" as="mq" hint-placeholder-count="16">
+        <span style="display: inline-flex; align-items: center; gap: 28px; white-space: nowrap">{{mq}}<span style="width: 5px; height: 5px; border-radius: 50%; background: #ff3b8d"></span></span>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav class="pub-nav pub-nav--float" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <div class="pub-links">
+      <a href="#how" onClick="{{goHow}}">How it works</a>
+      <a href="#games" onClick="{{goGames}}">Games</a>
+      <a href="Safety.dc.html">Safety</a>
+      <a href="About.dc.html">About</a>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{nextMode}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        <span>{{modeWord}}</span>
+      </button>
+      <a href="Login.dc.html" class="nav-signin wide-only">Sign in</a>
+      <a href="Signup.dc.html" class="btn btn-cta">Get your link</a>
+      <button class="icon-btn pub-menu tap" onClick="{{toggleDrawer}}" aria-label="Open menu" aria-expanded="{{drawerOpen}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+    </div>
+  </nav>
+
+<div class="pdr {{drawerCls}}">
+    <div class="pdr-scrim" onClick="{{toggleDrawer}}"></div>
+    <aside class="pdr-panel" role="dialog" aria-label="Menu" aria-hidden="{{drawerHidden}}">
+      <div class="pdr-head">
+        <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <button class="icon-btn tap" onClick="{{toggleDrawer}}" aria-label="Close menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <nav aria-label="Site" style="display: flex; flex-direction: column; gap: 3px">
+        <a href="Landing.dc.html" class="nav-i" aria-current="page" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+        <a href="#how" class="nav-i" onClick="{{goHow}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>How it works</a>
+        <a href="#games" class="nav-i" onClick="{{goGames}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+        <a href="Safety.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>Safety</a>
+        <a href="About.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>About</a>
+        <a href="Help.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"></path></svg>Help & FAQ</a>
+        <a href="Contact.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Contact</a>
+      </nav>
+      <div class="pdr-foot">
+        <button class="mode-btn tap" onClick="{{toggleMode}}" style="justify-content: center">Switch to {{modeWord}} mode</button>
+        <a href="Login.dc.html" class="btn btn-block tap">Sign in</a>
+        <a href="Signup.dc.html" class="btn btn-cta btn-block tap">Get your link</a>
+      </div>
+    </aside>
+  </div>
+
+  <header class="lh" id="top" onMouseMove="{{tilt}}" onMouseLeave="{{untilt}}" onTouchMove="{{tilt}}" onTouchEnd="{{untilt}}">
+    <div class="lh-bg" aria-hidden="true">
+      <div class="lh-glow lh-glow--pink"></div>
+      <div class="lh-glow lh-glow--purple"></div>
+      <div class="lh-grid"></div>
+      <div class="lh-vig"></div>
+    </div>
+
+    <div class="lh-bg-light" aria-hidden="true"></div>
+    <div class="lh-torch" aria-hidden="true"></div>
+
+    <div class="lh-copy">
+      <div class="lh-eyebrow">
+        <span class="lh-dot"></span><span>ANONYMOUS</span><i>•</i><span>REAL</span><i>•</i><span>NO JUDGMENT</span>
+      </div>
+      <h1 class="lh-title">
+        <span class="lh-white">Say It.</span>
+        <span class="lh-pink">Stay<span class="lh-scribble" aria-hidden="true"></span></span>
+        <span class="lh-white">Unknown.</span>
+      </h1>
+      <p class="lh-desc">Share honest thoughts, get real answers, explore what people actually think — all anonymously.</p>
+      <div class="lh-actions">
+        <a href="Signup.dc.html" class="lh-primary mag">
+          <span>Create Your Link</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg>
+          <span class="lh-shine" aria-hidden="true"></span>
+        </a>
+        <a href="#how" onClick="{{goHow}}" class="lh-secondary mag">
+          <span>See How It Works</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a>
+      </div>
+      <div class="lh-proof">
+        <div class="lh-avatars" aria-hidden="true"><span>J</span><span>M</span><span>A</span><span>+</span></div>
+        <div class="lh-proof-copy">
+          <strong>Built for real reactions.</strong>
+          <small><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>No account needed to answer</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="lh-art">
+      <div class="lh-halo" aria-hidden="true"></div>
+      <div class="lh-canvas">
+        <div class="lh-tilt">
+          <div class="lh-layer lh-layer--dark">
+            <div class="lh-float">
+              <img class="lh-img lh-img--dark" src="/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2" alt="Sekretly anonymous character holding the interaction phone">
+              <img class="lh-img lh-ghost lh-ghost--a" src="/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2" alt="" aria-hidden="true">
+              <img class="lh-img lh-ghost lh-ghost--b" src="/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2" alt="" aria-hidden="true">
+            </div>
+          </div>
+          <div class="lh-layer lh-layer--light">
+            <div class="lh-float">
+              <img class="lh-img lh-img--light" src="/_blob/b65b6f4065c21346fe19fae546a0d593" alt="Sekretly hoodie mascot winking, finger to lips, reaching out beside a phone showing Chat. Play. Keep it Secret.">
+            </div>
+            <span class="lh-spark" aria-hidden="true"></span><span class="lh-spark" aria-hidden="true"></span><span class="lh-spark" aria-hidden="true"></span><span class="lh-spark" aria-hidden="true"></span><span class="lh-spark" aria-hidden="true"></span>
+          </div>
+          <div class="lh-drift" aria-hidden="true">
+            <span class="lh-msg" style="--x: 4%; --y: 46%; --dl: 0s"><i>👀</i>who is this??</span>
+            <span class="lh-msg" style="--x: 52%; --y: 14%; --dl: 2.5s"><i>🔥</i><b>10/10</b>&nbsp;no notes</span>
+            <span class="lh-msg" style="--x: 10%; --y: 70%; --dl: 5s"><i>🤫</i>I still have your hoodie</span>
+            <span class="lh-msg" style="--x: 46%; --y: 62%; --dl: 7.5s"><i>👑</i>scored&nbsp;<b>5/5</b>&nbsp;on your quiz</span>
+            <span class="lh-msg" style="--x: 18%; --y: 24%; --dl: 10s"><i>💌</i>funny · loyal · chaotic</span>
+          </div>
+          <span class="lh-portal" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="lh-status"><span></span>LIVE <b>ANONYMOUS</b></div>
+      <div class="lh-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+        no filters. just truth.
+      </div>
+    </div>
+
+    <a href="#try" class="lh-scroll"><span>keep scrolling</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 9v8H9"></path></svg>
+    </a>
+  </header>
+
+  <section class="pub-wrap" style="padding-top: 36px" aria-label="What makes Sekretly different">
+    <div class="ln-swipe-hint" aria-hidden="true">Swipe <span>→</span></div>
+    <div class="rv-stag ln-feats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
+      <sc-for list="{{features}}" as="f" hint-placeholder-count="4">
+        <article class="card lift spot" style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <span class="ln-feat-n" aria-hidden="true">{{f.n}}</span>
+          <img src="{{f.icon}}" alt="" style="width: 48px; height: 48px">
+          <h3 style="font-size: 20px">{{f.title}}</h3>
+          <p class="muted" style="font-size: 15px; line-height: 1.5">{{f.body}}</p>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="try" class="ln-sec">
+    <div class="pub-wrap" style="display: flex; flex-wrap: wrap; gap: 40px 56px; align-items: center">
+      <div style="flex: 1 1 380px; min-width: 0">
+        <p class="ln-eyebrow rv">Feel it first</p>
+        <h2 class="ln-h2 rv" style="margin-top: 12px">Try it.<br><em>No one’s watching.</em></h2>
+        <p class="muted rv" style="margin-top: 16px; font-size: 17px; line-height: 1.55; max-width: 38ch">Pick a topic and a theme, then have a go. Every topic plays differently, and this is exactly what your friends see when they open your link.</p>
+        <div style="margin-top: 22px">
+          <div style="font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase" class="muted">Topic</div>
+          <div class="rail" style="display: flex; gap: 8px; margin-top: 8px; padding-bottom: 4px">
+            <sc-for list="{{topics}}" as="t" hint-placeholder-count="5">
+              <button class="chip tap {{t.cls}}" onClick="{{t.pick}}" aria-pressed="{{t.on}}">{{t.label}}</button>
+            </sc-for>
+          </div>
+          <div style="font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-top: 16px" class="muted">Theme</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px">
+            <sc-for list="{{themes}}" as="t" hint-placeholder-count="6">
+              <button class="tap" onClick="{{t.pick}}" aria-pressed="{{t.on}}" aria-label="{{t.name}} theme" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 6px; border-radius: 99px; border: 2px solid {{t.ring}}; background: var(--card); color: var(--ink); font-weight: 700; font-size: 14px">
+                <span class="{{t.cls}}" style="width: 30px; height: 30px; border-radius: 50%"></span>{{t.name}}
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 380px; min-width: 0; display: flex; justify-content: center">
+        <div class="tilt3d" style="width: 100%; max-width: 400px; border-radius: 36px; overflow: hidden; box-shadow: var(--shadow); transition: transform .5s cubic-bezier(.16,1,.3,1)">
+          <dc-import name="Main" theme="{{demoTh}}" topic="{{demoTopic}}" embed="yes" hint-size="100%,620px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="ln-sec" style="background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)">
+    <div class="pub-wrap">
+      <p class="ln-eyebrow rv">How it spreads</p>
+      <h2 class="ln-h2 rv" style="margin-top: 12px">Make a link.<br><em>Drop it. Watch.</em></h2>
+      <ol class="rv-stag ln-steps" style="list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px">
+        <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+          <li class="card lift spot" style="padding: 22px; position: relative">
+            <span class="d step-n" style="font-size: 48px; font-weight: 800; color: var(--pink); line-height: 1">{{st.n}}</span>
+            <h3 style="margin-top: 12px; font-size: 22px">{{st.title}}</h3>
+            <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">{{st.body}}</p>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ln-sec">
+    <div class="pub-wrap" style="display: flex; flex-wrap: wrap; gap: 40px 56px; align-items: center">
+      <div style="flex: 1 1 380px; min-width: 0">
+        <p class="ln-eyebrow rv">Here today, gone tomorrow</p>
+        <h2 class="ln-h2 rv" style="margin-top: 12px">Messages that<br><em>disappear.</em></h2>
+        <p class="muted rv" style="margin-top: 16px; font-size: 17px; line-height: 1.55; max-width: 40ch">You choose how long things last, from 1 day to 3 weeks. Reply to friends with an account in a two-way chat, and you both stay anonymous forever.</p>
+        <div class="rv-stag" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px">
+          <span class="pill">1 day</span><span class="pill">3 days</span><span class="pill">1 week</span><span class="pill">3 weeks</span>
+        </div>
+      </div>
+      <div class="rv-stag" style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 10px; max-width: 460px">
+        <sc-for list="{{fading}}" as="fm" hint-placeholder-count="4">
+          <div class="card peek" title="Peek before it fades" style="display: flex; align-items: center; gap: 12px; padding: 14px; opacity: {{fm.op}}; filter: blur({{fm.blur}})">
+            <span class="av {{fm.th}}"><img src="{{fm.icon}}" alt=""></span>
+            <span style="flex: 1; min-width: 0; font-weight: 700; font-size: 15px">{{fm.text}}</span>
+            <span class="muted" style="font-size: 12.5px; flex: none">{{fm.left}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="games" class="ln-sec" style="background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)">
+    <div class="pub-wrap">
+      <p class="ln-eyebrow rv">Game night</p>
+      <h2 class="ln-h2 rv" style="margin-top: 12px">Party games.<br><em>Zero names.</em></h2>
+      <p class="muted rv" style="margin-top: 16px; font-size: 17px; line-height: 1.55; max-width: 46ch">Everyone gets a random nickname like MangoMoon or BlueFox. Play with your class, your hostel, your group chat. Nobody knows who said what.</p>
+      <div class="rv-stag ln-games" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 30px">
+        <sc-for list="{{games}}" as="g" hint-placeholder-count="6">
+          <div class="card lift spot tilt3d" style="padding: 18px; display: flex; flex-direction: column; gap: 10px; position: relative; min-height: 170px">
+            <span class="pill" style="position: absolute; top: 14px; right: 14px; background: {{g.tagBg}}; color: {{g.tagInk}}">{{g.tag}}</span>
+            <img src="{{g.icon}}" alt="" style="width: 46px; height: 46px">
+            <h3 style="font-size: 19px; line-height: 1.05">{{g.name}}</h3>
+            <p class="muted" style="font-size: 13.5px; margin-top: auto">{{g.meta}}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="ln-sec">
+    <div class="pub-wrap" style="display: flex; flex-wrap: wrap; gap: 32px 56px; align-items: center">
+      <div style="flex: 1 1 420px; min-width: 0">
+        <p class="ln-eyebrow rv">The quiet promise</p>
+        <h2 class="ln-h2 rv" style="margin-top: 12px">Unknown doesn’t mean<br><em>uncontrolled.</em></h2>
+        <p class="muted rv" style="margin-top: 16px; font-size: 17px; line-height: 1.55; max-width: 40ch">Say what you want. Whoever receives it is in control: one tap reports it, the sender gets a warning, and after three warnings the next report blocks them from you for good. Changed your mind? Undo it.</p>
+        <a href="Safety.dc.html" class="btn rv" style="margin-top: 20px">Read our safety rules</a>
+      </div>
+      <div class="rv-stag" style="flex: 1 1 380px; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{safety}}" as="sf" hint-placeholder-count="6">
+          <div class="card lift spot" style="padding: 14px; font-weight: 700; font-size: 14.5px; display: flex; gap: 10px; align-items: center">
+            <span class="dot-pulse" style="width: 10px; height: 10px; border-radius: 50%; background: var(--pink); flex: none"></span>{{sf}}
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: radial-gradient(80% 120% at 50% 0%,#5a1240 0%,#1b0b26 60%,#0c0811 100%); color: #ffffff; text-align: center; padding: 96px 20px">
+    <img class="float" src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 84px; height: 84px">
+    <h2 class="rv" style="margin-top: 14px; font-size: clamp(42px, 7cqi, 84px); line-height: .95; font-weight: 800">So… what do they<br><span class="shimmer">really think?</span></h2>
+    <div class="rv-stag" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px">
+      <a href="Signup.dc.html" class="btn btn-lg tap" style="background: #ffffff; color: #211a2c; border: 0; padding: 0 28px">Create your link</a>
+      <a href="Main.dc.html" class="btn btn-lg tap" style="background: transparent; color: #ffffff; border-color: rgba(255,255,255,.3); padding: 0 24px">See a live link</a>
+    </div>
+  </section>
+
+  <footer class="ft">
+    <div class="ft-in">
+      <div class="ft-top">
+        <div class="ft-brand">
+          <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word" style="color: var(--ink)">Sekretly</span></a>
+          <p>Built for the things you almost said. Anonymous messages and party games, made in Nigeria.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-sm tap">Get your link</a>
+        </div>
+        <div class="ft-cols">
+          <div class="ft-col"><b>Product</b><a href="Signup.dc.html">Create a link</a><a href="#games" onClick="{{goGames}}">Games</a><a href="#how" onClick="{{goHow}}">How it works</a></div>
+          <div class="ft-col"><b>Company</b><a href="About.dc.html">About</a><a href="Contact.dc.html">Contact</a><a href="Help.dc.html">Help &amp; FAQ</a></div>
+          <div class="ft-col"><b>Safety</b><a href="Safety.dc.html">Safety center</a><a href="Safety.dc.html">Community rules</a><a href="Safety.dc.html">Report a problem</a></div>
+          <div class="ft-col"><b>Legal</b><a href="Legal.dc.html">Privacy policy</a><a href="Legal.dc.html">Terms of use</a><a href="Legal.dc.html">Cookies &amp; ads</a><button onClick="{{openConsent}}" style="all: unset; cursor: pointer">Cookie choices</button></div>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 Sekretly · 16+ only</span>
+        <span>Say it. Stay unknown.</span>
+      </div>
+    </div>
+  </footer>
+  <sc-if value="{{dockOn}}" hint-placeholder-val="{{ true }}">
+    <div class="ln-dock" aria-label="Get started">
+      <span class="ln-dock-ghost" aria-hidden="true"><img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt=""></span>
+      <span style="flex: 1; min-width: 0; line-height: 1.2"><b style="display: block; font-size: 14px">Your link in 30 seconds</b><span style="font-size: 12px; opacity: .75">Free · no real name needed</span></span>
+      <a href="Signup.dc.html" class="ln-dock-btn tap">Get my link</a>
+    </div>
+  </sc-if>
+  <sc-if value="{{consentOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="ck" role="dialog" aria-label="Cookie choices">
+      <div class="row" style="gap: 12px; align-items: flex-start">
+        <img src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 34px; height: 34px; flex: none">
+        <div style="flex: 1; min-width: 0">
+          <b style="font-size: 15px">Cookies, quickly</b>
+          <p class="muted" style="margin: 4px 0 0; font-size: 13.5px; line-height: 1.45">We use essential cookies to keep you logged in, and ad cookies (Google) to keep Sekretly free. Your messages are never used for ads. <a href="Legal.dc.html" class="pink" style="font-weight: 700">Details</a></p>
+          <sc-if value="{{ckMore}}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px">
+              <div class="row" style="justify-content: space-between; font-size: 14px"><span><b>Essential</b> <span class="muted">· always on</span></span><button class="switch" role="switch" aria-checked="true" aria-label="Essential cookies" disabled="{{ true }}"></button></div>
+              <div class="row" style="justify-content: space-between; font-size: 14px"><span><b>Personalised ads</b> <span class="muted">· off shows general ads</span></span><button class="switch" role="switch" aria-checked="{{ckAdsStr}}" aria-label="Personalised ads" onClick="{{toggleCkAds}}"></button></div>
+              <div class="row" style="justify-content: space-between; font-size: 14px"><span><b>Stats</b> <span class="muted">· counts, no names</span></span><button class="switch" role="switch" aria-checked="{{ckStatsStr}}" aria-label="Stats cookies" onClick="{{toggleCkStats}}"></button></div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap">
+        <button class="btn btn-cta tap" onClick="{{ckAccept}}" style="flex: 1 1 140px">Accept all</button>
+        <button class="btn tap" onClick="{{ckSave}}" style="flex: 1 1 140px">{{ckSaveLabel}}</button>
+        <button class="btn btn-ghost tap" onClick="{{ckToggleMore}}" style="flex: 1 1 100%; border: 0; min-height: 36px">{{ckMoreLabel}}</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"consent":{"editor":"enum","options":["auto","show"],"default":"auto"},"$preview":{"width":1280,"height":5000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    var ck = null;
+    try { ck = window.sessionStorage.getItem('sk-consent'); } catch (e) {}
+    if (props.consent === 'show') ck = null;
+    this.state = { consent: !ck, ckMore: false, ckAds: true, ckStats: true, mode: m || props.mode || 'dark', menu: false, topic: 0, theme: 'sunset', word: null, text: '', sent: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    try { this.motionOn(); } catch (e) {}
+    // arriving from another page's "How it works" / "Games" link
+    var j = null;
+    try { j = window.localStorage.getItem('sk-jump'); window.localStorage.removeItem('sk-jump'); } catch (e) {}
+    if (!j) { try { j = (window.location.hash || '').replace('#', ''); } catch (e) {} }
+    if (j === 'how' || j === 'games') { this.jt = setTimeout(function () { self.jump(j); }, 450); }
+  }
+  // smooth-scroll to a section without changing the page address (the canvas stops boards that navigate)
+  jump(id) {
+    try { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+  }
+  componentWillUnmount() {
+    clearTimeout(this.jt);
+    try { window.removeEventListener('storage', this.onStore); } catch (e) {}
+    try { window.removeEventListener('scroll', this.onScroll, true); document.removeEventListener('pointermove', this.onPtr); if (this.io) this.io.disconnect(); } catch (e) {}
+  }
+  // landing motion that CSS alone can't do: scroll progress, reveal on scroll, pointer-following effects
+  motionOn() {
+    var doc = document, win = window, tick = 0, lastT = null, lastM = null;
+    this.onScroll = function () {
+      if (tick) return;
+      tick = win.requestAnimationFrame(function () {
+        tick = 0;
+        doc.querySelectorAll('.lh').forEach(function (h) {
+          var r = h.getBoundingClientRect(), p = Math.min(1, Math.max(0, -r.top / (r.height * 0.85)));
+          h.style.setProperty('--p', p.toFixed(3));
+          var root = h.closest('.sk'), nav = root && root.querySelector('.pub-nav--float');
+          if (nav) nav.classList.toggle('is-scrolled', r.top < -40);
+          if (root) { var de = doc.documentElement, nearEnd = (win.innerHeight + (win.scrollY || de.scrollTop)) > de.scrollHeight - 700; root.classList.toggle('show-dock', r.bottom < 60 && !nearEnd); }
+        });
+      });
+    };
+    win.addEventListener('scroll', this.onScroll, { passive: true, capture: true });
+    this.onScroll();
+    if ('IntersectionObserver' in win) {
+      var io = this.io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+      doc.querySelectorAll('.lh').forEach(function (h) {
+        var root = h.closest('.sk'); if (!root) return;
+        root.setAttribute('data-rv', 'on');
+        root.querySelectorAll('.rv, .rv-stag').forEach(function (el) { io.observe(el); });
+      });
+    }
+    this.onPtr = function (e) {
+      var t = e.target && e.target.closest ? e.target : null; if (!t) return;
+      var sp = t.closest('.spot');
+      if (sp) { var q = sp.getBoundingClientRect(); sp.style.setProperty('--mx', Math.round(e.clientX - q.left) + 'px'); sp.style.setProperty('--my', Math.round(e.clientY - q.top) + 'px'); }
+      var tl = e.pointerType === 'mouse' ? t.closest('.tilt3d') : null;
+      if (lastT && lastT !== tl) lastT.style.transform = '';
+      if (tl) { var c = tl.getBoundingClientRect(), x = (e.clientX - c.left) / c.width - 0.5, y = (e.clientY - c.top) / c.height - 0.5; tl.style.transform = 'perspective(900px) translateY(-5px) rotateX(' + (y * -10).toFixed(2) + 'deg) rotateY(' + (x * 12).toFixed(2) + 'deg)'; }
+      lastT = tl;
+      var mg = e.pointerType === 'mouse' ? t.closest('.mag') : null;
+      if (lastM && lastM !== mg) lastM.style.translate = '';
+      if (mg) { var m = mg.getBoundingClientRect(); mg.style.translate = ((e.clientX - m.left - m.width / 2) * 0.14).toFixed(1) + 'px ' + ((e.clientY - m.top - m.height / 2) * 0.25).toFixed(1) + 'px'; }
+      lastM = mg;
+    };
+    doc.addEventListener('pointermove', this.onPtr, { passive: true });
+  }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state;
+    var E = {
+      shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', moon: '/_blob/1df7299954a782c5de8338339634a8e6',
+      unicorn: '/_blob/7ee69e13b899e048010df41d0cf87143', fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348', octopus: '/_blob/e910746badea9d78c41ac4aa913de4a6',
+      sparkles: '/_blob/727ac58e5046d6eefbb35427eff3c1df', hourglass: '/_blob/a689d835be296ffdce1f9d9fc18a844f', die: '/_blob/c31fcca8682736cc92ca4f3073f8c7dd',
+      eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', ghost: '/_blob/facd9191837d9eba7e7cedf471a11301', letter: '/_blob/ee2791bdeac805bec379541426d39014', fox: '/_blob/a1feeb887ae498080201d5cedfa0036a'
+    };
+    var dark = s.mode !== 'light';
+    var TOP = [['Describe me', 'describe'], ['Know-me quiz', 'quiz'], ['Confess', 'confess'], ['Rate me', 'rate'], ['Ask me anything', 'ama']];
+    var TH = [['default', 'Default'], ['sunset', 'Sunset'], ['midnight', 'Midnight'], ['bubblegum', 'Bubblegum'], ['neon', 'Neon'], ['ocean', 'Ocean']];
+    var marq = ['describe me in 3 words', 'rate me 1–10', 'confess something', 'ask me anything', 'never have I ever', 'how well do you know me?', 'truth or dare', 'hot takes'];
+    var colors = ['#ffe27a', '#ffffff', '#ff5fa2', '#7a3cff', '#22e1ff', '#5be0a0'];
+    var confetti = [];
+    for (var i = 0; i < 12; i++) confetti.push({ k: (i % 6) + 1, color: colors[i % 6], delay: (i * 0.04).toFixed(2) + 's' });
+    return {
+      mode: dark ? 'dark' : 'light',
+      isDark: dark, isLight: !dark,
+      modeWord: dark ? 'Light' : 'Dark',
+      nextMode: dark ? 'light' : 'dark',
+      drawerCls: self.state.drawer ? 'is-open' : '', drawerOpen: self.state.drawer ? 'true' : 'false', drawerHidden: self.state.drawer ? 'false' : 'true',
+      consentOpen: s.consent, ckMore: s.ckMore, ckMoreLabel: s.ckMore ? 'Fewer options' : 'Choose what to allow',
+      ckAdsStr: s.ckAds ? 'true' : 'false', ckStatsStr: s.ckStats ? 'true' : 'false',
+      toggleCkAds: function () { self.setState({ ckAds: !s.ckAds }); }, toggleCkStats: function () { self.setState({ ckStats: !s.ckStats }); },
+      ckToggleMore: function () { self.setState({ ckMore: !s.ckMore }); },
+      ckSaveLabel: s.ckMore ? 'Save my choices' : 'Essential only',
+      ckAccept: function () { try { window.sessionStorage.setItem('sk-consent', 'all'); } catch (e) {} self.setState({ consent: false }); },
+      ckSave: function () { var v = s.ckMore ? (s.ckAds ? 'ads' : '') + (s.ckStats ? '+stats' : '') || 'essential' : 'essential'; try { window.sessionStorage.setItem('sk-consent', v); } catch (e) {} self.setState({ consent: false }); },
+      openConsent: function () { self.setState({ consent: true, ckMore: true }); },
+      toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
+      goHow: function (e) { if (e && e.preventDefault) e.preventDefault(); self.setState({ drawer: false }); setTimeout(function () { self.jump('how'); }, 60); },
+      goGames: function (e) { if (e && e.preventDefault) e.preventDefault(); self.setState({ drawer: false }); setTimeout(function () { self.jump('games'); }, 60); },
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      // hero art leans toward the pointer; writes CSS vars straight to the header so nothing re-renders
+      tilt: function (e) {
+        var el = e && e.currentTarget; if (!el || !el.getBoundingClientRect) return;
+        var pt = e.touches && e.touches[0] ? e.touches[0] : e; if (pt.clientX == null) return;
+        var r = el.getBoundingClientRect(), x = (pt.clientX - r.left) / r.width - 0.5, y = (pt.clientY - r.top) / r.height - 0.5;
+        el.style.setProperty('--ry', (x * 9).toFixed(2) + 'deg'); el.style.setProperty('--rx', (y * -6).toFixed(2) + 'deg');
+        el.style.setProperty('--hx', (x * -40).toFixed(1) + 'px'); el.style.setProperty('--hy', (y * -30).toFixed(1) + 'px');
+        el.style.setProperty('--cx', Math.round(pt.clientX - r.left) + 'px'); el.style.setProperty('--cy', Math.round(pt.clientY - r.top) + 'px');
+      },
+      untilt: function (e) { var el = e && e.currentTarget; if (!el || !el.style) return; ['--rx', '--ry', '--hx', '--hy'].forEach(function (k) { el.style.removeProperty(k); }); },
+      menuOpen: s.menu,
+      toggleMenu: function () { self.setState({ menu: !s.menu }); },
+      marquee: marq.concat(marq),
+      dockOn: !s.consent,
+      features: [
+        { n: '01', icon: E.sparkles, title: 'Every topic plays different', body: 'Tap 3 words, take a know-me quiz, rate 1–10 or write a long confession. Never a boring text box.' },
+        { n: '02', icon: E.fox, title: 'Two-way anonymous chats', body: 'Text, photos and short videos. Friends with an account chat back and forth, and neither side ever learns who.' },
+        { n: '03', icon: E.hourglass, title: 'Messages that disappear', body: 'Set a timer from 1 day to 3 weeks. Then poof, gone from our servers too.' },
+        { n: '04', icon: E.die, title: 'Live party games', body: 'Never Have I Ever, Truth or Dare and more, with random nicknames.' }
+      ],
+      topics: TOP.map(function (t, i) { var on = s.topic === i; return { label: t[0], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ topic: i }); } }; }),
+      themes: TH.map(function (t) { var on = s.theme === t[0]; return { name: t[1], cls: 'th-' + t[0], on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ theme: t[0] }); } }; }),
+      demoTh: s.theme, demoTopic: TOP[s.topic][1],
+      steps: [
+        { n: '01', title: 'Create', body: 'Pick a topic, a theme and optional limits. Ten seconds, tops.' },
+        { n: '02', title: 'Share', body: 'Drop the link on WhatsApp Status, Instagram or Snapchat.' },
+        { n: '03', title: 'Receive', body: 'Anonymous messages land in your inbox with a ping.' },
+        { n: '04', title: 'Post the best', body: 'Turn a reply into a story card. Their friends tap, and it starts again.' }
+      ],
+      fading: [
+        { text: 'Funny · Loyal · Chaotic', left: '23h left', op: 1, blur: '0px', th: 'th-sunset', icon: E.ghost },
+        { text: '9/10. Minus one for always being late.', left: '8h left', op: 0.8, blur: '0px', th: 'th-midnight', icon: E.ghost },
+        { text: 'I still have your hoodie.', left: '1h left', op: 0.5, blur: '0.5px', th: 'th-bubblegum', icon: E.ghost },
+        { text: 'Message disappeared', left: 'gone', op: 0.25, blur: '1.5px', th: 'th-default', icon: E.hourglass }
+      ],
+      games: [
+        { name: 'Never Have I Ever', meta: '3–10 players · 3 lives', icon: E.shush, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' },
+        { name: 'Truth or Dare', meta: '2–4 players · photo dares', icon: E.die, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' },
+        { name: 'Would You Rather', meta: '2–20 players · quick votes', icon: E.eyes, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' },
+        { name: 'Most Likely To', meta: '3–15 players · vote a friend', icon: E.fire, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' },
+        { name: 'Hot Takes', meta: '2–20 players · agree or not', icon: E.sparkles, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' },
+        { name: 'Anonymous Polls', meta: 'any size · live results', icon: E.letter, tag: 'Live', tagBg: '#0d7f4b', tagInk: '#ffffff' }
+      ],
+      safety: ['Report in one tap', '50+ report reasons', 'Senders get warned', '4th report blocks them', 'Undo a block anytime', 'Photos blurred until you tap']
+    };
+  }
+}
+</script>
+</body>
+</html>

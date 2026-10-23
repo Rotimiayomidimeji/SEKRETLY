@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Admin users</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a href="Admin.dc.html" class="logo" style="padding: 0 10px 4px"><span class="logo-mark">S</span><span class="logo-word">Admin</span></a>
+    <span class="muted" style="font-size: 12px; padding: 0 12px 16px">admin · full access</span>
+    <a href="Admin.dc.html" class="nav-i">Overview</a>
+    <a href="AdminTraffic.dc.html" class="nav-i">Traffic manager</a>
+    <a href="AdminUsers.dc.html" class="nav-i" aria-current="page">Users</a>
+    <a href="AdminReports.dc.html" class="nav-i">Reports &amp; warnings<span class="count">4</span></a>
+    <a href="AdminCategories.dc.html" class="nav-i">Report categories</a>
+    <a href="AdminAds.dc.html" class="nav-i">Ads &amp; AdSense</a>
+    <a href="AdsMap.dc.html" class="nav-i">Ad placement map</a>
+    <a href="Home.dc.html" class="nav-i" style="margin-top: auto">Back to app</a>
+  </nav>
+  <nav class="anav" aria-label="Admin">
+    <a href="Admin.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"></rect><rect x="14" y="3" width="7" height="5" rx="2"></rect><rect x="14" y="12" width="7" height="9" rx="2"></rect><rect x="3" y="16" width="7" height="5" rx="2"></rect></svg><span>Overview</span></a>
+    <a href="AdminTraffic.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg><span>Traffic</span></a>
+    <a href="AdminUsers.dc.html" class="anav-i" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"></path></svg><span>Users</span></a>
+    <a href="AdminReports.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22V4"></path><path d="M5 4h12l-2 4 2 4H5"></path></svg><span>Reports</span><b class="anav-badge">4</b></a>
+    <details class="anav-more">
+      <summary class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg><span>More</span></summary>
+      <div class="anav-sheet">
+        <div class="anav-grab" aria-hidden="true"></div>
+        <a href="AdminCategories.dc.html" class="anav-s">Report categories</a>
+        <a href="AdminAds.dc.html" class="anav-s">Ads &amp; AdSense</a>
+        <a href="AdsMap.dc.html" class="anav-s">Ad placement map</a>
+        <a href="Home.dc.html" class="anav-s" style="color: var(--muted)">← Back to the app</a>
+      </div>
+    </details>
+  </nav>
+
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 1180px">
+      <header class="topbar">
+        <div class="grow"><h1 style="font-size: 28px">Users</h1><div class="muted" style="font-size: 13px">1,284 accounts · sample data</div></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+      <div class="rail adm-nav-rail" style="gap: 8px; margin-bottom: 14px">
+        <a href="Admin.dc.html" class="chip">Overview</a><a href="AdminTraffic.dc.html" class="chip">Traffic</a><a href="AdminUsers.dc.html" class="chip on">Users</a><a href="AdminReports.dc.html" class="chip">Reports</a><a href="AdminCategories.dc.html" class="chip">Categories</a><a href="AdminAds.dc.html" class="chip">Ads</a>
+      </div>
+
+      <section class="card" style="overflow: hidden">
+        <div class="row" style="padding: 14px 16px; flex-wrap: wrap; gap: 10px">
+          <label for="au-q" class="sr">Search users</label>
+          <input id="au-q" class="field" value="{{q}}" onChange="{{onQ}}" placeholder="Search @username or state" style="min-height: 42px; max-width: 320px; font-size: 14px">
+          <div class="rail" style="display: flex; gap: 8px">
+            <sc-for list="{{filters}}" as="f" hint-placeholder-count="5"><button class="chip tap {{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.on}}">{{f.label}}</button></sc-for>
+          </div>
+        </div>
+        <div class="adm-scroll" style="border-radius: 0">
+          <table class="adm-table">
+            <thead><tr><th>User</th><th>Joined</th><th>State</th><th>Device</th><th>Links</th><th>Msgs sent</th><th>Warnings got</th><th>Blocked by</th><th>Status</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="u" hint-placeholder-count="10">
+                <tr onClick="{{u.open}}">
+                  <td><span class="row" style="gap: 10px"><span class="av" style="width: 32px; height: 32px; border-radius: 10px; background: {{u.bg}}"><img src="{{u.av}}" alt=""></span><b>@{{u.name}}</b></span></td>
+                  <td class="muted">{{u.joined}}</td><td>{{u.state}}</td><td>{{u.device}}</td><td>{{u.links}}</td><td>{{u.sent}}</td>
+                  <td><span style="color: {{u.warnC}}; font-weight: 800">{{u.warns}}</span></td>
+                  <td>{{u.blockedBy}}</td>
+                  <td><span class="pill" style="background: {{u.stBg}}; color: {{u.stInk}}">{{u.status}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+  <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" onClick="{{closeSel}}">
+      <div class="sheet" role="dialog" aria-label="User details" onClick="{{stop}}" style="max-width: 580px">
+        <div class="row">
+          <span class="av" style="width: 52px; height: 52px; border-radius: 16px; background: {{sel.bg}}"><img src="{{sel.av}}" alt=""></span>
+          <div class="grow"><b style="font-size: 20px">@{{sel.name}}</b><div class="muted" style="font-size: 13px">Joined {{sel.joined}} · {{sel.state}} · {{sel.device}}</div></div>
+          <span class="pill" style="background: {{sel.stBg}}; color: {{sel.stInk}}">{{sel.status}}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+          <div class="card kpi" style="padding: 10px; background: var(--card2)"><div class="muted" style="font-size: 11.5px">Links</div><div class="v" style="font-size: 22px">{{sel.links}}</div></div>
+          <div class="card kpi" style="padding: 10px; background: var(--card2)"><div class="muted" style="font-size: 11.5px">Sent</div><div class="v" style="font-size: 22px">{{sel.sent}}</div></div>
+          <div class="card kpi" style="padding: 10px; background: var(--card2)"><div class="muted" style="font-size: 11.5px">Warnings</div><div class="v" style="font-size: 22px">{{sel.warns}}</div></div>
+          <div class="card kpi" style="padding: 10px; background: var(--card2)"><div class="muted" style="font-size: 11.5px">Blocked by</div><div class="v" style="font-size: 22px">{{sel.blockedBy}}</div></div>
+        </div>
+        <h3 style="font-size: 15px; margin-top: 16px">Warnings by receiver</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px">
+          <sc-for list="{{selPairs}}" as="p" hint-placeholder-count="3">
+            <div class="card" style="padding: 10px 12px">
+              <div class="row" style="font-size: 14px"><b class="grow">to @{{p.to}}</b><span class="muted">{{p.label}}</span></div>
+              <div class="warn-steps" style="margin-top: 6px"><sc-for list="{{p.steps}}" as="st" hint-placeholder-count="4"><span style="background: {{st.c}}"></span></sc-for></div>
+              <div class="muted" style="font-size: 12.5px; margin-top: 6px">{{p.cats}}</div>
+            </div>
+          </sc-for>
+          <sc-if value="{{noPairs}}" hint-placeholder-val="{{ false }}"><p class="muted" style="font-size: 14px">No warnings. Clean record.</p></sc-if>
+        </div>
+        <h3 style="font-size: 15px; margin-top: 14px">Recent devices</h3>
+        <div class="mono muted" style="margin-top: 6px; line-height: 1.8">{{sel.ips}}</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px">
+          <button class="btn tap" onClick="{{act}}" disabled="{{actDone}}">{{actLabel}}</button>
+          <button class="btn tap" onClick="{{clear}}" disabled="{{clearDone}}">{{clearLabel}}</button>
+          <button class="btn btn-danger tap" onClick="{{suspend}}">{{suspendLabel}}</button>
+          <button class="btn btn-danger tap" onClick="{{delAccount}}">{{delLabel}}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', q: '', filter: 'all', sel: null, over: {} };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var A = { fox: ['/_blob/a1feeb887ae498080201d5cedfa0036a', 'linear-gradient(135deg,#ffb35c,#ff5f8f)'], panda: ['/_blob/4b5463ad60ec0a1915c9b60ecf54e134', 'linear-gradient(135deg,#7ef0c1,#3aa0ff)'], frog: ['/_blob/fab7f564a0c6a958be79ebcec7291c73', 'linear-gradient(135deg,#d6ff6b,#22c4a0)'], octopus: ['/_blob/e910746badea9d78c41ac4aa913de4a6', 'linear-gradient(135deg,#ffd0f0,#a46bff)'], unicorn: ['/_blob/7ee69e13b899e048010df41d0cf87143', 'linear-gradient(135deg,#9fe7ff,#ff9ad5)'], koala: ['/_blob/f0e10078eb17fce65ae1a0a64d3fed2b', 'linear-gradient(135deg,#ffe48a,#ff8a5c)'] };
+    var U = [
+      { name: 'peach', av: 'frog', joined: '12 Oct', state: 'Lagos', device: 'Android', links: 4, sent: 61, pairs: [] },
+      { name: 'kola', av: 'fox', joined: '13 Oct', state: 'Oyo', device: 'Android', links: 2, sent: 140, pairs: [['tolu', 2, 'Insults, Insults'], ['peach', 3, 'Harassment, Mocking, Insults']] },
+      { name: 'jide_02', av: 'koala', joined: '14 Oct', state: 'Lagos', device: 'iPhone', links: 1, sent: 88, pairs: [['ada', 4, 'Harassment ×2, Unwanted advances, Creepy or inappropriate'], ['maya', 4, 'Explicit photo, Unwanted nudity ×3'], ['tolu', 1, 'Spam']] },
+      { name: 'maya', av: 'unicorn', joined: '12 Oct', state: 'FCT', device: 'iPhone', links: 5, sent: 23, pairs: [] },
+      { name: 'tobi_x', av: 'panda', joined: '19 Oct', state: 'FCT', device: 'iPhone', links: 0, sent: 3, pairs: [] },
+      { name: 'ada', av: 'octopus', joined: '15 Oct', state: 'Enugu', device: 'Android', links: 3, sent: 45, pairs: [['kemi', 1, 'Body shaming']] },
+      { name: 'promo_king', av: 'koala', joined: '18 Oct', state: 'Lagos', device: 'Windows', links: 0, sent: 410, pairs: [['peach', 4, 'Spam ×4'], ['maya', 4, 'Spam, Scam ×3'], ['ada', 3, 'Spam ×3'], ['tolu', 4, 'Phishing link ×4']] },
+      { name: 'tolu', av: 'fox', joined: '13 Oct', state: 'Rivers', device: 'Android', links: 2, sent: 31, pairs: [] }
+    ];
+    var line = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
+    var deco = function (u) {
+      if ((s.cleared || {})[u.name]) u = Object.assign({}, u, { pairs: u.pairs.filter(function (p) { return p[1] >= 4; }) });
+      var warns = u.pairs.reduce(function (a, p) { return a + Math.min(3, p[1]); }, 0);
+      var blockedBy = u.pairs.filter(function (p) { return p[1] >= 4; }).length;
+      var status = s.over[u.name] || (blockedBy >= 3 ? 'Review' : (warns > 0 ? 'Warned' : 'Good'));
+      var st = { Good: ['rgba(13,127,75,.18)', 'var(--ok)'], Warned: ['rgba(255,176,32,.18)', 'var(--warn)'], Review: ['rgba(196,33,58,.18)', 'var(--bad)'], Suspended: ['#c4213a', '#ffffff'], Deleted: ['var(--card2)', 'var(--muted)'] }[status];
+      return { name: u.name, av: A[u.av][0], bg: A[u.av][1], joined: u.joined, state: u.state, device: u.device, links: u.links, sent: u.sent, warns: warns, blockedBy: blockedBy, status: status, stBg: st[0], stInk: st[1], warnC: warns ? 'var(--warn)' : 'var(--muted)', raw: u, ips: '102.89.•••.••• · ' + u.device + ' · ' + u.state + ' · today   |   105.112.•••.••• · ' + u.device + ' · 2 days ago', open: function () { self.setState({ sel: u.name }); } };
+    };
+    var q = s.q.trim().toLowerCase().replace('@', '');
+    var rows = U.map(deco).filter(function (u) {
+      if (q && (u.name + ' ' + u.state).toLowerCase().indexOf(q) < 0) return false;
+      if (s.filter === 'warned') return u.warns > 0;
+      if (s.filter === 'blocked') return u.blockedBy > 0;
+      if (s.filter === 'review') return u.status === 'Review' || u.status === 'Suspended';
+      if (s.filter === 'new') return u.joined === '19 Oct' || u.joined === '18 Oct';
+      return true;
+    });
+    var sel = s.sel ? deco(U.filter(function (u) { return u.name === s.sel; })[0]) : null;
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      q: s.q, onQ: function (e) { self.setState({ q: e.target.value }); },
+      filters: [['all', 'All'], ['warned', 'Has warnings'], ['blocked', 'Blocked by someone'], ['review', 'Needs review'], ['new', 'New this week']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
+      rows: rows,
+      hasSel: !!sel,
+      sel: sel || { name: '', av: '', bg: '', joined: '', state: '', device: '', links: 0, sent: 0, warns: 0, blockedBy: 0, status: '', stBg: '', stInk: '', ips: '' },
+      selPairs: sel ? sel.raw.pairs.map(function (p) { return { to: p[0], label: p[1] >= 4 ? 'Blocked by them' : p[1] + ' of 3 warnings', cats: p[2], steps: [1, 2, 3, 4].map(function (i) { return { c: i <= p[1] ? (i === 4 ? '#c4213a' : '#ffb020') : line }; }) }; }) : [],
+      noPairs: !!sel && sel.raw.pairs.length === 0,
+      closeSel: function () { self.setState({ sel: null }); },
+      stop: function (e) { e.stopPropagation(); },
+      act: function () { if (!sel) return; var o = Object.assign({}, s.warned); o[sel.name] = true; self.setState({ warned: o }); },
+      actDone: !!sel && !!(s.warned || {})[sel.name], actLabel: sel && (s.warned || {})[sel.name] ? 'Warning sent ✓' : 'Send admin warning',
+      clear: function () { if (!sel) return; var o = Object.assign({}, s.cleared); o[sel.name] = true; self.setState({ cleared: o }); },
+      clearDone: !!sel && !!(s.cleared || {})[sel.name], clearLabel: sel && (s.cleared || {})[sel.name] ? 'Warnings cleared ✓' : 'Clear all warnings',
+      suspendLabel: sel && sel.status === 'Suspended' ? 'Lift suspension' : 'Suspend 7 days',
+      delLabel: sel && sel.status === 'Deleted' ? 'Deleted' : s.delAsk === (sel && sel.name) ? 'Tap again to delete' : 'Delete account',
+      delAccount: function () { if (!sel || sel.status === 'Deleted') return; if (s.delAsk !== sel.name) { self.setState({ delAsk: sel.name }); return; } var o = Object.assign({}, s.over); o[sel.name] = 'Deleted'; self.setState({ over: o, delAsk: null }); },
+      suspend: function () { if (!sel) return; var o = Object.assign({}, s.over); o[sel.name] = sel.status === 'Suspended' ? '' : 'Suspended'; self.setState({ over: o }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

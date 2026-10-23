@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Traffic manager</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.hbar{display:flex;align-items:flex-end;gap:4px;height:140px}
+.hbar span{flex:1;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#22e1ff,#7a3cff);min-height:4px}
+.heat{display:grid;grid-template-columns:40px repeat(24,minmax(0,1fr));gap:3px;font-size:10.5px}
+.heat .hc{display:block;aspect-ratio:1;border-radius:4px;background:#ff3b8d}
+.heat .hl{align-self:center;font-weight:700;color:var(--muted)}
+.tm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.seg2{display:flex;padding:4px;border-radius:14px;background:var(--card2);gap:4px}
+.seg2 button{min-height:38px;padding:0 12px;border:0;border-radius:10px;background:transparent;font-weight:800;font-size:13px;color:var(--muted)}
+.seg2 button[aria-pressed="true"]{background:var(--card);color:var(--ink)}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a href="Admin.dc.html" class="logo" style="padding: 0 10px 4px"><span class="logo-mark">S</span><span class="logo-word">Admin</span></a>
+    <span class="muted" style="font-size: 12px; padding: 0 12px 16px">admin · full access</span>
+    <a href="Admin.dc.html" class="nav-i">Overview</a>
+    <a href="AdminTraffic.dc.html" class="nav-i" aria-current="page">Traffic manager</a>
+    <a href="AdminUsers.dc.html" class="nav-i">Users</a>
+    <a href="AdminReports.dc.html" class="nav-i">Reports &amp; warnings<span class="count">4</span></a>
+    <a href="AdminCategories.dc.html" class="nav-i">Report categories</a>
+    <a href="AdminAds.dc.html" class="nav-i">Ads &amp; AdSense</a>
+    <a href="AdsMap.dc.html" class="nav-i">Ad placement map</a>
+    <a href="Home.dc.html" class="nav-i" style="margin-top: auto">Back to app</a>
+  </nav>
+  <nav class="anav" aria-label="Admin">
+    <a href="Admin.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"></rect><rect x="14" y="3" width="7" height="5" rx="2"></rect><rect x="14" y="12" width="7" height="9" rx="2"></rect><rect x="3" y="16" width="7" height="5" rx="2"></rect></svg><span>Overview</span></a>
+    <a href="AdminTraffic.dc.html" class="anav-i" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg><span>Traffic</span></a>
+    <a href="AdminUsers.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"></path></svg><span>Users</span></a>
+    <a href="AdminReports.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22V4"></path><path d="M5 4h12l-2 4 2 4H5"></path></svg><span>Reports</span><b class="anav-badge">4</b></a>
+    <details class="anav-more">
+      <summary class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg><span>More</span></summary>
+      <div class="anav-sheet">
+        <div class="anav-grab" aria-hidden="true"></div>
+        <a href="AdminCategories.dc.html" class="anav-s">Report categories</a>
+        <a href="AdminAds.dc.html" class="anav-s">Ads &amp; AdSense</a>
+        <a href="AdsMap.dc.html" class="anav-s">Ad placement map</a>
+        <a href="Home.dc.html" class="anav-s" style="color: var(--muted)">← Back to the app</a>
+      </div>
+    </details>
+  </nav>
+
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 1180px">
+      <header class="topbar" style="flex-wrap: wrap">
+        <div class="grow" style="flex: 1 1 240px"><h1 style="font-size: 28px">Traffic manager</h1><div class="muted" style="font-size: 13px">Who visits, from where, on what, and how. No names, ever.</div></div>
+        <div class="seg2" role="group" aria-label="Date range"><sc-for list="{{ranges}}" as="r" hint-placeholder-count="3"><button aria-pressed="{{r.on}}" onClick="{{r.pick}}">{{r.label}}</button></sc-for></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+      <div class="rail adm-nav-rail" style="gap: 8px; margin-bottom: 14px">
+        <a href="Admin.dc.html" class="chip">Overview</a><a href="AdminTraffic.dc.html" class="chip on">Traffic</a><a href="AdminUsers.dc.html" class="chip">Users</a><a href="AdminReports.dc.html" class="chip">Reports</a><a href="AdminCategories.dc.html" class="chip">Categories</a><a href="AdminAds.dc.html" class="chip">Ads</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
+        <div class="card kpi" style="border-color: #5be0a0"><div class="muted row" style="font-size: 12.5px; gap: 6px"><span class="live" style="width: 8px; height: 8px; border-radius: 50%; background: #5be0a0"></span>Live now</div><div class="v">{{live}}</div><div class="muted" style="font-size: 12px">on the site this minute</div></div>
+        <sc-for list="{{kpis}}" as="k" hint-placeholder-count="5">
+          <div class="card kpi"><div class="muted" style="font-size: 12.5px">{{k.label}}</div><div class="v">{{k.value}}</div><div class="muted" style="font-size: 12px">{{k.sub}}</div></div>
+        </sc-for>
+      </div>
+
+      <section class="card" style="padding: 18px; margin-top: 12px">
+        <div class="row"><h2 class="grow" style="font-size: 18px">Visits by hour</h2><span class="muted" style="font-size: 12.5px">{{rangeLabel}}</span></div>
+        <div class="hbar" style="margin-top: 14px"><sc-for list="{{hours}}" as="h" hint-placeholder-count="24"><span style="height: {{h.h}}" title="{{h.t}}"></span></sc-for></div>
+        <div class="muted row" style="justify-content: space-between; font-size: 11.5px; margin-top: 6px"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
+      </section>
+
+      <div class="tm-grid" style="margin-top: 12px">
+        <sc-for list="{{breakdowns}}" as="b" hint-placeholder-count="6">
+          <section class="card" style="padding: 18px">
+            <h2 style="font-size: 16px">{{b.title}}</h2>
+            <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 12px">
+              <sc-for list="{{b.rows}}" as="r" hint-placeholder-count="5">
+                <div><div class="row" style="font-size: 13px"><span class="grow">{{r.label}}</span><b>{{r.v}}</b></div><div class="bar" style="margin-top: 4px; height: 7px"><span style="width: {{r.w}}"></span></div></div>
+              </sc-for>
+            </div>
+          </section>
+        </sc-for>
+      </div>
+
+      <section class="card" style="padding: 18px; margin-top: 12px; overflow-x: auto">
+        <h2 style="font-size: 16px">Peak hours <span class="muted" style="font-weight: 500; font-size: 13px">· darker means busier</span></h2>
+        <div class="heat" style="margin-top: 12px; min-width: 640px">
+          <span></span>
+          <sc-for list="{{heatHead}}" as="hh" hint-placeholder-count="24"><span class="muted" style="text-align: center">{{hh}}</span></sc-for>
+          <sc-for list="{{heat}}" as="cell" hint-placeholder-count="175"><span class="{{cell.cls}}" style="opacity: {{cell.o}}" title="{{cell.t}}">{{cell.label}}</span></sc-for>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 12px; overflow: hidden">
+        <div class="row" style="padding: 16px 16px 0; flex-wrap: wrap; gap: 10px">
+          <h2 class="grow" style="font-size: 18px">Visit log <span class="pill" style="margin-left: 6px"><span class="live" style="width: 7px; height: 7px; border-radius: 50%; background: #5be0a0"></span>live</span></h2>
+          <label for="tm-q" class="sr">Search visits</label>
+          <input id="tm-q" class="field" value="{{q}}" onChange="{{onQ}}" placeholder="Search IP, state, page, @user" style="min-height: 42px; width: 260px; font-size: 14px">
+          <div class="row" style="gap: 8px">
+            <span style="font-size: 13px; font-weight: 700">Show full IPs</span>
+            <button class="switch" role="switch" aria-checked="{{ipStr}}" aria-label="Show full IP addresses" onClick="{{toggleIp}}"></button>
+          </div>
+        </div>
+        <div class="rail" style="display: flex; gap: 8px; padding: 12px 16px">
+          <sc-for list="{{filters}}" as="f" hint-placeholder-count="6"><button class="chip tap {{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.on}}">{{f.label}}</button></sc-for>
+        </div>
+        <sc-if value="{{ipShown}}" hint-placeholder-val="{{ false }}"><div style="margin: 0 16px 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,176,32,.14); font-size: 13px"><b>Full IPs visible.</b> This view is logged with your admin name and time.</div></sc-if>
+        <div class="adm-scroll" style="max-height: 560px; border-radius: 0">
+          <table class="adm-table">
+            <thead><tr><th>Time</th><th>IP address</th><th>Visitor</th><th>Visits</th><th>Location</th><th>Network</th><th>Device</th><th>OS · Browser</th><th>Came from</th><th>Landing page</th><th>Pages</th><th>Time on site</th><th>Account</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+                <tr onClick="{{r.open}}" class="{{r.cls}}">
+                  <td class="muted">{{r.time}}</td>
+                  <td class="mono">{{r.ip}}</td>
+                  <td class="mono muted">{{r.vid}}</td>
+                  <td><span class="pill" style="padding: 3px 8px">{{r.visits}}×</span></td>
+                  <td>{{r.loc}}</td>
+                  <td>{{r.net}}</td>
+                  <td>{{r.device}}</td>
+                  <td>{{r.osb}}</td>
+                  <td>{{r.src}}</td>
+                  <td class="mono">{{r.landing}}</td>
+                  <td>{{r.pages}}</td>
+                  <td>{{r.dur}}</td>
+                  <td><span style="color: {{r.acctC}}; font-weight: 700">{{r.acct}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div class="muted" style="padding: 12px 16px; font-size: 12.5px; border-top: 1px solid var(--line)">Showing {{shownCount}} of {{totalCount}} visits · IP addresses are kept for 30 days, admins only. Location is approximate, from the IP and network.</div>
+      </section>
+    </div>
+  </div>
+</div>
+
+  <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" onClick="{{closeSel}}">
+      <div class="sheet" role="dialog" aria-label="Visit details" onClick="{{stop}}" style="max-width: 560px">
+        <div class="row">
+          <div class="grow"><div class="muted" style="font-size: 12.5px">Visit · {{sel.time}} today</div><div class="mono" style="font-size: 18px; font-weight: 800; margin-top: 2px">{{sel.ip}}</div></div>
+          <button class="icon-btn tap" onClick="{{closeSel}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+          <sc-for list="{{selFacts}}" as="f" hint-placeholder-count="10">
+            <div class="card" style="padding: 10px 12px; background: var(--card2)"><div class="muted" style="font-size: 11.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase">{{f.k}}</div><div style="font-weight: 700; font-size: 14px; margin-top: 2px">{{f.v}}</div></div>
+          </sc-for>
+        </div>
+        <h3 style="font-size: 15px; margin-top: 16px">Path on this visit</h3>
+        <ol style="list-style: none; margin: 8px 0 0; padding: 0; border-left: 2px solid var(--line); margin-left: 6px">
+          <sc-for list="{{selPath}}" as="p" hint-placeholder-count="4">
+            <li style="position: relative; padding: 0 0 12px 16px"><span style="position: absolute; left: -6px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #ff3b8d"></span><span class="mono">{{p.page}}</span> <span class="muted" style="font-size: 12.5px">· {{p.t}}</span></li>
+          </sc-for>
+        </ol>
+        <div class="card" style="padding: 12px 14px; margin-top: 6px; background: var(--card2)">
+          <div class="muted" style="font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Hint preview · later, for receivers</div>
+          <p style="margin-top: 6px; font-size: 14px; line-height: 1.45">“{{sel.hint}}”</p>
+          <p class="muted" style="margin-top: 4px; font-size: 12px">Only vague fields are ever used in hints. Never the IP, visitor ID or exact place.</p>
+        </div>
+        <div class="row" style="gap: 8px; margin-top: 14px">
+          <button class="btn btn-danger tap" onClick="{{toggleBlockIp}}" style="flex: 1">{{blockIpLabel}}</button>
+          <sc-if value="{{selHasAcct}}" hint-placeholder-val="{{ false }}"><a href="AdminUsers.dc.html" class="btn tap" style="flex: 1">Open account</a></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', range: 'today', filter: 'all', q: '', showIp: false, sel: null, live: 41, extra: 0, blockedIps: {} };
+  }
+  pool() {
+    var states = [['Lagos', 'Ikeja'], ['Lagos', 'Lekki'], ['FCT', 'Abuja'], ['Oyo', 'Ibadan'], ['Rivers', 'Port Harcourt'], ['Enugu', 'Enugu'], ['Kano', 'Kano'], ['Kaduna', 'Zaria'], ['Ogun', 'Abeokuta'], ['Edo', 'Benin City'], ['Anambra', 'Awka'], ['Osun', 'Ile-Ife']];
+    var nets = [['MTN', '102.89'], ['Airtel', '105.112'], ['Glo', '197.211'], ['MTN', '197.210'], ['9mobile', '41.190'], ['Wi-Fi · Spectranet', '41.217']];
+    var devs = [['Mobile', 'Android', 'Chrome'], ['Mobile', 'iOS', 'Safari'], ['Mobile', 'Android', 'Opera Mini'], ['Mobile', 'Android', 'Instagram app'], ['Desktop', 'Windows', 'Chrome'], ['Mobile', 'iOS', 'WhatsApp app'], ['Tablet', 'Android', 'Chrome'], ['Desktop', 'macOS', 'Safari']];
+    var srcs = ['WhatsApp', 'Instagram', 'Snapchat', 'Direct', 'WhatsApp', 'Google', 'TikTok', 'WhatsApp'];
+    var lands = ['/peach/k7x2m9/sunset/describe-3', '/tolu/a81kd2/midnight/rate-me', '/', '/maya/q2n8x1/ocean/ama', '/g/MANGO7', '/peach/k7x2m9/sunset/describe-3', '/about', '/ada/z9p1mm/neon/confess'];
+    var accts = ['Visitor', 'Visitor', '@tobi_x', 'Visitor', '@kola', 'Visitor', 'Visitor', '@maya', 'Visitor', '@ada'];
+    var out = [];
+    for (var i = 0; i < 26; i++) {
+      var st = states[(i * 5) % states.length], n = nets[(i * 7) % nets.length], d = devs[(i * 3) % devs.length];
+      var mins = i * 3 + (i % 4);
+      out.push({
+        id: 'v' + i,
+        time: (21 - Math.floor(mins / 60)) + ':' + ('0' + (59 - mins % 60)).slice(-2),
+        ip: n[1] + '.' + ((i * 37) % 250 + 3) + '.' + ((i * 91) % 250 + 2),
+        vid: 'v_' + ((i * 2654435761) >>> 0).toString(16).slice(0, 6),
+        visits: 1 + (i * 7) % 9,
+        state: st[0], city: st[1], country: i % 13 === 12 ? 'Ghana' : 'Nigeria',
+        net: n[0], device: d[0], os: d[1], browser: d[2],
+        src: srcs[i % srcs.length], landing: lands[(i * 3) % lands.length],
+        pages: 1 + (i * 5) % 7, dur: Math.floor(((i * 47) % 540) / 60) + 'm ' + ('0' + ((i * 47) % 60)).slice(-2) + 's',
+        acct: accts[i % accts.length]
+      });
+    }
+    return out;
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.iv = setInterval(function () { var x = self.state.extra + 1; self.setState({ extra: x, live: 36 + (x * 5) % 13 }); }, 3500);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.iv); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var mult = { today: 1, week: 6.4, month: 24.8 }[s.range];
+    var fmt = function (n) { return Math.round(n).toLocaleString('en-US'); };
+    var pool = this.pool();
+    var all = pool.slice(0, 20);
+    for (var k = 0; k < Math.min(s.extra, 6); k++) { var p = Object.assign({}, pool[20 + k]); p.time = 'just now'; p.fresh = k === Math.min(s.extra, 6) - 1; all.unshift(p); }
+    var q = s.q.trim().toLowerCase();
+    var rows = all.filter(function (r) {
+      if (s.filter === 'visitors' && r.acct !== 'Visitor') return false;
+      if (s.filter === 'accounts' && r.acct === 'Visitor') return false;
+      if (s.filter === 'mobile' && r.device !== 'Mobile') return false;
+      if (s.filter === 'desktop' && r.device === 'Mobile') return false;
+      if (s.filter === 'returning' && r.visits < 3) return false;
+      if (q && (r.ip + ' ' + r.state + ' ' + r.city + ' ' + r.landing + ' ' + r.acct + ' ' + r.net).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    var mask = function (ip) { if (s.showIp) return ip; var p = ip.split('.'); return p[0] + '.' + p[1] + '.•••.•••'; };
+    var H = [12, 8, 5, 3, 2, 4, 9, 18, 26, 31, 34, 38, 44, 41, 39, 47, 55, 61, 72, 84, 96, 100, 88, 63];
+    var bd = function (title, list) { var max = list[0][1]; return { title: title, rows: list.map(function (r) { return { label: r[0], v: r[1] + '%', w: Math.round(r[1] / max * 100) + '%' }; }) }; };
+    var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], df = [0.7, 0.65, 0.7, 0.75, 0.95, 1, 0.85];
+    var heat = [];
+    days.forEach(function (d, di) { heat.push({ cls: 'hl', label: d, o: 1, t: d }); H.forEach(function (h, hi) { heat.push({ cls: 'hc', label: '', o: (0.06 + h / 100 * df[di] * 0.94).toFixed(2), t: d + ' ' + hi + ':00' }); }); });
+    var sel = s.sel ? all.filter(function (r) { return r.id === s.sel; })[0] : null;
+    var hintTime = sel ? (parseInt(sel.time, 10) >= 21 || sel.time === 'just now' ? 'late at night' : 'in the evening') : '';
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ranges: [['today', 'Today'], ['week', '7 days'], ['month', '30 days']].map(function (r) { return { label: r[1], on: s.range === r[0] ? 'true' : 'false', pick: function () { self.setState({ range: r[0] }); } }; }),
+      rangeLabel: { today: 'Today, Lagos time', week: 'Average day, last 7 days', month: 'Average day, last 30 days' }[s.range],
+      live: s.live,
+      kpis: [
+        { label: 'Visits', value: fmt(4812 * mult), sub: 'page loads' },
+        { label: 'Unique visitors', value: fmt(3276 * mult), sub: 'by device' },
+        { label: 'Returning', value: '39%', sub: 'came back' },
+        { label: 'Avg time on site', value: '3m 42s', sub: 'per visit' },
+        { label: 'Bounce', value: '28%', sub: 'left after 1 page' }
+      ],
+      hours: H.map(function (v, i) { return { h: v + '%', t: i + ':00 · ' + fmt(v * 3.1 * mult) + ' visits' }; }),
+      breakdowns: [
+        bd('Top states', [['Lagos', 38], ['FCT · Abuja', 14], ['Oyo', 9], ['Rivers', 8], ['Enugu', 6], ['Kano', 5]]),
+        bd('Device type', [['Mobile', 86], ['Desktop', 10], ['Tablet', 4]]),
+        bd('Phone system', [['Android', 71], ['iOS', 22], ['Windows', 5], ['macOS', 2]]),
+        bd('Browser', [['Chrome', 44], ['Safari', 19], ['Opera Mini', 14], ['Instagram app', 12], ['WhatsApp app', 8]]),
+        bd('Mobile network', [['MTN', 46], ['Airtel', 25], ['Glo', 13], ['Wi-Fi / other', 10], ['9mobile', 6]]),
+        bd('Came from', [['WhatsApp', 54], ['Instagram', 21], ['Snapchat', 10], ['Direct', 8], ['Google', 4], ['TikTok', 3]]),
+        bd('Countries', [['Nigeria', 93], ['Ghana', 3], ['United Kingdom', 2], ['United States', 1], ['Other', 1]]),
+        bd('Top links visited', [['/peach/…/describe-3', 31], ['/tolu/…/rate-me', 18], ['/maya/…/ama', 12], ['/g/MANGO7', 9], ['/ (landing)', 8]])
+      ],
+      heatHead: H.map(function (h, i) { return i % 3 === 0 ? String(i) : ''; }),
+      heat: heat,
+      q: s.q, onQ: function (e) { self.setState({ q: e.target.value }); },
+      ipStr: s.showIp ? 'true' : 'false', ipShown: s.showIp, toggleIp: function () { self.setState({ showIp: !s.showIp }); },
+      filters: [['all', 'All'], ['visitors', 'Visitors'], ['accounts', 'Accounts'], ['mobile', 'Mobile'], ['desktop', 'Desktop & tablet'], ['returning', 'Returning 3+']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
+      rows: rows.map(function (r) { return {
+        time: r.time, ip: mask(r.ip) + (s.blockedIps[r.ip] ? ' ⛔' : ''), vid: r.vid, visits: r.visits, loc: r.city + ', ' + r.state + (r.country !== 'Nigeria' ? ' · ' + r.country : ''),
+        net: r.net, device: r.device, osb: r.os + ' · ' + r.browser, src: r.src, landing: r.landing, pages: r.pages, dur: r.dur,
+        acct: r.acct, acctC: r.acct === 'Visitor' ? 'var(--muted)' : 'var(--pink)', cls: r.fresh ? 'fresh' : '',
+        open: function () { self.setState({ sel: r.id }); }
+      }; }),
+      shownCount: rows.length, totalCount: fmt(4812 * mult),
+      hasSel: !!sel,
+      sel: sel ? { ip: mask(sel.ip), time: sel.time, hint: 'Someone in ' + sel.state + ', on ' + (sel.os === 'iOS' ? 'an iPhone' : (sel.device === 'Mobile' ? 'an Android phone' : 'a computer')) + ', ' + hintTime } : { ip: '', time: '', hint: '' },
+      selFacts: sel ? [
+        { k: 'Visitor ID', v: sel.vid }, { k: 'Visits from this device', v: sel.visits + ' total' },
+        { k: 'Location (approx.)', v: sel.city + ', ' + sel.state + ', ' + sel.country }, { k: 'Network', v: sel.net },
+        { k: 'Device', v: sel.device }, { k: 'System · browser', v: sel.os + ' · ' + sel.browser },
+        { k: 'Came from', v: sel.src }, { k: 'Time on site', v: sel.dur },
+        { k: 'Account', v: sel.acct }, { k: 'Local time', v: sel.time === 'just now' ? 'now' : sel.time }
+      ] : [],
+      selPath: sel ? [{ page: sel.landing, t: '0:00' }, { page: 'tap word “Funny”', t: '0:14' }, { page: 'sent message', t: '0:41' }, { page: '/signup', t: '0:52' }].slice(0, Math.max(2, Math.min(4, sel.pages))) : [],
+      selHasAcct: !!(sel && sel.acct !== 'Visitor'),
+      blockIpLabel: sel && s.blockedIps[sel.ip] ? 'Unblock this IP' : 'Block this IP (abuse only)',
+      toggleBlockIp: function () { if (!sel) return; var b = Object.assign({}, s.blockedIps); b[sel.ip] = !b[sel.ip]; self.setState({ blockedIps: b }); },
+      closeSel: function () { self.setState({ sel: null }); },
+      stop: function (e) { e.stopPropagation(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

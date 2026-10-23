@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Verify your email</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.vf-wrap{position:relative;margin-top:8px}
+.vf-wrap input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:text;font-size:16px}
+.vf-boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:0}
+.vf-box{height:58px;border-radius:16px;border:2px solid var(--line);background:var(--field);display:grid;place-items:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:26px;font-weight:800;transition:border-color .2s,transform .2s}
+.vf-box.on{border-color:#ff3b8d;transform:translateY(-2px)}
+.vf-box.bad{border-color:var(--bad);animation:vfShake .4s}
+@keyframes vfShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" style="background: var(--hero); display: flex; flex-direction: column">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 16px 20px">
+    <a href="Signup.dc.html" class="icon-btn tap" aria-label="Back to sign up">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg>
+    </a>
+    <span style="flex: 1"></span>
+    <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+      <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+      <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      <span>{{modeWord}}</span>
+    </button>
+  </header>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px 20px 40px">
+    <div class="card rise" style="width: 100%; max-width: 420px; padding: 24px; box-shadow: var(--shadow)">
+      <sc-if value="{{asking}}" hint-placeholder-val="{{ true }}">
+        <div>
+          <img class="pop" src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 56px; height: 56px">
+          <h1 style="margin-top: 8px; font-size: 30px; font-weight: 800">Check your email</h1>
+          <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">We sent a 6-digit code to <b style="color: var(--ink)">{{masked}}</b>. It only proves the email is yours, so you can get back in if you forget your password.</p>
+          <label for="vf-code" class="label" style="margin-top: 16px">6-digit code</label>
+          <div class="vf-wrap">
+            <div class="vf-boxes" aria-hidden="true">
+              <sc-for list="{{boxes}}" as="b" hint-placeholder-count="6"><span class="vf-box {{b.cls}}">{{b.d}}</span></sc-for>
+            </div>
+            <input id="vf-code" value="{{code}}" onChange="{{onCode}}" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+          </div>
+          <sc-if value="{{wrong}}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--bad)">That code doesn’t match. Check the newest email and try again.</p></sc-if>
+          <button class="btn btn-cta btn-lg btn-block tap" onClick="{{verify}}" disabled="{{codeShort}}" style="margin-top: 18px">Verify</button>
+          <button class="btn btn-ghost btn-block" onClick="{{resend}}" disabled="{{cantResend}}" style="margin-top: 8px; border: 0">{{resendLabel}}</button>
+          <div class="row" style="justify-content: space-between; margin-top: 6px; font-size: 13.5px">
+            <a href="Signup.dc.html" class="pink" style="font-weight: 700">Change email</a>
+            <a href="Onboarding.dc.html" class="muted" style="font-weight: 700">Skip for now</a>
+          </div>
+          <p class="muted" style="margin-top: 12px; font-size: 12.5px; text-align: center">Demo: any 6 digits work except 000000.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+        <div style="text-align: center">
+          <img class="pop" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 72px; height: 72px">
+          <h1 style="margin-top: 8px; font-size: 30px; font-weight: 800">Email verified</h1>
+          <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">Your account can be recovered now. We never show your email to anyone.</p>
+          <a href="Onboarding.dc.html" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 18px">Continue</a>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = Object.assign({ mode: m || props.mode || 'dark' }, this.arrive());
+  }
+  // Signup leaves the email it collected in sk-email and stamps sk-nav
+  arrive() {
+    var em = '';
+    try { em = window.localStorage.getItem('sk-email') || ''; this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (e) { this.nav = ''; }
+    return { email: em || 'peach@gmail.com', code: '', wrong: false, done: false, wait: 30 };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.tk = setInterval(function () {
+      var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {}
+      if (nv !== self.nav) { self.setState(self.arrive()); return; }
+      if (self.state.wait > 0) self.setState({ wait: self.state.wait - 1 });
+    }, 1000);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var at = s.email.indexOf('@'), name = at > 0 ? s.email.slice(0, at) : s.email;
+    var masked = name.charAt(0) + '•••••' + (at > 0 ? s.email.slice(at) : '');
+    var boxes = [0, 1, 2, 3, 4, 5].map(function (i) { return { d: s.code.charAt(i) || '', cls: s.wrong ? 'bad' : (i === s.code.length ? 'on' : '') }; });
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      asking: !s.done, done: s.done, masked: masked, boxes: boxes,
+      code: s.code, onCode: function (e) { self.setState({ code: e.target.value.replace(/\D/g, '').slice(0, 6), wrong: false }); },
+      codeShort: s.code.length < 6, wrong: s.wrong,
+      verify: function () { if (s.code === '000000') self.setState({ wrong: true }); else self.setState({ done: true }); },
+      cantResend: s.wait > 0, resendLabel: s.wait > 0 ? 'Resend code in ' + s.wait + 's' : 'Resend code',
+      resend: function () { if (s.wait === 0) self.setState({ wait: 30, code: '', wrong: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

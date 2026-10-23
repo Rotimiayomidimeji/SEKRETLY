@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Join a game</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.ja-code{width:100%;min-height:72px;border-radius:22px;border:2px solid var(--line);background:var(--field);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:38px;font-weight:800;letter-spacing:.5em;text-align:center;text-transform:uppercase;padding-left:.5em;transition:border-color .2s,box-shadow .2s}
+.ja-code:focus{outline:0;border-color:#ff3b8d;box-shadow:0 0 0 4px rgba(255,59,141,.18)}
+.ja-prev{display:flex;gap:12px;align-items:center;padding:12px;border-radius:22px;color:#ffffff;margin-top:10px}
+.ja-week{display:flex;gap:6px}
+.ja-week span{flex:1;height:34px;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:800}
+.ja-rank{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ja-rank:last-child{border-bottom:0}
+.ja-rank b.n{width:26px;text-align:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:17px}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i">Home</a>
+    <a href="Inbox.dc.html" class="nav-i">Inbox<span class="count">4</span></a>
+    <a href="GamesHub.dc.html" class="nav-i" aria-current="page">Games</a>
+    <a href="Notifications.dc.html" class="nav-i">Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i">Profile</a>
+  </nav>
+  <div class="main">
+    <div class="wrap" style="max-width: 760px">
+      <header class="topbar">
+        <a href="GamesHub.dc.html" class="icon-btn tap" aria-label="Back to games"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+        <h1 class="grow" style="font-size: 26px">Join a game</h1>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+
+      <section class="card" style="padding: 16px">
+        <label for="ja-code" style="font-weight: 800">Room code</label>
+        <input id="ja-code" class="ja-code" value="{{code}}" onChange="{{onCode}}" maxlength="4" placeholder="····" autocomplete="off" style="margin-top: 10px">
+        <sc-if value="{{codeBad}}" hint-placeholder-val="{{ false }}"><p style="margin-top: 8px; font-size: 13.5px; color: var(--bad); font-weight: 700">No room with that code. Check the letters, or ask for the link.</p></sc-if>
+        <sc-if value="{{codeOk}}" hint-placeholder-val="{{ false }}">
+          <div class="ja-prev pop" style="background: radial-gradient(120% 90% at 50% 0%,#4a1263 0%,#160a22 70%)">
+            <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 46px; height: 46px; flex: none">
+            <span style="flex: 1"><b class="d" style="font-size: 18px">Friday Night Never</b><div style="font-size: 13px; opacity: .85">Never Have I Ever · 3 of 6 seated · Mild → Unhinged</div></span>
+            <a href="NHIELobbyJoin.dc.html" onClick="{{joinCode}}" class="btn btn-sm tap" style="background: #ffffff; color: #1a0b14; border: 0">Join</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{codeHint}}" hint-placeholder-val="{{ true }}"><p class="muted" style="margin-top: 8px; font-size: 13px">Try K7Q2</p></sc-if>
+      </section>
+
+      <div class="sec-h"><h2>Invites for you</h2><span class="muted" style="font-size: 13px">{{inviteCount}} waiting</span></div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{invites}}" as="iv" hint-placeholder-count="2">
+          <div class="card rise" style="padding: 12px; display: flex; gap: 12px; align-items: center">
+            <span class="av" style="background: {{iv.tint}}"><img src="{{iv.icon}}" alt=""></span>
+            <span style="flex: 1; min-width: 0"><b>{{iv.room}}</b><div class="muted" style="font-size: 12.5px">{{iv.from}} · {{iv.game}} · {{iv.seats}}</div></span>
+            <button class="btn btn-sm btn-ghost tap" onClick="{{iv.decline}}" style="border: 0">Decline</button>
+            <a href="{{iv.href}}" onClick="{{iv.join}}" class="btn btn-sm btn-cta tap">Accept</a>
+          </div>
+        </sc-for>
+        <sc-if value="{{noInvites}}" hint-placeholder-val="{{ false }}"><p class="muted" style="font-size: 14px">No invites right now. Start a game and invite your people.</p></sc-if>
+      </div>
+
+      <div class="sec-h"><h2>Friends playing now</h2></div>
+      <div class="card" style="overflow: hidden">
+        <sc-for list="{{live}}" as="lv" hint-placeholder-count="3">
+          <div class="list-row">
+            <span class="av" style="background: {{lv.bg}}; width: 42px; height: 42px; border-radius: 50%; color: #1a0b14; font-weight: 800">{{lv.initial}}</span>
+            <span style="flex: 1; min-width: 0"><b>{{lv.name}}</b><div class="muted" style="font-size: 12.5px">{{lv.what}}</div></span>
+            <span class="live" style="width: 9px; height: 9px; border-radius: 50%; background: #5be0a0; flex: none"></span>
+            <a href="{{lv.href}}" onClick="{{lv.join}}" class="btn btn-sm tap">{{lv.cta}}</a>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="sec-h"><h2>Your game week</h2></div>
+      <section class="card" style="padding: 16px">
+        <div class="row"><img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 40px; height: 40px"><span style="flex: 1"><b class="d" style="font-size: 20px">4-day streak</b><div class="muted" style="font-size: 13px">Play one round today to make it 5</div></span><span class="pill" style="background: #ff3b8d; color: #ffffff">Lv 7</span></div>
+        <div class="ja-week" style="margin-top: 12px"><sc-for list="{{week}}" as="d" hint-placeholder-count="7"><span style="background: {{d.bg}}; color: {{d.ink}}">{{d.label}}</span></sc-for></div>
+      </section>
+      <section class="card" style="padding: 14px; margin-top: 10px; display: flex; gap: 12px; align-items: center">
+        <img class="{{giftCls}}" src="/_blob/0bb83498eeb25491f1a1f03843b26271" alt="" style="width: 52px; height: 52px; flex: none">
+        <span style="flex: 1"><b>{{giftTitle}}</b><div class="muted" style="font-size: 13px">{{giftSub}}</div></span>
+        <button class="btn btn-sm btn-cta tap" onClick="{{openGift}}" disabled="{{giftDone}}">{{giftCta}}</button>
+      </section>
+      <section class="card" style="padding: 8px 16px; margin-top: 10px">
+        <div class="row" style="padding: 8px 0"><b style="flex: 1">Crew leaderboard · this week</b><span class="muted" style="font-size: 12.5px">resets Monday</span></div>
+        <sc-for list="{{ranks}}" as="rk" hint-placeholder-count="5">
+          <div class="ja-rank"><b class="n">{{rk.n}}</b><span class="av" style="background: {{rk.bg}}; width: 32px; height: 32px; border-radius: 50%; color: #1a0b14; font-weight: 800; font-size: 13px">{{rk.initial}}</span><span style="flex: 1; font-weight: {{rk.w}}">{{rk.name}}</span><span class="muted" style="font-weight: 700">{{rk.xp}} XP</span></div>
+        </sc-for>
+      </section>
+    </div>
+  </div>
+</div>
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+    <a href="CreateGame.dc.html" class="fab" aria-label="Create game"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', code: '', declined: {}, gift: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var code = s.code.toUpperCase();
+    var IV = [
+      { id: 'a', gid: 'tod', href: 'TruthDareLobbyJoin.dc.html', room: 'Dare Club 300L', from: 'Fox invited you', game: 'Truth or Dare', seats: '2 of 4 seated', icon: '/_blob/dabc1dc3b2ca85f511896f5fe287b1b4', tint: 'linear-gradient(135deg,#ff9a4a,#7a2d0b)' },
+      { id: 'b', gid: 'mlt', href: 'MostLikelyLobbyJoin.dc.html', room: 'Hostel B awards', from: 'Moon invited you', game: 'Most Likely To', seats: '5 of 8 seated', icon: '/_blob/886899060459eafd6bc4284897539947', tint: 'linear-gradient(135deg,#ffd23d,#3a2a08)' }
+    ].filter(function (x) { return !s.declined[x.id]; });
+    var joinAs = function (game, room, late) { return function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: game, room: room, role: 'player', late: !!late })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }; };
+    var DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var x = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', x); } catch (e) {} self.setState({ mode: x }); },
+      code: code, onCode: function (e) { self.setState({ code: e.target.value.replace(/[^a-z0-9]/gi, '').slice(0, 4) }); },
+      joinCode: joinAs('nhie', 'Friday Night Never'), codeOk: code === 'K7Q2', codeBad: code.length === 4 && code !== 'K7Q2', codeHint: code.length < 4,
+      invites: IV.map(function (x) { return Object.assign({}, x, { join: joinAs(x.gid, x.room), decline: function () { var o = Object.assign({}, s.declined); o[x.id] = true; self.setState({ declined: o }); } }); }),
+      inviteCount: IV.length, noInvites: IV.length === 0,
+      live: [['Fox', '#ffb35c', 'Truth or Dare · Dare Club 300L · turn 3 of 6', 'Jump in', 'tod', 'Dare Club 300L', 'TruthDare.dc.html', true], ['Ada', '#7ef0c1', 'Hot Takes · Sunday vibes only · in the lobby', 'Join', 'hot', 'Sunday vibes only', 'HotTakesLobbyJoin.dc.html', false], ['Tolu', '#ff9ad5', 'Would You Rather · Class of 2027 chaos · turn 4 of 8', 'Jump in', 'wyr', 'Class of 2027 chaos', 'WYR.dc.html', true]].map(function (x) { return { name: x[0], initial: x[0].charAt(0), bg: x[1], what: x[2], cta: x[3], href: x[6], join: joinAs(x[4], x[5], x[7]) }; }),
+      week: DAYS.map(function (d, k) { var done = k < 4, today = k === 4; return { label: done ? '🔥' : d, bg: done ? '#ff3b8d' : today ? 'var(--card2)' : 'transparent', ink: done ? '#ffffff' : 'var(--muted)' }; }),
+      giftCls: s.gift ? 'pop' : 'float', giftDone: s.gift,
+      giftTitle: s.gift ? 'Situationship pack unlocked' : 'Daily pack ready', giftSub: s.gift ? '30 new spicy cards in all six games. Next pack in 23h.' : 'Open it for a free card pack. Comes back every day.',
+      giftCta: s.gift ? 'Opened' : 'Open', openGift: function () { self.setState({ gift: true }); },
+      ranks: [['MangoMoon (you)', '#ffd23d', 1240, 800], ['BlueFox', '#7fb2ff', 1180, 600], ['ZoboQueen', '#b78bff', 960, 600], ['KolaNut', '#ff9ad5', 720, 600], ['CocoaRay', '#7ef0c1', 610, 600]].map(function (r, k) { return { n: k + 1, name: r[0], initial: r[0].charAt(0), bg: r[1], xp: r[2], w: r[3] }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About Sekretly</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+  <nav class="pub-nav" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <div class="pub-links">
+      <a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a><a href="Safety.dc.html">Safety</a><a href="About.dc.html" aria-current="page">About</a><a href="Help.dc.html">Help</a><a href="Contact.dc.html">Contact</a>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        <span>{{modeWord}}</span>
+      </button>
+      <a href="Signup.dc.html" class="btn btn-cta">Get your link</a>
+      <button class="icon-btn pub-menu tap" onClick="{{toggleDrawer}}" aria-label="Open menu" aria-expanded="{{drawerOpen}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="pdr {{drawerCls}}">
+    <div class="pdr-scrim" onClick="{{toggleDrawer}}"></div>
+    <aside class="pdr-panel" role="dialog" aria-label="Menu" aria-hidden="{{drawerHidden}}">
+      <div class="pdr-head">
+        <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <button class="icon-btn tap" onClick="{{toggleDrawer}}" aria-label="Close menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <nav aria-label="Site" style="display: flex; flex-direction: column; gap: 3px">
+        <a href="Landing.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+        <a href="Landing.dc.html#how" class="nav-i" onClick="{{jumpHow}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>How it works</a>
+        <a href="Landing.dc.html#games" class="nav-i" onClick="{{jumpGames}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+        <a href="Safety.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>Safety</a>
+        <a href="About.dc.html" class="nav-i" aria-current="page" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>About</a>
+        <a href="Help.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"></path></svg>Help & FAQ</a>
+        <a href="Contact.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Contact</a>
+      </nav>
+      <div class="pdr-foot">
+        <button class="mode-btn tap" onClick="{{toggleMode}}" style="justify-content: center">Switch to {{modeWord}} mode</button>
+        <a href="Login.dc.html" class="btn btn-block tap">Sign in</a>
+        <a href="Signup.dc.html" class="btn btn-cta btn-block tap">Get your link</a>
+      </div>
+    </aside>
+  </div>
+
+
+  <header style="background: var(--hero); padding: 72px 0 64px">
+    <div class="pub-wrap">
+      <p style="font-size: 12.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase" class="pink">About us</p>
+      <h1 style="margin-top: 14px; font-size: clamp(42px, 7cqi, 84px); line-height: .95; font-weight: 800; max-width: 14ch">A home for the things you almost said.</h1>
+      <p class="muted" style="margin-top: 18px; font-size: 19px; line-height: 1.55; max-width: 46ch">Sekretly is an anonymous social app for honest messages, disappearing chats and party games. Built in Nigeria, open to everyone 16 and older.</p>
+    </div>
+  </header>
+
+  <main class="pub-wrap" style="padding-top: 56px">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px">
+      <sc-for list="{{values}}" as="v" hint-placeholder-count="4">
+        <article class="card" style="padding: 22px">
+          <img src="{{v.icon}}" alt="" style="width: 46px; height: 46px">
+          <h2 style="margin-top: 12px; font-size: 22px">{{v.title}}</h2>
+          <p class="muted" style="margin-top: 8px; font-size: 15.5px; line-height: 1.55">{{v.body}}</p>
+        </article>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px 64px; margin-top: 64px">
+      <div class="prose" style="flex: 1 1 520px; min-width: 0">
+        <h2 style="margin-top: 0">Why we built Sekretly</h2>
+        <p>Most of what people really think never gets said. Not because it is mean, but because saying it with your name attached is scary. A compliment you were too shy to give. A confession from first year. A rating your friends would never say to your face.</p>
+        <p>Sekretly gives those words somewhere safe to land. You make a link, share it, and the people around you answer honestly. Our ready-made words and sentences make it easy to say something kind, even when you do not know how to start.</p>
+        <h2>How it works</h2>
+        <ul>
+          <li><b>Links:</b> pick a topic like “Describe me in 3 words”, a theme, and share it to your story.</li>
+          <li><b>Messages:</b> anyone can answer without an account. Messages disappear after the time you choose.</li>
+          <li><b>Chats:</b> friends with an account can chat back and forth, and both of you stay anonymous.</li>
+          <li><b>Games:</b> live party games where everyone gets a random nickname.</li>
+        </ul>
+        <h2>How Sekretly is paid for</h2>
+        <p>Sekretly is free. We show a small number of clearly labelled ads in places like your inbox list and the screen after you send a message. We never put ads inside chats, inside the message box, or during a game turn. Later we will offer optional premium hints, which only ever show real, approximate information. We never sell your messages.</p>
+        <h2>Who runs Sekretly</h2>
+        <p>Sekretly is run by [COMPANY OR FOUNDER NAME], based in [CITY], Nigeria. You can reach the team any time through our <a href="Contact.dc.html" class="pink">contact page</a>.</p>
+      </div>
+      <aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div class="card" style="padding: 20px">
+          <h3 style="font-size: 18px">Quick facts</h3>
+          <dl style="margin: 12px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; font-size: 14.5px">
+            <dt class="muted">Founded</dt><dd style="margin: 0">2026</dd>
+            <dt class="muted">Based in</dt><dd style="margin: 0">Nigeria</dd>
+            <dt class="muted">Age</dt><dd style="margin: 0">16+ only</dd>
+            <dt class="muted">Price</dt><dd style="margin: 0">Free, with ads</dd>
+            <dt class="muted">Platform</dt><dd style="margin: 0">Web app, installable</dd>
+          </dl>
+        </div>
+        <div class="card" style="padding: 20px">
+          <h3 style="font-size: 18px">Talk to us</h3>
+          <p class="muted" style="margin-top: 6px; font-size: 14.5px">Questions, press, partnerships or a safety concern.</p>
+          <a href="Contact.dc.html" class="btn btn-block" style="margin-top: 12px">Contact the team</a>
+        </div>
+        <div class="ad ad-mrec"><b>Medium rectangle</b>300 × 250 · content page</div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="ft">
+    <div class="ft-in">
+      <div class="ft-top">
+        <div class="ft-brand">
+          <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word" style="color: var(--ink)">Sekretly</span></a>
+          <p>Built for the things you almost said. Anonymous messages and party games, made in Nigeria.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-sm tap">Get your link</a>
+        </div>
+        <div class="ft-cols">
+          <div class="ft-col"><b>Product</b><a href="Signup.dc.html">Create a link</a><a href="Landing.dc.html#games" onClick="{{jumpGames}}">Games</a><a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a></div>
+          <div class="ft-col"><b>Company</b><a href="About.dc.html">About</a><a href="Contact.dc.html">Contact</a><a href="Help.dc.html">Help &amp; FAQ</a></div>
+          <div class="ft-col"><b>Safety</b><a href="Safety.dc.html">Safety center</a><a href="Safety.dc.html">Community rules</a><a href="Safety.dc.html">Report a problem</a></div>
+          <div class="ft-col"><b>Legal</b><a href="Legal.dc.html">Privacy policy</a><a href="Legal.dc.html">Terms of use</a><a href="Legal.dc.html">Cookies &amp; ads</a></div>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 Sekretly · 16+ only</span>
+        <span>Say it. Stay unknown.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, dark = this.state.mode !== 'light';
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      drawerCls: self.state.drawer ? 'is-open' : '', drawerOpen: self.state.drawer ? 'true' : 'false', drawerHidden: self.state.drawer ? 'false' : 'true',
+      toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
+      jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
+      jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      values: [
+        { icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', title: 'Anonymous, not cruel', body: 'Nobody sees who sent what. Rude words are blocked before they send, and reports are reviewed by people.' },
+        { icon: '/_blob/a689d835be296ffdce1f9d9fc18a844f', title: 'Less data, on purpose', body: 'Messages disappear on your timer. We keep only approximate info, never your exact location.' },
+        { icon: '/_blob/c31fcca8682736cc92ca4f3073f8c7dd', title: 'Fun comes first', body: 'Themes, ready-made words and live games make honesty feel like play, not pressure.' },
+        { icon: '/_blob/727ac58e5046d6eefbb35427eff3c1df', title: 'Real, never fake', body: 'No fake messages to make you sign up. No invented hints. If it shows up, a real person sent it.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

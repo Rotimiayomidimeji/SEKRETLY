@@ -3,7 +3,6 @@
 import Image from "next/image";
 import {
   motion,
-  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -17,7 +16,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  type MouseEvent,
   useRef,
 } from "react";
 
@@ -49,95 +47,16 @@ export function HeroExperience({
     [0, -28]
   );
 
-  const artYRaw = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, -45]
-  );
-
   const copyY = useSpring(copyYRaw, {
     stiffness: 90,
     damping: 26,
   });
-
-  const artY = useSpring(artYRaw, {
-    stiffness: 80,
-    damping: 25,
-  });
-
-  /*
-   * Pointer parallax.
-   * Only moves the artwork a few pixels.
-   */
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-
-  const smoothX = useSpring(pointerX, {
-    stiffness: 75,
-    damping: 20,
-  });
-
-  const smoothY = useSpring(pointerY, {
-    stiffness: 75,
-    damping: 20,
-  });
-
-  const rotateY = useTransform(
-    smoothX,
-    [-1, 1],
-    [-2.5, 2.5]
-  );
-
-  const rotateX = useTransform(
-    smoothY,
-    [-1, 1],
-    [2, -2]
-  );
-
-  const translateX = useTransform(
-    smoothX,
-    [-1, 1],
-    [-10, 10]
-  );
-
-  const translateY = useTransform(
-    smoothY,
-    [-1, 1],
-    [-7, 7]
-  );
-
-  function handlePointerMove(
-    event: MouseEvent<HTMLElement>
-  ) {
-    if (reducedMotion) return;
-
-    const bounds =
-      event.currentTarget.getBoundingClientRect();
-
-    const x =
-      (event.clientX - bounds.left) /
-      bounds.width;
-
-    const y =
-      (event.clientY - bounds.top) /
-      bounds.height;
-
-    pointerX.set((x - 0.5) * 2);
-    pointerY.set((y - 0.5) * 2);
-  }
-
-  function resetPointer() {
-    pointerX.set(0);
-    pointerY.set(0);
-  }
 
   return (
     <section
       ref={heroRef}
       id="top"
       className="sekret-hero"
-      onMouseMove={handlePointerMove}
-      onMouseLeave={resetPointer}
     >
       {/* BACKGROUND ATMOSPHERE */}
       <div

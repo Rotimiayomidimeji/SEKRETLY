@@ -1,0 +1,9 @@
+/* Verify: from design/mockup/Verify.dc.html */
+body{margin:0;background:#0c0811}
+.vf-wrap{position:relative;margin-top:8px}
+.vf-wrap input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:text;font-size:16px}
+.vf-boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:0}
+.vf-box{height:58px;border-radius:16px;border:2px solid var(--line);background:var(--field);display:grid;place-items:center;font-family:var(--font-display),system-ui,sans-serif;font-size:26px;font-weight:800;transition:border-color .2s,transform .2s}
+.vf-box.on{border-color:#ff3b8d;transform:translateY(-2px)}
+.vf-box.bad{border-color:var(--bad);animation:vfShake .4s}
+@keyframes vfShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}

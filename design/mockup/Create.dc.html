@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Create or edit a link</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.cr-prev{order:0}
+.cr-ctrl{order:1}
+@container (min-width:860px){.cr-prev{order:2}.cr-prev-in{position:sticky;top:24px}}
+/* live preview: a scaled-down link page for the chosen topic */
+.cr-mini{border-radius:26px;padding:16px;min-height:236px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:background .5s}
+.cr-ttl{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.08;max-width:15ch}
+.cr-box{margin-top:12px;padding:10px;border-radius:16px;background:rgba(0,0,0,.2)}
+.cr-row{display:grid;gap:5px}
+.cr-slot{height:34px;border-radius:10px;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;font-size:11px;font-weight:800;opacity:.85}
+.cr-pill{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:99px;background:rgba(255,255,255,.18);font-size:11px;font-weight:700}
+.cr-opt{height:26px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;padding:0 9px;font-size:11px;font-weight:700}
+.cr-opt.ok{background:#5be0a0;color:#0f2a1c}
+.cr-tile{height:28px;border-radius:8px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:12px;font-weight:800}
+.cr-tile.hi{background:#ffe27a;color:#3a0b1d}
+.cr-lines{height:70px;border-radius:12px;background:repeating-linear-gradient(transparent 0 17px,rgba(255,255,255,.22) 17px 18px)}
+.cr-bar{height:30px;border-radius:10px;background:rgba(255,255,255,.14);display:flex;align-items:center;padding:0 10px;font-size:11.5px;opacity:.85}
+.cr-send{margin-top:10px;height:34px;border-radius:12px;background:rgba(255,255,255,.92);color:#3a0b1d;display:grid;place-items:center;font-size:12px;font-weight:800}
+/* story card */
+.cr-story{width:228px;aspect-ratio:9/16;border-radius:26px;padding:18px 16px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.cr-story .cr-ttl{font-size:19px;max-width:13ch}
+/* quiz builder */
+.qb{border-radius:20px;border:1px solid var(--line);background:var(--card);overflow:hidden;transition:border-color .2s}
+.qb.open{border-color:#ff3b8d}
+.qb-head{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:8px 14px;border:0;background:none;color:var(--ink);text-align:left}
+.qb-n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+.qb-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.qb-opt{display:flex;align-items:center;gap:8px}
+.sk .qb-mark{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:transparent;display:grid;place-items:center;flex:none;color:transparent;font-weight:900;font-size:16px;transition:background .2s,border-color .2s}
+.sk .qb-mark[aria-pressed="true"]{background:#5be0a0;border-color:#5be0a0;color:#0f2a1c}
+.cr-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:16px;background:#211a2c;color:#ffffff;font-weight:700;font-size:14px;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:up .35s cubic-bezier(.2,.8,.2,1) both;white-space:nowrap}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <div style="max-width: 1080px; margin: 0 auto; padding: 14px 18px 32px">
+    <header class="topbar" style="padding-bottom: 0">
+      <a href="Home.dc.html" aria-label="Close" class="icon-btn tap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      </a>
+      <div class="grow">
+        <div class="muted" style="font-size: 13px">Step {{stepNo}} of {{stepCount}}</div>
+        <div class="d" style="font-size: 20px; font-weight: 800; letter-spacing: -.02em">{{stepTitle}}</div>
+      </div>
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      </button>
+    </header>
+    <div style="display: flex; gap: 6px; margin-top: 14px" aria-hidden="true">
+      <sc-for list="{{bars}}" as="b" hint-placeholder-count="4"><span style="flex: 1; height: 6px; border-radius: 9px; background: {{b.c}}; transition: background .3s"></span></sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px 40px; margin-top: 18px">
+      <aside class="cr-prev" style="flex: 1 1 320px; min-width: 0">
+        <div class="cr-prev-in">
+          <sc-if value="{{notShare}}" hint-placeholder-val="{{ true }}">
+            <div class="cr-mini {{thCls}} pop">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700">
+                <img src="/_blob/1fb2cbc919646a3a048411532a08bd4c" alt="" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.3)">@peach
+                <span style="margin-left: auto; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .8">Live preview</span>
+              </div>
+              <div class="cr-ttl" style="margin-top: 12px">{{topicTitle}}</div>
+              <div style="font-size: 12px; opacity: .85; margin-top: 4px; max-width: 30ch">{{topicHint}}</div>
+              <div class="cr-box">
+                <sc-if value="{{pvDescribe}}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div class="cr-row" style="grid-template-columns: repeat(3, 1fr)"><span class="cr-slot">1</span><span class="cr-slot">2</span><span class="cr-slot">3</span></div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px"><span class="cr-pill">Funny</span><span class="cr-pill">Loyal</span><span class="cr-pill">Chaotic</span><span class="cr-pill">Smart</span><span class="cr-pill">+ own word</span></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{pvQuiz}}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display: flex; gap: 3px"><sc-for list="{{pvDots}}" as="pd" hint-placeholder-count="5"><span style="flex: 1; height: 4px; border-radius: 4px; background: {{pd}}"></span></sc-for></div>
+                    <div style="font-size: 12.5px; font-weight: 800; margin: 8px 0 6px">{{pvQ}}</div>
+                    <div class="cr-row"><sc-for list="{{pvOpts}}" as="po" hint-placeholder-count="4"><span class="cr-opt {{po.cls}}">{{po.label}}</span></sc-for></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{pvConfess}}" hint-placeholder-val="{{ false }}">
+                  <div><div class="cr-lines"></div><div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; opacity: .8; margin-top: 6px"><span>Long ones become cards</span><span>0/2000</span></div></div>
+                </sc-if>
+                <sc-if value="{{pvRate}}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-size: 11px; font-weight: 800; opacity: .85; margin-bottom: 6px">They’re rating you</div>
+                    <div class="cr-row" style="grid-template-columns: repeat(5, 1fr)"><sc-for list="{{pvTiles}}" as="pt" hint-placeholder-count="10"><span class="cr-tile {{pt.cls}}">{{pt.n}}</span></sc-for></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{pvAsk}}" hint-placeholder-val="{{ false }}">
+                  <div><div class="cr-bar" style="height: 52px; align-items: flex-start; padding-top: 8px">{{pvAskText}}</div></div>
+                </sc-if>
+                <div class="cr-send">{{pvSend}}</div>
+              </div>
+              <img class="float" src="{{thEmoji}}" alt="" style="position: absolute; right: 12px; top: 40px; width: 46px; height: 46px">
+            </div>
+            <p class="muted" style="margin-top: 8px; text-align: center; font-size: 12.5px">This is what your friends see when they open your link.</p>
+          </sc-if>
+          <sc-if value="{{isShare}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; justify-content: center">
+              <div class="cr-story pop {{thCls}}">
+                <div style="display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 800; letter-spacing: .06em"><span class="logo-mark" style="width: 22px; height: 22px; border-radius: 7px; font-size: 12px">S</span>SEKRETLY</div>
+                <img src="{{thEmoji}}" alt="" style="width: 58px; height: 58px; margin-top: 26px">
+                <div class="cr-ttl" style="margin-top: 10px">{{topicTitle}}</div>
+                <div style="margin-top: 6px; font-size: 12px; opacity: .85">{{storyLine}}</div>
+                <div class="cr-box" style="margin-top: 14px; padding: 8px">
+                  <sc-if value="{{pvDescribe}}" hint-placeholder-val="{{ true }}"><div class="cr-row" style="grid-template-columns: repeat(3, 1fr)"><span class="cr-slot" style="height: 28px">?</span><span class="cr-slot" style="height: 28px">?</span><span class="cr-slot" style="height: 28px">?</span></div></sc-if>
+                  <sc-if value="{{pvQuiz}}" hint-placeholder-val="{{ false }}"><div style="font-size: 11.5px; font-weight: 800; text-align: center">{{quizCount}} questions · beat my bestie’s score</div></sc-if>
+                  <sc-if value="{{pvConfess}}" hint-placeholder-val="{{ false }}"><div class="cr-lines" style="height: 40px"></div></sc-if>
+                  <sc-if value="{{pvRate}}" hint-placeholder-val="{{ false }}"><div class="cr-row" style="grid-template-columns: repeat(5, 1fr)"><sc-for list="{{pvTiles}}" as="pt" hint-placeholder-count="10"><span class="cr-tile {{pt.cls}}" style="height: 22px; font-size: 10px">{{pt.n}}</span></sc-for></div></sc-if>
+                  <sc-if value="{{pvAsk}}" hint-placeholder-val="{{ false }}"><div class="cr-bar" style="height: 28px">{{pvAskText}}</div></sc-if>
+                </div>
+                <div style="margin-top: auto; padding: 9px 12px; border-radius: 14px; background: rgba(0,0,0,.22); font-size: 11.5px; font-weight: 800; text-align: center">tap the link sticker ↑</div>
+              </div>
+            </div>
+            <p class="muted" style="margin-top: 10px; text-align: center; font-size: 13px">Story card · 9:16 · Status, Stories and Snaps</p>
+          </sc-if>
+        </div>
+      </aside>
+
+      <section class="cr-ctrl rise" style="flex: 999 1 380px; min-width: 0">
+        <sc-if value="{{sTheme}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <p class="muted" style="margin-bottom: 12px; font-size: 15px">Now pick the colours people see when they open your link.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+              <sc-for list="{{themes}}" as="t" hint-placeholder-count="6">
+                <button class="tap" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="padding: 0; border: 3px solid {{t.ring}}; border-radius: 22px; background: var(--card); overflow: hidden; color: var(--ink); text-align: left">
+                  <span class="{{t.cls}}" style="display: grid; place-items: center; height: 84px"><img src="{{t.emoji}}" alt="" style="width: 44px; height: 44px"></span>
+                  <span style="display: block; padding: 9px 10px; font-weight: 800; font-size: 14px">{{t.name}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{sTopic}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <p class="muted" style="margin-bottom: 12px; font-size: 15px">What should people send you? Each topic has its own way to answer. Watch the preview change.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <sc-for list="{{topics}}" as="tp" hint-placeholder-count="6">
+                <button class="tap" onClick="{{tp.pick}}" aria-pressed="{{tp.on}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 14px; border-radius: 18px; border: 2px solid {{tp.ring}}; background: var(--card); color: var(--ink); text-align: left">
+                  <img src="{{tp.emoji}}" alt="" style="width: 36px; height: 36px; flex: none">
+                  <span style="flex: 1; min-width: 0"><b style="display: block; font-size: 16px">{{tp.title}}</b><span class="muted" style="display: block; font-size: 13px">{{tp.sub}}</span></span>
+                  <sc-if value="{{tp.isNew}}" hint-placeholder-val="{{ false }}"><span class="pill" style="background: #ffd23d; color: #1a0b14; font-size: 11px">NEW</span></sc-if>
+                  <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid {{tp.ring}}; background: {{tp.dot}}; flex: none"></span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{isCustom}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 10px">
+                <label for="cr-custom" class="label">Your question</label>
+                <input id="cr-custom" class="field" value="{{custom}}" onChange="{{onCustom}}" maxlength="60" placeholder="e.g. Who is my secret twin?">
+                <p class="hint">{{customLeft}} characters left. Friends answer in a free text box.</p>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{sQuiz}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <p class="muted" style="margin-bottom: 12px; font-size: 15px">Write questions about you, add options, then tap ✓ on the right answer. Friends guess and get a score.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <sc-for list="{{qs}}" as="q" hint-placeholder-count="5">
+                <div class="qb {{q.cls}}">
+                  <button class="qb-head tap" onClick="{{q.toggle}}" aria-expanded="{{q.openStr}}">
+                    <span class="qb-n" style="background: {{q.nBg}}; color: {{q.nInk}}">{{q.n}}</span>
+                    <span style="flex: 1; min-width: 0"><b style="display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{q.title}}</b><span style="display: block; font-size: 12.5px; color: {{q.statusColor}}; font-weight: 700">{{q.status}}</span></span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: rotate({{q.rot}}); transition: transform .25s"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                  <sc-if value="{{q.open}}" hint-placeholder-val="{{ false }}">
+                    <div class="qb-body">
+                      <label class="sr" for="qb-q{{q.n}}">Question {{q.n}}</label>
+                      <input id="qb-q{{q.n}}" class="field" value="{{q.text}}" onChange="{{q.onText}}" maxlength="70" placeholder="Ask something about you">
+                      <sc-for list="{{q.opts}}" as="o" hint-placeholder-count="4">
+                        <div class="qb-opt">
+                          <button class="qb-mark tap" onClick="{{o.mark}}" aria-pressed="{{o.right}}" aria-label="Mark option {{o.n}} as the right answer">✓</button>
+                          <label class="sr" for="{{o.id}}">Option {{o.n}}</label>
+                          <input id="{{o.id}}" class="field" value="{{o.text}}" onChange="{{o.onText}}" maxlength="28" placeholder="Option {{o.n}}" style="flex: 1; min-width: 0; min-height: 44px">
+                        </div>
+                      </sc-for>
+                      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px">
+                        <button class="btn btn-sm tap" onClick="{{q.swap}}">Use a ready-made question</button>
+                        <sc-if value="{{q.canRemove}}" hint-placeholder-val="{{ true }}"><button class="btn btn-sm btn-ghost tap" onClick="{{q.remove}}" style="color: #ff8b98">Remove</button></sc-if>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{canAddQ}}" hint-placeholder-val="{{ true }}">
+              <button class="btn btn-block tap" onClick="{{addQ}}" style="margin-top: 10px; border-style: dashed">{{addLabel}}</button>
+            </sc-if>
+            <p class="hint" style="margin-top: 8px">{{quizNote}}</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{sLimits}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <p class="muted" style="font-size: 15px">Optional. When a limit is hit your link takes a nap. Resume it anytime from My links.</p>
+            <div class="card" style="padding: 14px">
+              <div class="row">
+                <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 34px; height: 34px">
+                <div style="flex: 1"><b style="font-size: 15px">Stop after a number of messages</b><div class="muted" style="font-size: 13px">{{msgSummary}}</div></div>
+                <button class="switch" role="switch" aria-checked="{{limMsgStr}}" aria-label="Message limit" onClick="{{toggleMsg}}"></button>
+              </div>
+              <sc-if value="{{limMsg}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px">
+                  <sc-for list="{{msgOpts}}" as="o" hint-placeholder-count="4"><button class="chip tap {{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <div class="card" style="padding: 14px">
+              <div class="row">
+                <img src="/_blob/a689d835be296ffdce1f9d9fc18a844f" alt="" style="width: 34px; height: 34px">
+                <div style="flex: 1"><b style="font-size: 15px">Stop after a time</b><div class="muted" style="font-size: 13px">{{timeSummary}}</div></div>
+                <button class="switch" role="switch" aria-checked="{{limTimeStr}}" aria-label="Time limit" onClick="{{toggleTime}}"></button>
+              </div>
+              <sc-if value="{{limTime}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px">
+                  <sc-for list="{{timeOpts}}" as="o" hint-placeholder-count="5"><button class="chip tap {{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isShare}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="row">
+              <img class="pop" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 48px; height: 48px">
+              <div><div class="d" style="font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1">{{liveTitle}}</div><div class="muted" style="font-size: 14px; margin-top: 4px">Drop it where your people are.</div></div>
+            </div>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 18px; background: var(--field); border: 1px solid var(--line)">
+              <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{url}}</span>
+              <button class="btn btn-sm tap" onClick="{{copy}}" style="background: {{copyBg}}; color: #ffffff; border: 0">{{copyLabel}}</button>
+            </div>
+            <button class="btn btn-lg btn-block tap" onClick="{{shareWa}}" style="margin-top: 14px; background: #128c4a; color: #ffffff; border: 0">Share to WhatsApp Status</button>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px">
+              <button class="btn tap" onClick="{{shareIg}}" style="background: linear-gradient(135deg,#7a2ff7,#d81b72 55%,#c2410c); color: #ffffff; border: 0">Instagram</button>
+              <button class="btn tap" onClick="{{shareSc}}" style="background: #fffc00; color: #111111; border: 0">Snapchat</button>
+              <button class="btn tap" onClick="{{saveCard}}">Save card</button>
+            </div>
+            <a href="{{previewHref}}" class="btn btn-block btn-ghost tap" style="margin-top: 10px">See my link page as a friend →</a>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px">
+          <sc-if value="{{canBack}}" hint-placeholder-val="{{ false }}"><button class="btn btn-lg tap" onClick="{{back}}">Back</button></sc-if>
+          <sc-if value="{{notShare}}" hint-placeholder-val="{{ true }}"><button class="btn btn-cta btn-lg tap" onClick="{{next}}" disabled="{{cantNext}}" style="flex: 1; opacity: {{nextOpacity}}">{{nextLabel}}</button></sc-if>
+          <sc-if value="{{isShare}}" hint-placeholder-val="{{ false }}"><a href="MyLinks.dc.html" class="btn btn-cta btn-lg tap" style="flex: 1">Done</a></sc-if>
+        </div>
+      </section>
+    </div>
+  </div>
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}"><div class="cr-toast" role="status">{{toastText}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"topic":{"editor":"enum","options":["describe-3","know-me","confess","rate-me","ama","custom"],"default":"describe-3"},"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', step: 0, theme: 'sunset', topic: props.topic || 'describe-3', custom: '', limMsg: false, msgN: 50, limTime: true, time: '24 hours', copied: false,
+      quiz: this.starter(), openQ: 0, swapN: 0, toast: null };
+  }
+  // My links › Edit leaves { id, topic, theme } in sk-linkedit and stamps sk-nav
+  editArrive() {
+    var e = null;
+    try { e = JSON.parse(window.localStorage.getItem('sk-linkedit') || 'null'); window.localStorage.removeItem('sk-linkedit'); this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (x) { this.nav = ''; }
+    return e ? { editing: e.id, topic: e.topic, theme: e.theme, step: 0, copied: false } : { editing: null };
+  }
+  componentDidMount() {
+    var self = this;
+    this.setState(this.editArrive());
+    this.nt = setInterval(function () { var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (x) {} if (nv !== self.nav) self.setState(self.editArrive()); }, 700);
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { clearInterval(this.nt); try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearTimeout(this.tt); }
+  componentDidUpdate(prev) {
+    if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
+    if (prev.topic !== this.props.topic && this.props.topic) this.setState({ topic: this.props.topic, step: 0 });
+  }
+  // ready-made questions the owner can drop in (they still write the options and mark the answer)
+  ideas() {
+    return ['What’s my go-to food?', 'Where am I on a Friday night?', 'What’s my love language?', 'Who’s my celebrity crush?', 'What annoys me the most?', 'What’s my dream country?', 'My worst habit?', 'Which song is always on repeat?', 'What would I never eat?', 'My comfort show?', 'Morning person or night owl?', 'What scares me most?'];
+  }
+  starter() {
+    return [
+      { text: 'What’s my go-to food?', opts: ['Jollof rice', 'Suya', 'Amala', 'Indomie'], right: 1 },
+      { text: 'Where am I on a Friday night?', opts: ['At an owambe', 'In bed by 10', 'At the club', 'Church vigil'], right: 1 },
+      { text: 'What’s my love language?', opts: ['Words', 'Gifts', 'Quality time', 'Acts of service'], right: -1 },
+      { text: 'Who’s my celebrity crush?', opts: ['Tems', 'Burna Boy', 'Ayra Starr', 'Rema'], right: -1 },
+      { text: 'What annoys me the most?', opts: ['Late replies', 'Loud chewing', 'Liars', ''], right: -1 }
+    ];
+  }
+  flash(t) { var self = this; clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(function () { self.setState({ toast: null }); }, 1800); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var E = { shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', moon: '/_blob/1df7299954a782c5de8338339634a8e6', unicorn: '/_blob/7ee69e13b899e048010df41d0cf87143', fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348', octopus: '/_blob/e910746badea9d78c41ac4aa913de4a6', sparkles: '/_blob/727ac58e5046d6eefbb35427eff3c1df', ghost: '/_blob/facd9191837d9eba7e7cedf471a11301', letter: '/_blob/ee2791bdeac805bec379541426d39014', crown: '/_blob/886899060459eafd6bc4284897539947' };
+    var T = [['default', 'Default', E.shush], ['sunset', 'Sunset', E.peach], ['midnight', 'Midnight', E.moon], ['bubblegum', 'Bubblegum', E.unicorn], ['neon', 'Neon', E.fire], ['ocean', 'Ocean', E.octopus]];
+    var th = T.filter(function (t) { return t[0] === s.theme; })[0];
+    var TP = [
+      { id: 'describe-3', title: 'Describe me in 3 words', sub: 'Friends tap 3 words that sum you up', hint: 'Tap 3 words. That’s it.', story: 'sum me up in 3 words', send: 'Send my 3 words', emoji: E.sparkles, pv: 'describe' },
+      { id: 'know-me', title: 'How well do you know me?', sub: 'You write a quiz, friends guess and get a score', hint: 'Answer my questions. See your score.', story: 'take my quiz, if you dare', send: 'See my score', emoji: E.crown, pv: 'quiz', isNew: true },
+      { id: 'confess', title: 'Confess something', sub: 'A blank page for long, honest messages', hint: 'Say the whole thing. Nobody will know.', story: 'tell me anything, anonymously', send: 'Send confession', emoji: E.shush, pv: 'confess' },
+      { id: 'rate-me', title: 'Rate me 1–10', sub: 'Friends tap a number and say why', hint: 'You’re rating me. Be honest.', story: 'rate me, anonymously', send: 'Send my rating', emoji: E.fire, pv: 'rate' },
+      { id: 'ama', title: 'Ask me anything', sub: 'Questions you answer on your story', hint: 'Any question. I answer, you stay unknown.', story: 'ask me anything', send: 'Ask anonymously', emoji: E.ghost, pv: 'ask' },
+      { id: 'custom', title: 'Custom topic', sub: 'Write your own question', hint: 'Answer anonymously.', story: 'send me anonymous messages', send: 'Send anonymously', emoji: E.letter, pv: 'ask' }
+    ];
+    var tp = TP.filter(function (t) { return t.id === s.topic; })[0] || TP[0];
+    var isCustom = tp.id === 'custom', isQuiz = tp.id === 'know-me';
+    var line = dark ? 'rgba(255,255,255,.12)' : 'rgba(48,34,72,.14)';
+    // steps depend on the topic: the quiz adds "Write your quiz"
+    var STEPS = isQuiz ? ['topic', 'quiz', 'theme', 'limits', 'share'] : ['topic', 'theme', 'limits', 'share'];
+    var TITLES = { theme: 'Pick a theme', topic: 'Pick a topic', quiz: 'Write your quiz', limits: 'Set limits', share: 'Share it' };
+    var step = Math.min(s.step, STEPS.length - 1), cur = STEPS[step];
+    // quiz validity: question text, at least 2 options, a marked answer that has text
+    var Q = s.quiz;
+    var qOk = function (q) { var filled = q.opts.filter(function (o) { return o.trim(); }).length; return q.text.trim().length > 3 && filled >= 2 && q.right >= 0 && !!q.opts[q.right].trim(); };
+    var ready = Q.filter(qOk).length;
+    var quizValid = ready === Q.length && Q.length >= 3;
+    var setQ = function (i, patch) { var nq = Q.map(function (q, k) { return k === i ? Object.assign({}, q, patch) : q; }); self.setState({ quiz: nq }); };
+    var cantNext = (cur === 'topic' && isCustom && !s.custom.trim()) || (cur === 'quiz' && !quizValid);
+    var firstBad = Q.map(qOk).indexOf(false);
+    var save = function () {
+      try { if (isQuiz) window.localStorage.setItem('sk-quiz', JSON.stringify(Q.map(function (q) { return [q.text.trim(), q.opts.filter(function (o) { return o.trim(); }), q.opts.filter(function (o, k) { return k < q.right && o.trim(); }).length]; }))); } catch (e) {}
+    };
+    var pvQ = Q[0] || { text: '', opts: [], right: -1 };
+    function opt(label, active, fn) { return { label: label, on: active ? 'true' : 'false', cls: active ? 'on' : '', pick: fn }; }
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      stepNo: step + 1, stepCount: STEPS.length, stepTitle: (s.editing && cur !== 'share' ? 'Edit · ' : '') + TITLES[cur],
+      liveTitle: s.editing ? 'Changes saved' : 'Your link is live',
+      bars: STEPS.map(function (x, i) { return { c: i <= step ? '#d81b72' : line }; }),
+      thCls: 'th-' + th[0], thEmoji: th[2],
+      topicTitle: isCustom ? (s.custom.trim() || 'Your question here') : tp.title, topicHint: tp.hint, storyLine: tp.story,
+      pvDescribe: tp.pv === 'describe', pvQuiz: tp.pv === 'quiz', pvConfess: tp.pv === 'confess', pvRate: tp.pv === 'rate', pvAsk: tp.pv === 'ask',
+      pvAskText: isCustom ? 'Type your answer…' : 'Ask me anything…', pvSend: tp.send,
+      pvDots: Q.map(function (q, k) { return k === 0 ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.25)'; }),
+      pvQ: pvQ.text || 'Your first question', pvOpts: pvQ.opts.filter(function (o) { return o.trim(); }).slice(0, 4).map(function (o) { return { label: o, cls: '' }; }),
+      pvTiles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { return { n: n, cls: n === 8 ? 'hi' : '' }; }),
+      quizCount: Q.length,
+      sTheme: cur === 'theme', sTopic: cur === 'topic', sQuiz: cur === 'quiz', sLimits: cur === 'limits',
+      notShare: cur !== 'share', isShare: cur === 'share',
+      themes: T.map(function (t) { var a = t[0] === s.theme; return { name: t[1], cls: 'th-' + t[0], emoji: t[2], on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ theme: t[0] }); } }; }),
+      topics: TP.map(function (t) { var a = t.id === tp.id; return { title: t.title, sub: t.sub, emoji: t.emoji, isNew: !!t.isNew, on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : line, dot: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ topic: t.id }); } }; }),
+      isCustom: isCustom, custom: s.custom, onCustom: function (e) { self.setState({ custom: e.target.value.slice(0, 60) }); }, customLeft: 60 - s.custom.length,
+      // quiz builder
+      qs: Q.map(function (q, i) {
+        var open = s.openQ === i, ok = qOk(q);
+        var status = ok ? '✓ Answer: ' + q.opts[q.right] : (q.text.trim().length <= 3 ? 'Write the question' : q.opts.filter(function (o) { return o.trim(); }).length < 2 ? 'Add at least 2 options' : 'Tap ✓ on the right answer');
+        return {
+          n: i + 1, title: q.text.trim() || 'New question', status: status, statusColor: ok ? '#5be0a0' : '#ffb347',
+          cls: open ? 'open' : '', open: open, openStr: open ? 'true' : 'false', rot: open ? '180deg' : '0deg',
+          nBg: ok ? '#5be0a0' : 'var(--card2)', nInk: ok ? '#0f2a1c' : 'var(--ink)',
+          toggle: function () { self.setState({ openQ: open ? -1 : i }); },
+          text: q.text, onText: function (e) { setQ(i, { text: e.target.value.slice(0, 70) }); },
+          opts: q.opts.map(function (o, k) {
+            return { n: k + 1, id: 'qb-' + i + '-' + k, text: o, right: q.right === k ? 'true' : 'false',
+              onText: function (e) { var no = q.opts.slice(); no[k] = e.target.value.slice(0, 28); setQ(i, { opts: no }); },
+              mark: function () { if (!q.opts[k].trim()) { self.flash('Write option ' + (k + 1) + ' first'); return; } setQ(i, { right: k }); } };
+          }),
+          swap: function () { var I = self.ideas(), used = Q.map(function (x) { return x.text; }), n = s.swapN, pick = I[n % I.length], g = 0; while (used.indexOf(pick) >= 0 && g++ < I.length) { n++; pick = I[n % I.length]; } setQ(i, { text: pick, opts: ['', '', '', ''], right: -1 }); self.setState({ swapN: n + 1 }); },
+          canRemove: Q.length > 3,
+          remove: function () { self.setState({ quiz: Q.filter(function (x, k) { return k !== i; }), openQ: -1 }); }
+        };
+      }),
+      canAddQ: Q.length < 10, addLabel: '+ Add a question (' + Q.length + '/10)',
+      addQ: function () { self.setState({ quiz: Q.concat([{ text: '', opts: ['', '', '', ''], right: -1 }]), openQ: Q.length }); },
+      quizNote: quizValid ? 'All ' + Q.length + ' questions are ready. Friends see them one at a time, in this order.' : ready + ' of ' + Q.length + ' ready. Every question needs at least 2 options and a ✓ answer (3 to 10 questions).',
+      // limits
+      limMsg: s.limMsg, limTime: s.limTime, limMsgStr: s.limMsg ? 'true' : 'false', limTimeStr: s.limTime ? 'true' : 'false',
+      toggleMsg: function () { self.setState({ limMsg: !s.limMsg }); },
+      toggleTime: function () { self.setState({ limTime: !s.limTime }); },
+      msgSummary: s.limMsg ? 'Naps after ' + s.msgN + ' messages' : 'No limit',
+      timeSummary: s.limTime ? 'Naps after ' + s.time : 'Stays open',
+      msgOpts: [10, 25, 50, 100].map(function (n) { return opt(String(n), s.msgN === n, function () { self.setState({ msgN: n }); }); }),
+      timeOpts: ['1 hour', '6 hours', '24 hours', '3 days', '7 days'].map(function (t) { return opt(t, s.time === t, function () { self.setState({ time: t }); }); }),
+      // share
+      url: 'sekretly.com/peach/k7x2m9/' + s.theme + '/' + tp.id,
+      copyLabel: s.copied ? 'Copied' : 'Copy', copyBg: s.copied ? '#0d7f4b' : '#d81b72',
+      copy: function () { self.setState({ copied: true }); self.flash('Link copied'); },
+      shareWa: function () { self.flash('Opening WhatsApp with your card…'); },
+      shareIg: function () { self.flash('Opening Instagram Stories…'); },
+      shareSc: function () { self.flash('Opening Snapchat…'); },
+      saveCard: function () { self.flash('Card saved to your photos'); },
+      previewHref: isQuiz ? 'LinkQuiz.dc.html' : tp.id === 'confess' ? 'LinkConfess.dc.html' : tp.id === 'rate-me' ? 'LinkRate.dc.html' : tp.id === 'ama' ? 'LinkAMA.dc.html' : 'Main.dc.html',
+      toast: !!s.toast, toastText: s.toast || '',
+      canBack: step > 0 && cur !== 'share',
+      back: function () { self.setState({ step: Math.max(0, step - 1) }); },
+      next: function () {
+        if (cantNext) { if (cur === 'quiz' && firstBad >= 0) { self.setState({ openQ: firstBad }); self.flash('Question ' + (firstBad + 1) + ' isn’t finished'); } return; }
+        if (STEPS[step + 1] === 'share') save();
+        self.setState({ step: Math.min(STEPS.length - 1, step + 1) });
+      },
+      cantNext: cantNext && cur !== 'quiz', nextOpacity: cantNext ? 0.55 : 1,
+      nextLabel: STEPS[step + 1] === 'share' ? (s.editing ? 'Save changes' : 'Create link') : cur === 'quiz' ? (quizValid ? 'Next' : ready + '/' + Q.length + ' ready') : 'Next'
+    };
+  }
+}
+</script>
+</body>
+</html>

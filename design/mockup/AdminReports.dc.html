@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Admin reports</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a href="Admin.dc.html" class="logo" style="padding: 0 10px 4px"><span class="logo-mark">S</span><span class="logo-word">Admin</span></a>
+    <span class="muted" style="font-size: 12px; padding: 0 12px 16px">admin · full access</span>
+    <a href="Admin.dc.html" class="nav-i">Overview</a>
+    <a href="AdminTraffic.dc.html" class="nav-i">Traffic manager</a>
+    <a href="AdminUsers.dc.html" class="nav-i">Users</a>
+    <a href="AdminReports.dc.html" class="nav-i" aria-current="page">Reports &amp; warnings<sc-if value="{{hasOpen}}" hint-placeholder-val="{{ true }}"><span class="count">{{openCount}}</span></sc-if></a>
+    <a href="AdminCategories.dc.html" class="nav-i">Report categories</a>
+    <a href="AdminAds.dc.html" class="nav-i">Ads &amp; AdSense</a>
+    <a href="AdsMap.dc.html" class="nav-i">Ad placement map</a>
+    <a href="Home.dc.html" class="nav-i" style="margin-top: auto">Back to app</a>
+  </nav>
+  <nav class="anav" aria-label="Admin">
+    <a href="Admin.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"></rect><rect x="14" y="3" width="7" height="5" rx="2"></rect><rect x="14" y="12" width="7" height="9" rx="2"></rect><rect x="3" y="16" width="7" height="5" rx="2"></rect></svg><span>Overview</span></a>
+    <a href="AdminTraffic.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg><span>Traffic</span></a>
+    <a href="AdminUsers.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"></path></svg><span>Users</span></a>
+    <a href="AdminReports.dc.html" class="anav-i" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22V4"></path><path d="M5 4h12l-2 4 2 4H5"></path></svg><span>Reports</span><b class="anav-badge">4</b></a>
+    <details class="anav-more">
+      <summary class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg><span>More</span></summary>
+      <div class="anav-sheet">
+        <div class="anav-grab" aria-hidden="true"></div>
+        <a href="AdminCategories.dc.html" class="anav-s">Report categories</a>
+        <a href="AdminAds.dc.html" class="anav-s">Ads &amp; AdSense</a>
+        <a href="AdsMap.dc.html" class="anav-s">Ad placement map</a>
+        <a href="Home.dc.html" class="anav-s" style="color: var(--muted)">← Back to the app</a>
+      </div>
+    </details>
+  </nav>
+
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 1180px">
+      <header class="topbar">
+        <div class="grow"><h1 style="font-size: 28px">Reports &amp; warnings</h1><div class="muted" style="font-size: 13px">Warnings and blocks happen automatically. You step in for serious ones, or to reverse a mistake.</div></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+      <div class="rail adm-nav-rail" style="gap: 8px; margin-bottom: 14px">
+        <a href="Admin.dc.html" class="chip">Overview</a><a href="AdminTraffic.dc.html" class="chip">Traffic</a><a href="AdminUsers.dc.html" class="chip">Users</a><a href="AdminReports.dc.html" class="chip on">Reports</a><a href="AdminCategories.dc.html" class="chip">Categories</a><a href="AdminAds.dc.html" class="chip">Ads</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
+        <sc-for list="{{kpis}}" as="k" hint-placeholder-count="5"><div class="card kpi"><div class="muted" style="font-size: 12.5px">{{k.label}}</div><div class="v" style="color: {{k.c}}">{{k.value}}</div></div></sc-for>
+      </div>
+
+      <div class="rail" role="tablist" style="display: flex; gap: 8px; margin-top: 16px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{t.on}}" class="chip tap {{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+      </div>
+
+      <sc-if value="{{showCards}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px">
+          <sc-for list="{{reports}}" as="r" hint-placeholder-count="5">
+            <article class="card" style="padding: 16px; border-color: {{r.border}}">
+              <div class="row" style="flex-wrap: wrap; gap: 8px">
+                <span class="pill" style="background: {{r.catBg}}; color: #ffffff">{{r.cat}}</span>
+                <sc-if value="{{r.serious}}" hint-placeholder-val="{{ false }}"><span class="pill" style="background: transparent; border: 1px solid var(--bad); color: var(--bad)">Serious · needs a human</span></sc-if>
+                <span class="muted" style="font-size: 13px">@{{r.receiver}} reported {{r.sender}} · {{r.ago}}</span>
+                <span class="grow"></span>
+                <span class="pill">{{r.status}}</span>
+              </div>
+              <div class="row" style="gap: 12px; margin-top: 12px; align-items: flex-start">
+                <sc-if value="{{r.hasMedia}}" hint-placeholder-val="{{ false }}"><span class="media blur" style="width: 84px; height: 84px; flex: none"><img src="/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2" alt="Reported photo, blurred"><span class="media-tag">Photo</span></span></sc-if>
+                <p style="font-size: 16px; line-height: 1.5; flex: 1">“{{r.text}}”</p>
+              </div>
+              <div class="card" style="margin-top: 12px; padding: 10px 12px; background: var(--card2); font-size: 13.5px">
+                <b>Automatic action:</b> {{r.auto}}
+                <div class="warn-steps" style="margin-top: 8px; max-width: 260px"><sc-for list="{{r.steps}}" as="st" hint-placeholder-count="4"><span style="background: {{st.c}}"></span></sc-for></div>
+              </div>
+              <sc-if value="{{r.open}}" hint-placeholder-val="{{ true }}">
+                <div class="row" style="gap: 8px; margin-top: 12px; flex-wrap: wrap">
+                  <button class="btn btn-sm tap" onClick="{{r.keep}}">Keep action</button>
+                  <button class="btn btn-sm tap" onClick="{{r.reverse}}">Reverse warning</button>
+                  <button class="btn btn-sm btn-danger tap" onClick="{{r.suspend}}">Suspend sender</button>
+                  <sc-if value="{{r.serious}}" hint-placeholder-val="{{ false }}"><button class="btn btn-sm tap" onClick="{{r.escalate}}" style="background: #c4213a; color: #ffffff; border: 0">Escalate · save evidence</button></sc-if>
+                </div>
+              </sc-if>
+            </article>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showLog}}" hint-placeholder-val="{{ false }}">
+        <section class="card" style="margin-top: 12px; overflow: hidden">
+          <div class="adm-scroll" style="border-radius: 0">
+            <table class="adm-table">
+              <thead><tr><th>Time</th><th>Action</th><th>Sender</th><th>Receiver</th><th>Category</th><th>Warning sent</th></tr></thead>
+              <tbody>
+                <sc-for list="{{log}}" as="l" hint-placeholder-count="8">
+                  <tr><td class="muted">{{l.t}}</td><td><span class="pill" style="background: {{l.bg}}; color: #ffffff">{{l.action}}</span></td><td>{{l.sender}}</td><td>@{{l.receiver}}</td><td>{{l.cat}}</td><td class="muted" style="white-space: normal; min-width: 320px">{{l.msg}}</td></tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', tab: 'review', done: {} };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var line = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
+    var R = [
+      { id: 'r1', cat: 'Threats', serious: true, receiver: 'maya', sender: 'a visitor (device v_3c91af)', ago: '6m', text: 'watch yourself on Monday, I know your hostel', n: 1, auto: 'Warning 1 of 3 saved to the sender’s device. Sent to review because it is a threat.' },
+      { id: 'r2', cat: 'Underage concern', serious: true, receiver: 'ada', sender: '@jide_02', ago: '22m', text: 'how old are you really? send me a pic', n: 4, auto: '4th report from @ada. @jide_02 is now blocked from messaging @ada. Sent to review because a minor may be involved.' },
+      { id: 'r3', cat: 'Self-harm', serious: true, receiver: 'tolu', sender: '@kemi', ago: '40m', text: 'honestly I don’t think I’ll be here next week', n: 0, auto: 'No warning. @kemi was sent help-line resources. Sent to review so a person can check in.' },
+      { id: 'r4', cat: 'Non-consensual image', serious: true, receiver: 'maya', sender: 'a visitor (device v_77de02)', ago: '1h', text: 'remember this?', media: true, n: 2, auto: 'Warning 2 of 3 saved to the sender’s device. Photo kept for 30 days as evidence.' },
+      { id: 'r5', cat: 'Insults', serious: false, receiver: 'tolu', sender: '@kola', ago: '25m', text: 'you’re so mid it hurts', n: 2, auto: 'Warning 2 of 3 sent to @kola.' },
+      { id: 'r6', cat: 'Harassment', serious: false, receiver: 'peach', sender: '@kola', ago: '2h', text: 'answer me. why are you ignoring me', n: 3, auto: 'Warning 3 of 3 sent to @kola. Next report from @peach blocks them.' },
+      { id: 'r7', cat: 'Spam', serious: false, receiver: 'peach', sender: '@promo_king', ago: '3h', text: 'WIN 50k airtime now!!! click bit.ly/…', n: 4, auto: '4th report. @promo_king is blocked from @peach. They are blocked by 3 people, so the account was flagged.' }
+    ];
+    var shown = R.filter(function (r) { return s.tab === 'review' ? r.serious : true; });
+    var open = R.filter(function (r) { return r.serious && !s.done[r.id]; }).length;
+    var setDone = function (id, v) { var d = Object.assign({}, s.done); d[id] = v; self.setState({ done: d }); };
+    var catBg = function (c) { return { Threats: '#c4213a', 'Underage concern': '#c4213a', 'Self-harm': '#7a3cff', 'Non-consensual image': '#c4213a' }[c] || '#d81b72'; };
+    var L = [
+      ['21:58', 'Warning 2/3', '@kola', 'tolu', 'Insults', 'Your message to @tolu was reported as “Insults”. This is warning 2 of 3.'],
+      ['21:41', 'Blocked', '@jide_02', 'ada', 'Underage concern', 'You can no longer message @ada. Your messages were reported 4 times.'],
+      ['21:36', 'Support sent', '@kemi', 'tolu', 'Self-harm', 'Someone who got your message is worried about you. Free, confidential help: [HELP-LINE].'],
+      ['21:12', 'Warning 1/3', 'visitor v_3c91af', 'maya', 'Threats', 'Heads up: a message you sent was marked “Threats” by the person who got it. Keep it respectful.'],
+      ['20:50', 'Undo', '@fox_chat', 'peach', 'Harassment', '@peach removed the block. You can message them again.'],
+      ['19:59', 'Warning 3/3', '@kola', 'peach', 'Harassment', '@peach flagged something you sent as “Harassment”. This is your last warning. One more report and you can’t message them again.'],
+      ['18:47', 'Blocked', '@promo_king', 'peach', 'Spam', 'You can no longer message @peach. Your messages were reported 4 times.']
+    ];
+    var abg = { 'Blocked': '#c4213a', 'Support sent': '#7a3cff', 'Undo': '#665e74' };
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      openCount: open, hasOpen: open > 0,
+      kpis: [
+        { label: 'Reports today', value: '58', c: 'var(--ink)' },
+        { label: 'Warnings sent', value: '51', c: 'var(--warn)' },
+        { label: 'Blocks (4th report)', value: '6', c: 'var(--bad)' },
+        { label: 'Blocks undone', value: '2', c: 'var(--muted)' },
+        { label: 'Needs review', value: String(open), c: open ? 'var(--bad)' : 'var(--ok)' }
+      ],
+      tabs: [['review', 'Needs review'], ['all', 'All reports'], ['log', 'Automatic actions log']].map(function (t) { var on = s.tab === t[0]; return { label: t[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ tab: t[0] }); } }; }),
+      showCards: s.tab !== 'log', showLog: s.tab === 'log',
+      reports: shown.map(function (r) {
+        var d = s.done[r.id];
+        return { cat: r.cat, serious: r.serious, receiver: r.receiver, sender: r.sender, ago: r.ago, text: r.text, hasMedia: !!r.media, auto: r.auto,
+          catBg: catBg(r.cat), border: r.serious && !d ? 'var(--bad)' : 'var(--line)',
+          status: d ? ({ keep: 'Kept', reverse: 'Warning reversed', suspend: 'Sender suspended', escalate: 'Escalated' })[d] : (r.serious ? 'Open' : 'Auto-handled'),
+          open: !d,
+          steps: [1, 2, 3, 4].map(function (i) { return { c: i <= r.n ? (i === 4 ? '#c4213a' : '#ffb020') : line }; }),
+          keep: function () { setDone(r.id, 'keep'); }, reverse: function () { setDone(r.id, 'reverse'); }, suspend: function () { setDone(r.id, 'suspend'); }, escalate: function () { setDone(r.id, 'escalate'); } };
+      }),
+      log: L.map(function (l) { return { t: l[0], action: l[1], sender: l[2], receiver: l[3], cat: l[4], msg: l[5], bg: abg[l[1]] || '#b26a00' }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

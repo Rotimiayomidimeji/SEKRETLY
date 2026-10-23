@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Inbox</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.ib{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.ib-list{display:flex;flex-direction:column;flex:1;min-width:0;height:100%}
+.ib-list.hide{display:none}
+.ib-detail{display:none;flex:1;min-width:0;flex-direction:column;height:100%;position:relative}
+.ib-detail.open{display:flex}
+.bnav.hide{display:none}
+.ib .side{height:100%}
+.ib-list{position:relative}
+.sk .ib-row{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px;border-radius:20px;color:var(--ink);text-align:left;-webkit-touch-callout:none;user-select:none;transition:background .2s,border-color .2s,transform .15s}
+.sk .ib-row:active{transform:scale(.985)}
+.ib-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;flex:none;color:transparent;transition:background .2s,border-color .2s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.ib-check.on{background:#ff3b8d;border-color:#ff3b8d;color:#ffffff;transform:scale(1.08)}
+.ib-selbar{position:sticky;bottom:0;z-index:6;margin:18px -4px 0;padding:10px;border-radius:22px;background:var(--card2);border:1px solid var(--line);box-shadow:var(--shadow);animation:up .3s cubic-bezier(.2,.8,.2,1) both}
+.ib-acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.sk .ib-act{min-height:58px;border-radius:16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:800;text-decoration:none;padding:4px}
+.sk .ib-act[disabled]{opacity:.4}
+.sk .ib-act.cta{background:var(--cta);color:#ffffff;border:0}
+.sk .ib-act.bad{color:var(--bad)}
+.ib-menu-wrap{position:absolute;inset:0;z-index:45}
+.sk .ib-menu-scrim{position:absolute;inset:0;border:0;background:transparent;padding:0}
+.ib-menu{position:absolute;top:62px;right:12px;width:max-content;min-width:230px;padding:6px;border-radius:18px;background:var(--card2);border:1px solid var(--line);box-shadow:var(--shadow);animation:up .2s cubic-bezier(.2,.8,.2,1) both}
+.sk .ib-menu button{display:flex;align-items:center;gap:10px;width:100%;white-space:nowrap;min-height:46px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:var(--ink);font-size:15px;font-weight:700;text-align:left}
+.sk .ib-menu button:hover{background:var(--card)}
+.sk .ib-menu button.bad{color:var(--bad)}
+.ib-menu span{width:22px;text-align:center}
+.ib-bub{position:relative;-webkit-touch-callout:none;user-select:none;transition:transform .15s}
+.ib-bub.chosen > div:last-child,.ib-bub.chosen .ib-btext{outline:2.5px solid #ff3b8d;outline-offset:2px}
+.ib-bub .ib-check{position:absolute;top:50%;margin-top:-12px}
+.ib-bub.mine .ib-check{left:-32px}.ib-bub.theirs .ib-check{right:-32px}
+@container (min-width:900px){
+  .ib-list,.ib-list.hide{display:flex;flex:0 0 380px;border-right:1px solid var(--line)}
+  .ib-detail{display:flex}
+  .ib-back{display:none!important}
+  .ib-pad{padding-bottom:24px!important}
+}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+<div class="ib">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">{{unread}}</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+  </nav>
+
+  <section class="{{listClass}}" aria-label="Messages">
+    <div class="ib-pad" style="flex: 1; overflow-y: auto; padding: 16px 16px 110px">
+      <header class="topbar" style="padding-bottom: 0">
+        <sc-if value="{{inArchive}}" hint-placeholder-val="{{ false }}"><button class="icon-btn tap" onClick="{{leaveArchive}}" aria-label="Back to inbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button></sc-if>
+        <h1 class="grow" style="font-size: 30px">{{listTitle}}</h1>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+        <a href="Notifications.dc.html" class="icon-btn tap" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg><span class="badge">3</span></a>
+        <button class="icon-btn tap" onClick="{{openListMenu}}" aria-label="More options" aria-haspopup="menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg></button>
+      </header>
+      <sc-if value="{{inArchive}}" hint-placeholder-val="{{ false }}"><p class="muted" style="margin-top: 8px; font-size: 13.5px">{{archiveNote}}</p></sc-if>
+      <sc-if value="{{notArchive}}" hint-placeholder-val="{{ true }}"><div>
+      <a href="Settings.dc.html" class="pill" style="margin-top: 10px; text-decoration: none"><img src="/_blob/a689d835be296ffdce1f9d9fc18a844f" alt="" style="width: 16px; height: 16px">Messages disappear after 1 day · change</a>
+      <div class="rail" role="tablist" aria-label="Filter" style="display: flex; gap: 8px; margin-top: 12px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button role="tab" aria-selected="{{f.on}}" class="chip tap {{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+      </div>
+      <sc-if value="{{showHoldTip}}" hint-placeholder-val="{{ false }}"><p class="muted" style="margin-top: 10px; font-size: 12.5px">Tip: hold a message to select a few at once.</p></sc-if>
+      </div></sc-if>
+
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+        <div style="margin-top: 18px">
+          <div class="row" style="gap: 8px; padding: 0 2px 8px">
+            <span class="{{g.th}}" style="width: 14px; height: 14px; border-radius: 5px"></span>
+            <span style="font-size: 13px; font-weight: 800">{{g.title}}</span><span class="muted" style="font-size: 13px">· {{g.n}}</span>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{g.items}}" as="m" hint-placeholder-count="2">
+              <li style="display: flex; align-items: center; gap: 6px">
+                <button class="ib-row tap {{m.freshCls}}" onClick="{{m.tap}}" onPointerDown="{{m.press}}" onPointerUp="{{m.release}}" onPointerLeave="{{m.release}}" onContextMenu="{{m.ctx}}" aria-pressed="{{m.chosenStr}}" style="border: 1px solid {{m.line}}; background: {{m.bg}}; opacity: {{m.op}}">
+                  <sc-if value="{{m.selMode}}" hint-placeholder-val="{{ false }}"><span class="ib-check {{m.chkCls}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span></sc-if>
+                  <span class="av {{m.avCls}}" style="background: {{m.avBg}}"><img src="{{m.av}}" alt=""></span>
+                  <span style="flex: 1; min-width: 0">
+                    <span class="muted" style="display: flex; gap: 6px; font-size: 13px; align-items: center"><b style="color: var(--ink)">{{m.who}}</b>{{m.kindLabel}}<sc-if value="{{m.blocked}}" hint-placeholder-val="{{ false }}"><span class="pill" style="padding: 2px 7px; font-size: 10.5px; background: #c4213a; color: #ffffff">Blocked</span></sc-if><sc-if value="{{m.warned}}" hint-placeholder-val="{{ false }}"><span class="pill" style="padding: 2px 7px; font-size: 10.5px">{{m.warnLabel}}</span></sc-if></span>
+                    <span style="display: block; margin-top: 2px; font-size: 15px; font-weight: {{m.weight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: {{m.italic}}">{{m.preview}}</span>
+                  </span>
+                  <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none">
+                    <span class="muted" style="font-size: 12px">{{m.ago}}</span>
+                    <span class="row" style="gap: 5px">
+                      <sc-if value="{{m.unread}}" hint-placeholder-val="{{ false }}"><span style="width: 9px; height: 9px; border-radius: 50%; background: #ff3b8d"></span></sc-if>
+                      <svg width="20" height="20" viewBox="0 0 24 24" role="img" aria-label="Disappears in {{m.left}}"><circle cx="12" cy="12" r="9" fill="none" stroke="{{m.ringBg}}" stroke-width="3"></circle><circle cx="12" cy="12" r="9" fill="none" stroke="{{m.ringC}}" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{m.dash}} 57" transform="rotate(-90 12 12)"></circle></svg>
+                    </span>
+                  </span>
+                </button>
+              </li>
+              <sc-if value="{{m.adAfter}}" hint-placeholder-val="{{ false }}">
+                <li class="ad ad-feed"><b>In-feed native ad</b>full width × 108 · after every 5th message</li>
+              </sc-if>
+            </sc-for>
+          </ul>
+        </div>
+      </sc-for>
+      <sc-if value="{{listEmpty}}" hint-placeholder-val="{{ false }}">
+        <div class="muted" style="text-align: center; padding: 48px 12px"><img src="/_blob/7356090e8cd14d77123c7e2f69c92dcb" alt="" style="width: 64px; height: 64px"><div style="margin-top: 8px; font-weight: 800; color: var(--ink)">{{emptyTitle}}</div><div style="font-size: 13.5px; margin-top: 4px">{{emptyBody}}</div></div>
+      </sc-if>
+      <sc-if value="{{selMode}}" hint-placeholder-val="{{ false }}">
+        <div class="ib-selbar" role="toolbar" aria-label="Selected messages">
+          <div class="row" style="gap: 8px">
+            <button class="icon-btn tap" onClick="{{cancelSel}}" aria-label="Cancel selection" style="width: 38px; height: 38px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+            <b style="flex: 1; font-size: 15px">{{selCount}}</b>
+            <button class="chip tap" onClick="{{selectAll}}" style="min-height: 36px">{{selAllLabel}}</button>
+          </div>
+          <div class="ib-acts">
+            <a href="ShareStudio.dc.html" onClick="{{bulkStash}}" class="ib-act cta tap" aria-disabled="{{noShareStr}}" style="opacity: {{shareOp}}; pointer-events: {{sharePe}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>Edit in studio</a>
+            <button class="ib-act tap" onClick="{{openQuick}}" disabled="{{noShare}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg>Post</button>
+            <button class="ib-act tap" onClick="{{bulkArchive}}" disabled="{{noneChosen}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v10h14V9M10 13h4"></path></svg>{{archiveWord}}</button>
+            <button class="ib-act bad tap" onClick="{{bulkDelete}}" disabled="{{noneChosen}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path></svg>Delete</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{listMenuOpen}}" hint-placeholder-val="{{ false }}">
+      <div class="ib-menu-wrap"><button class="ib-menu-scrim" onClick="{{closeMenu}}" aria-label="Close menu"></button>
+        <div class="ib-menu" role="menu">
+          <sc-for list="{{listMenuItems}}" as="mi" hint-placeholder-count="3"><button role="menuitem" class="tap {{mi.cls}}" onClick="{{mi.go}}"><span aria-hidden="true">{{mi.icon}}</span>{{mi.label}}</button></sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <section class="{{detailClass}}" aria-label="Message">
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div class="muted" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center">
+        <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 96px; height: 96px">
+        <div class="d" style="font-size: 22px; font-weight: 800; color: var(--ink)">Pick a message</div>
+        <div style="max-width: 32ch">Read it, reply in a chat, or share it to your story.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+      <div style="flex: 1; display: flex; flex-direction: column; min-height: 0">
+        <header class="row" style="gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line)">
+          <button class="ib-back icon-btn tap" onClick="{{close}}" aria-label="Back to inbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+          <span class="av {{sel.avCls}}" style="width: 40px; height: 40px; border-radius: 14px; background: {{sel.avBg}}"><img src="{{sel.av}}" alt=""></span>
+          <div style="flex: 1; min-width: 0"><b style="font-size: 16px">{{sel.who}}</b><div class="muted" style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{sel.sub}}</div></div>
+          <button class="btn btn-sm tap" onClick="{{openHint}}" aria-label="Get a hint about who sent this" style="gap: 6px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>{{hintBtn}}
+          </button>
+          <button class="icon-btn tap" onClick="{{openItemMenu}}" aria-label="More options for this conversation" aria-haspopup="menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg></button>
+        </header>
+
+        <sc-if value="{{selBlocked}}" hint-placeholder-val="{{ false }}">
+          <div class="row" style="gap: 10px; padding: 10px 14px; background: rgba(196,33,58,.12); border-bottom: 1px solid var(--line); font-size: 13.5px">
+            <span style="flex: 1"><b>{{sel.who}} can’t message you anymore.</b> Reported 4 times.</span>
+            <button class="btn btn-sm tap" onClick="{{undoBlock}}">Undo</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{selOne}}" hint-placeholder-val="{{ false }}">
+          <div class="rise" style="flex: 1; overflow-y: auto; padding: 18px 16px 24px; display: flex; flex-direction: column; align-items: center">
+            <div class="{{sel.th}}" style="width: 100%; max-width: 460px; border-radius: 30px; padding: 22px; min-height: 300px; display: flex; flex-direction: column">
+              <div style="font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .85">{{sel.topic}}</div>
+              <sc-if value="{{selHasMedia}}" hint-placeholder-val="{{ false }}">
+                <div class="media {{mediaCls}}" style="margin-top: 14px; height: 230px">
+                  <img src="/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2" alt="Photo sent anonymously">
+                  <span class="media-tag">{{sel.mediaTag}}</span>
+                  <sc-if value="{{mediaHidden}}" hint-placeholder-val="{{ true }}">
+                    <button class="media-cover" onClick="{{revealMedia}}">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      Tap to view
+                      <span style="font-size: 12px; font-weight: 600; opacity: .85">Blurred because it’s from someone anonymous</span>
+                    </button>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{selPlain}}" hint-placeholder-val="{{ true }}">
+                <p class="{{pageCls}}" style="margin-top: 16px; font-size: {{pageFs}}; font-weight: {{pageW}}; letter-spacing: {{pageLs}}; line-height: {{pageLh}}">{{pageText}}</p>
+              </sc-if>
+              <sc-if value="{{selRate}}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="margin-top: 14px; display: flex; align-items: flex-end; gap: 12px">
+                    <span class="d pop" style="font-size: 104px; font-weight: 800; line-height: .82; letter-spacing: -.06em">{{rateN}}</span>
+                    <span style="padding-bottom: 6px"><b style="font-size: 22px; opacity: .8">/10</b><br><span class="pill" style="margin-top: 6px; background: rgba(0,0,0,.25); color: inherit">{{rateCat}}</span></span>
+                    <img class="float" src="{{rateEmoji}}" alt="" style="margin-left: auto; width: 64px; height: 64px">
+                  </div>
+                  <sc-if value="{{hasRateWhy}}" hint-placeholder-val="{{ true }}"><p class="d" style="margin-top: 14px; font-size: 22px; font-weight: 800; line-height: 1.2">“{{rateWhy}}”</p></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{selQuiz}}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 14px; margin-top: 12px">
+                    <span class="d pop" style="font-size: 64px; font-weight: 800; line-height: .9; letter-spacing: -.04em">{{quizScore}}</span>
+                    <span><b style="font-size: 18px">{{quizVerdict}}</b><br><span style="font-size: 13px; opacity: .85">{{quizRankText}}</span></span>
+                  </div>
+                  <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px">
+                    <sc-for list="{{quizRows}}" as="qr" hint-placeholder-count="5">
+                      <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: rgba(0,0,0,.2); font-size: 13.5px">
+                        <span style="width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; font-weight: 900; background: {{qr.bg}}; color: #10220f">{{qr.mark}}</span>
+                        <span style="flex: 1; min-width: 0"><span style="display: block; opacity: .8; font-size: 12px">{{qr.q}}</span><b>{{qr.a}}</b><span style="opacity: .8">{{qr.fix}}</span></span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{hasQuizNote}}" hint-placeholder-val="{{ true }}"><p style="margin-top: 12px; font-size: 16px; font-weight: 700">{{quizNoteText}}</p></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{selPaged}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px">
+                  <button class="icon-btn tap" onClick="{{pagePrev}}" disabled="{{atFirst}}" aria-label="Previous card" style="width: 42px; height: 42px; border: 0; background: rgba(0,0,0,.24); color: inherit; opacity: {{prevOp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+                  <div style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px"><sc-for list="{{pageDots}}" as="pd" hint-placeholder-count="3"><span style="width: {{pd.w}}; height: 7px; border-radius: 7px; background: {{pd.c}}; transition: width .25s"></span></sc-for></div>
+                  <span style="font-size: 13px; font-weight: 800; min-width: 38px; text-align: center">{{pageNo}}</span>
+                  <button class="icon-btn tap" onClick="{{pageNext}}" disabled="{{atLast}}" aria-label="Next card" style="width: 42px; height: 42px; border: 0; background: rgba(255,255,255,.9); color: #211a2c; opacity: {{nextOp}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+                </div>
+              </sc-if>
+              <div style="margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; font-size: 13px; opacity: .9"><span>anonymous · {{sel.ago}}</span><span>gone in {{sel.left}}</span></div>
+            </div>
+            <div style="width: 100%; max-width: 460px; margin-top: 14px; display: flex; flex-direction: column; gap: 8px">
+              <sc-if value="{{selAma}}" hint-placeholder-val="{{ false }}">
+                <div><label for="ama-ans" class="label">Your answer</label><textarea id="ama-ans" class="field" value="{{amaAnswer}}" onChange="{{onAma}}" maxlength="200" placeholder="Answer it, then share both to your story" style="min-height: 84px"></textarea></div>
+              </sc-if>
+              <sc-if value="{{selPaged}}" hint-placeholder-val="{{ false }}"><div class="muted" style="font-size: 13px; text-align: center">Long message · {{pageCount}} cards · Share sends all {{pageCount}}, numbered in order</div></sc-if>
+              <a href="ShareStudio.dc.html" onClick="{{shareStash}}" class="btn btn-cta btn-lg btn-block tap" style="gap: 8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M16 6l-4-4-4 4"></path><path d="M12 2v13"></path></svg>{{shareLabel}}</a>
+              <sc-if value="{{canReply}}" hint-placeholder-val="{{ true }}">
+                <button class="btn btn-lg btn-block tap" onClick="{{replyPrivately}}" style="gap: 8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"></path></svg>{{replyLabel}}</button>
+              </sc-if>
+              <sc-if value="{{noReply}}" hint-placeholder-val="{{ false }}"><div class="muted" style="font-size: 13px; text-align: center; line-height: 1.45">They didn’t turn on replies, so you can’t answer privately.<br>Share it to your story instead.</div></sc-if>
+              <div class="card row" style="padding: 12px 14px; gap: 10px">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--pink); flex: none"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                <sc-if value="{{hintLocked}}" hint-placeholder-val="{{ true }}"><span style="flex: 1; font-size: 13px; line-height: 1.4"><b>Curious who sent it?</b> <span class="muted">Watch a short ad for one vague clue, like “Lagos, late at night”. Never a name.</span></span></sc-if>
+                <sc-if value="{{hintLocked}}" hint-placeholder-val="{{ true }}"><button class="btn btn-sm tap" onClick="{{openHint}}">Get hint</button></sc-if>
+                <sc-if value="{{hintUnlocked}}" hint-placeholder-val="{{ false }}"><span style="flex: 1; font-size: 13.5px; line-height: 1.4"><b>Hint:</b> {{hintText}}</span></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{selChat}}" hint-placeholder-val="{{ false }}">
+          <div style="flex: 1; display: flex; flex-direction: column; min-height: 0">
+            <div style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+              <div class="muted" style="align-self: center; text-align: center; font-size: 12.5px; max-width: 34ch; padding: 6px 0 10px">{{chatIntro}}</div>
+              <sc-for list="{{thread}}" as="b" hint-placeholder-count="4">
+                <div class="rise ib-bub {{b.selCls}}" style="align-self: {{b.align}}; max-width: 78%" onClick="{{b.tap}}" onPointerDown="{{b.press}}" onPointerUp="{{b.release}}" onPointerLeave="{{b.release}}" onContextMenu="{{b.ctx}}">
+                  <sc-if value="{{b.showChk}}" hint-placeholder-val="{{ false }}"><span class="ib-check {{b.chkCls}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span></sc-if>
+                  <sc-if value="{{b.isMedia}}" hint-placeholder-val="{{ false }}">
+                    <div class="media {{b.mediaCls}}" style="width: 220px; height: 150px; border-radius: 20px">
+                      <img src="{{b.src}}" alt="{{b.alt}}">
+                      <span class="media-tag">{{b.tag}}</span>
+                      <sc-if value="{{b.hidden}}" hint-placeholder-val="{{ true }}"><button class="media-cover" onClick="{{b.reveal}}" style="font-size: 13px">Tap to view video</button></sc-if>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{b.isText}}" hint-placeholder-val="{{ true }}">
+                    <div class="ib-btext" style="padding: 11px 14px; border-radius: {{b.radius}}; background: {{b.bg}}; color: {{b.ink}}; border: 1px {{b.border}}; font-size: 15px; line-height: 1.4; font-style: {{b.style}}">{{b.text}}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{typing}}" hint-placeholder-val="{{ false }}">
+                <div aria-label="typing" style="align-self: flex-start; padding: 12px 16px; border-radius: 20px 20px 20px 6px; background: var(--card2); display: flex; gap: 5px">
+                  <span class="blink" style="width: 7px; height: 7px; border-radius: 50%; background: var(--ink)"></span><span class="blink2" style="width: 7px; height: 7px; border-radius: 50%; background: var(--ink)"></span><span class="blink3" style="width: 7px; height: 7px; border-radius: 50%; background: var(--ink)"></span>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{chatSelMode}}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 10px 12px 14px; border-top: 1px solid var(--line)">
+                <div class="row" style="gap: 8px">
+                  <button class="icon-btn tap" onClick="{{cancelChatSel}}" aria-label="Cancel selection" style="width: 38px; height: 38px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+                  <b style="flex: 1; font-size: 15px">{{chatSelCount}}</b>
+                </div>
+                <div class="ib-acts" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+                  <a href="ShareStudio.dc.html" onClick="{{chatStash}}" class="ib-act cta tap" style="opacity: {{chatShareOp}}; pointer-events: {{chatSharePe}}">Edit in studio</a>
+                  <button class="ib-act tap" onClick="{{chatQuick}}" disabled="{{chatNoPublic}}">Post theirs</button>
+                  <button class="ib-act bad tap" onClick="{{chatDelete}}" disabled="{{chatNone}}">Delete for me</button>
+                </div>
+                <p class="muted" style="margin-top: 8px; font-size: 12px">Your own messages go to friends in the app only, never to public stories.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{notChatSel}}" hint-placeholder-val="{{ true }}">
+            <div class="row" style="gap: 8px; padding: 10px 12px 14px; border-top: 1px solid var(--line)">
+              <label class="icon-btn tap" aria-label="Attach photo or video" style="width: 52px; height: 52px; cursor: pointer"><input type="file" accept="image/*,video/*" onChange="{{attachChat}}" class="sr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="m21 16-5-5-9 8"></path></svg></label>
+              <label for="chat-input" class="sr">Reply anonymously</label>
+              <input id="chat-input" class="field" value="{{draft}}" onChange="{{onDraft}}" placeholder="Reply anonymously…" style="flex: 1; min-width: 0">
+              <button class="icon-btn tap" onClick="{{sendReply}}" aria-label="Send" style="width: 52px; height: 52px; border: 0; background: var(--cta); color: #ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg></button>
+            </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{itemMenuOpen}}" hint-placeholder-val="{{ false }}">
+      <div class="ib-menu-wrap"><button class="ib-menu-scrim" onClick="{{closeMenu}}" aria-label="Close menu"></button>
+        <div class="ib-menu" role="menu">
+          <sc-for list="{{itemMenuItems}}" as="mi" hint-placeholder-count="3"><button role="menuitem" class="tap {{mi.cls}}" onClick="{{mi.go}}"><span aria-hidden="true">{{mi.icon}}</span>{{mi.label}}</button></sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+</div>
+
+  <nav class="{{navClass}}" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">{{unread}}</span></a>
+    <a href="Create.dc.html" class="fab" aria-label="Create link"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+
+
+  <sc-if value="{{report}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Report this message">
+        <sc-if value="{{notReported}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="font-size: 22px">Why are you reporting this?</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 14px; line-height: 1.45">{{reportIntro}}</p>
+            <div class="warn-steps" style="margin-top: 12px" aria-label="{{selWarns}} of 4 reports">
+              <sc-for list="{{steps}}" as="st" hint-placeholder-count="4"><span style="background: {{st.c}}"></span></sc-for>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px">
+              <sc-for list="{{reasons}}" as="r" hint-placeholder-count="7"><button class="reason tap" onClick="{{r.pick}}" aria-pressed="{{r.on}}">{{r.label}}</button></sc-for>
+              <button class="reason tap" onClick="{{pickOther}}" aria-pressed="{{otherOn}}" style="border-style: dashed; color: var(--pink)">Other reason</button>
+            </div>
+            <button class="btn btn-ghost btn-sm" onClick="{{shuffle}}" style="border: 0; margin-top: 6px; color: var(--muted)">Show different reasons</button>
+            <sc-if value="{{otherOn}}" hint-placeholder-val="{{ false }}">
+              <textarea class="field" value="{{otherText}}" onChange="{{onOther}}" placeholder="Tell us what happened" aria-label="Other reason" style="min-height: 80px; margin-top: 6px"></textarea>
+            </sc-if>
+            <button class="btn btn-ink btn-lg btn-block tap" onClick="{{submitReport}}" disabled="{{cantReport}}" style="margin-top: 14px">Report</button>
+            <button class="btn btn-ghost btn-block" onClick="{{closeReport}}" style="margin-top: 6px; border: 0">Cancel</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{reported}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center; padding: 6px 0">
+            <img class="pop" src="{{resultIcon}}" alt="" style="width: 64px; height: 64px">
+            <h2 style="font-size: 22px; margin-top: 8px">{{resultTitle}}</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 14.5px; line-height: 1.5">{{resultBody}}</p>
+            <div class="card" style="margin-top: 12px; padding: 12px 14px; text-align: left; background: var(--card2)">
+              <div class="muted" style="font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">What they see</div>
+              <p style="margin-top: 6px; font-size: 14px; line-height: 1.45">{{resultPreview}}</p>
+            </div>
+            <div class="row" style="gap: 8px; margin-top: 14px">
+              <sc-if value="{{justBlocked}}" hint-placeholder-val="{{ false }}"><button class="btn btn-lg tap" onClick="{{undoBlockClose}}" style="flex: 1">Undo block</button></sc-if>
+              <button class="btn btn-ink btn-lg tap" onClick="{{closeReport}}" style="flex: 1">Done</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{delOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Delete">
+        <h2 style="font-size: 22px">{{delTitle}}</h2>
+        <p class="muted" style="margin-top: 6px; font-size: 14.5px; line-height: 1.5">{{delBody}}</p>
+        <button class="btn btn-lg btn-block tap" onClick="{{confirmDel}}" style="margin-top: 14px; background: #c4213a; color: #ffffff; border: 0">Delete</button>
+        <button class="btn btn-ghost btn-block" onClick="{{cancelDel}}" style="margin-top: 6px; border: 0">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{quickOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Post">
+        <sc-if value="{{quickPick}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div class="row"><h2 style="flex: 1; font-size: 21px">{{quickTitle}}</h2><button class="icon-btn tap" onClick="{{closeQuick}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+            <p class="muted" style="margin-top: 4px; font-size: 13.5px">{{quickSub}}</p>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+              <sc-for list="{{quickDests}}" as="qd" hint-placeholder-count="4"><button class="btn btn-lg tap" onClick="{{qd.go}}" style="background: {{qd.bg}}; color: {{qd.ink}}; border: 0">{{qd.name}}</button></sc-for>
+            </div>
+            <a href="ShareStudio.dc.html" onClick="{{bulkStashFromQuick}}" class="btn btn-ghost btn-block tap" style="margin-top: 10px; border: 0">Edit the cards first</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{quickRun}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="font-size: 21px">{{quickRunTitle}}</h2>
+            <div style="margin-top: 10px; max-height: 260px; overflow-y: auto">
+              <sc-for list="{{quickSteps}}" as="qs" hint-placeholder-count="4">
+                <div class="row" style="gap: 10px; padding: 7px 0; font-size: 14px"><span style="width: 28px; height: 28px; border-radius: 10px; display: grid; place-items: center; flex: none; font-weight: 800; background: {{qs.bg}}; color: {{qs.ink}}">{{qs.mark}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{qs.label}}</span></div>
+              </sc-for>
+            </div>
+            <sc-if value="{{quickDone}}" hint-placeholder-val="{{ false }}"><div class="ad" style="width: 100%; max-width: 320px; height: 100px; margin: 12px auto 0"><b>Banner ad</b>320 × 100 · after posting</div></sc-if>
+            <button class="btn btn-ink btn-lg btn-block tap" onClick="{{closeQuick}}" style="margin-top: 12px">{{quickBtn}}</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{hintSheet}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Unlock a hint">
+        <sc-if value="{{hintOffer}}" hint-placeholder-val="{{ true }}">
+          <div style="text-align: center">
+            <img class="pop" src="/_blob/7356090e8cd14d77123c7e2f69c92dcb" alt="" style="width: 64px; height: 64px">
+            <h2 style="font-size: 22px; margin-top: 8px">Unlock a hint</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 14.5px; line-height: 1.5">Watch a short ad and we’ll show one vague clue about who sent this. Never a name, number or exact place.</p>
+            <button class="btn btn-cta btn-lg btn-block tap" onClick="{{startHint}}" style="margin-top: 16px">Watch ad · 5 sec</button>
+            <button class="btn btn-ghost btn-block" onClick="{{closeHint}}" style="margin-top: 6px; border: 0">Not now</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{hintWatching}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="ad" style="height: 210px; margin: 0; border-radius: 18px"><b>Rewarded video ad</b>{{hintAdText}}</div>
+            <div style="height: 6px; border-radius: 6px; background: var(--card2); margin-top: 12px; overflow: hidden"><span style="display: block; height: 100%; width: {{hintPct}}; background: var(--cta); transition: width 1s linear"></span></div>
+            <button class="btn btn-ghost btn-block" onClick="{{closeHint}}" style="margin-top: 8px; border: 0">Skip ad and lose the hint</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{hintDone}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center">
+            <img class="pop" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 64px; height: 64px">
+            <h2 style="font-size: 22px; margin-top: 8px">Here’s your hint</h2>
+            <div class="card" style="margin-top: 12px; padding: 16px; font-size: 18px; font-weight: 800; background: var(--card2)">{{hintText}}</div>
+            <p class="muted" style="margin-top: 10px; font-size: 13px; line-height: 1.45">Hints are rough on purpose: city, device type and time of day.</p>
+            <button class="btn btn-ink btn-lg btn-block tap" onClick="{{closeHint}}" style="margin-top: 14px">Done</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><img src="{{toastIcon}}" alt="" style="width: 34px; height: 34px; flex: none"><span style="font-size: 14px; line-height: 1.35"><b>{{toastTitle}}</b><br><span class="muted">{{toastSub}}</span></span></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"startOpen":{"editor":null},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    var E = { fox: '/_blob/a1feeb887ae498080201d5cedfa0036a', moon: '/_blob/1df7299954a782c5de8338339634a8e6' };
+    this.state = {
+      mode: m || props.mode || 'dark', filter: 'all', openId: props.startOpen || null, share: false, draft: '', typing: false, toast: null,
+      shown: {}, page: 0, selMode: false, chosen: {}, archived: {}, menu: null, del: null, quick: null, chatSel: false, chatChosen: {}, deletedBubbles: {}, ama: {}, hints: {}, hint: null, hintT: 0, report: false, result: null, picked: null, other: false, otherText: '', seed: 3,
+      items: [
+        { id: 'm0', kind: 'one', link: 'describe', text: 'Funny · Loyal · Chaotic', ago: '2m', left: '23h', pct: 0.96, unread: true, warns: 0, acct: false, replyOk: false },
+        { id: 'm5', kind: 'one', link: 'confess', text: 'I need to say this before we graduate, and I can’t say it to your face. Remember the departmental dinner in 300L, when NEPA took the light and everybody started screaming? I was the one holding your hand. You thought it was Tunde. I let you think that, and I have regretted it every single day since. I watched you laugh about it with him the next morning and I just smiled like a mumu. I tried to stop liking you after that. I joined a different reading group. I muted your status for two whole weeks. It didn’t work. Every time you post a sunset, I check who viewed it before me like a crazy person. I’m not telling you this so you’ll like me back. I know you’re talking to someone, and I hope he treats you well. I’m telling you because you once said nobody ever notices you. That’s not true. Somebody noticed everything: the way you hum when you’re reading, how you always give away the last piece of chin chin, how you remember everybody’s birthday. You are not invisible. You never were. Okay. That’s it. Please don’t try to guess.', ago: '1m', left: '24h', pct: 0.99, unread: true, warns: 0, acct: true, replyOk: true },
+        { id: 'q1', kind: 'one', link: 'quiz', text: 'You know me so well it’s scary', quiz: { score: 4, rank: 2, rows: [['What’s my go-to food?', 'Suya', ''], ['Where am I on a Friday night?', 'In bed by 10', ''], ['What’s my love language?', 'Gifts', 'Quality time'], ['Who’s my celebrity crush?', 'Rema', ''], ['What annoys me the most?', 'Late replies', '']] }, ago: '9m', left: '23h', pct: 0.95, unread: true, warns: 0, acct: true, replyOk: true },
+        { id: 't1', kind: 'chat', link: 'describe', who: 'Fox', av: E.fox, avBg: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', ago: '14m', left: '21h', pct: 0.88, unread: true, warns: 3, acct: true,
+          thread: [{ me: false, text: 'Describe you? Funny, loyal, and lowkey a menace.' }, { me: true, text: 'lowkey?? be serious' }, { me: false, media: 'video' }, { gone: true }, { me: false, text: 'ok but who do you keep posting on your story?' }] },
+        { id: 'p1', kind: 'one', link: 'custom', media: 'photo', text: 'saw this and thought of you', ago: '40m', left: '22h', pct: 0.92, unread: true, warns: 1, acct: true, replyOk: true },
+        { id: 'm4', kind: 'one', link: 'describe', text: 'Smart · Calm · Ludo', ago: '50m', left: '22h', pct: 0.9, unread: false, warns: 0, acct: false, replyOk: false },
+        { id: 'a1', kind: 'one', link: 'ama', text: 'What’s the most spontaneous thing you’ve ever done?', ago: '55m', left: '22h', pct: 0.9, unread: true, warns: 0, acct: false, replyOk: false },
+        { id: 'm2', kind: 'one', link: 'rate', rate: 9, cat: 'Overall', text: 'Minus one for always being late.', ago: '1h', left: '20h', pct: 0.83, unread: false, warns: 0, acct: true, replyOk: true },
+        { id: 't2', kind: 'chat', link: 'rate', who: 'Moon', av: E.moon, avBg: 'linear-gradient(135deg,#7f8cff,#2b2f7a)', ago: '3h', left: '18h', pct: 0.75, unread: false, warns: 0, acct: true,
+          thread: [{ me: false, text: 'Can I tell you something in person one day?' }, { me: true, text: 'depends. is it good or bad' }, { me: false, text: 'good. very good. ok bye' }] },
+        { id: 'm3', kind: 'one', link: 'confess', text: 'I copied your assignment in 200L and I am still sorry. Not just once, the whole semester. You stayed up doing it and I just changed the font. When you got a B and I got an A, I wanted to tell you so many times, but I was scared you would hate me. You helped me pass and you didn’t even know it. If you ever need anything, I owe you, for real.', ago: '5h', left: '6h', pct: 0.25, unread: false, warns: 0, acct: true, replyOk: true }
+      ]
+    };
+  }
+  cats() {
+    return ['Abusive', 'Harassment', 'Bullying', 'Insults', 'Threats', 'Intimidation', 'Hate speech', 'Racism', 'Tribalism', 'Religious hate', 'Sexism', 'Body shaming', 'Disability mockery', 'Sexual content', 'Unwanted nudity', 'Explicit photo', 'Explicit video', 'Non-consensual image', 'Unwanted advances', 'Creepy or inappropriate', 'Grooming concern', 'Underage concern', 'Stalking', 'Doxxing / private info', 'Exposing secrets', 'Blackmail', 'Extortion', 'Impersonation', 'Scam', 'Fraud', 'Phishing link', 'Malware link', 'Spam', 'Flooding', 'Advertising', 'Selling things', 'Gambling promo', 'Drugs', 'Weapons', 'Violence', 'Graphic gore', 'Self-harm', 'Suicide talk', 'Misinformation', 'False rumour', 'Defamation', 'Trolling', 'Mocking', 'Profanity', 'Other harmful'];
+  }
+  pickRandom(seed) {
+    var all = this.cats().slice(), out = [], n = 5 + (seed * 7) % 6, x = seed * 9301 + 49297;
+    while (out.length < n && all.length) { x = (x * 9301 + 49297) % 233280; out.push(all.splice(Math.floor(x / 233280 * all.length), 1)[0]); }
+    return out;
+  }
+  warning(cat, n, who) {
+    var T = ['Your message to @peach was reported as “' + cat + '”.', '@peach flagged something you sent as “' + cat + '”.', 'Heads up: a message you sent was marked “' + cat + '” by the person who got it.', 'A message you sent to @peach was reported for “' + cat + '”.'];
+    var S = n >= 3 ? [' This is your last warning. One more report and you can’t message them again.'] : [' This is warning ' + n + ' of 3.', ' ' + (3 - n) + ' more warnings and the next report blocks you from messaging them.', ' Keep it respectful.'];
+    return T[(n + cat.length) % T.length] + S[cat.length % S.length];
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.t1 = setTimeout(function () {
+      var fresh = { id: 'm9', kind: 'one', link: 'rate', rate: 10, cat: 'Vibe', text: 'I will not be explaining.', ago: 'now', left: '24h', pct: 1, unread: true, fresh: true, warns: 0, acct: false, replyOk: false };
+      self.setState({ items: [fresh].concat(self.state.items), toast: 'msg' });
+    }, 3000);
+    this.t2 = setTimeout(function () { if (self.state.toast === 'msg') self.setState({ toast: null }); }, 7600);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.ht); clearInterval(this.qt); clearTimeout(this.lp); clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); clearTimeout(this.t4); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  flash(kind) { var self = this; this.setState({ toast: kind }); clearTimeout(this.t4); this.t4 = setTimeout(function () { self.setState({ toast: null }); }, 4300); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var GHOST = '/_blob/facd9191837d9eba7e7cedf471a11301';
+    var L = { describe: { title: 'Describe me in 3 words', th: 'th-sunset' }, quiz: { title: 'How well do you know me?', th: 'th-ocean' }, rate: { title: 'Rate me 1–10', th: 'th-midnight' }, confess: { title: 'Confess something', th: 'th-bubblegum' }, ama: { title: 'Ask me anything', th: 'th-neon' }, custom: { title: 'Tell me something', th: 'th-default' } };
+    // long text reads as the same cards Share studio posts: each one filled to the brim, carrying on in the next
+    var split = function (t, max) {
+      var out = [], rest = (t || '').trim();
+      while (rest.length > max) {
+        var cut = -1;
+        for (var i = max; i >= Math.floor(max * 0.92); i--) { if (/[.!?]/.test(rest.charAt(i - 1)) && rest.charAt(i) === ' ') { cut = i; break; } }
+        if (cut < 0) cut = rest.lastIndexOf(' ', max);
+        if (cut <= 0) cut = max;
+        out.push(rest.slice(0, cut).trim()); rest = rest.slice(cut).trim();
+      }
+      if (rest) out.push(rest);
+      if (out.length > 1 && out[out.length - 1].length < max * 0.3) {
+        var both = out.splice(out.length - 2, 2).join(' '), mid = both.indexOf(' ', Math.floor(both.length / 2));
+        if (mid < 0) mid = Math.floor(both.length / 2);
+        out.push(both.slice(0, mid).trim(), both.slice(mid).trim());
+      }
+      return out;
+    };
+    var shareText = function (m) {
+      if (m.quiz) return 'Someone scored ' + m.quiz.score + '/5 on my quiz' + (m.text ? '. “' + m.text + '”' : '');
+      if (m.rate) return m.rate + '/10' + (m.text ? '. ' + m.text : '');
+      if (m.link === 'ama' && s.ama[m.id] && s.ama[m.id].trim()) return 'Q: ' + m.text + ' A: ' + s.ama[m.id].trim();
+      return m.text;
+    };
+    var HINTS = ['Lagos · Android · late at night', 'Abuja · iPhone · this afternoon', 'Ibadan · Android · early morning', 'Port Harcourt · iPhone · around midnight', 'Somewhere near you · Android · this evening'];
+    var hintOf = function (id) { var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 997; return HINTS[h % HINTS.length]; };
+    var line = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
+    var inArchive = s.filter === 'archived';
+    var shown = s.items.filter(function (m) {
+      if (inArchive) return !!s.archived[m.id];
+      if (s.archived[m.id]) return false;
+      if (s.filter === 'unread') return m.unread;
+      if (s.filter === 'chats') return m.kind === 'chat';
+      if (s.filter === 'blocked') return m.warns >= 4;
+      return true;
+    });
+    var counter = 0;
+    // hand the chosen message(s) to the Share studio board
+    var stashOf = function (list) { return function () { try { window.localStorage.setItem('sk-share', JSON.stringify(list)); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }; };
+    function decorate(m) {
+      var link = L[m.link], isOpen = s.openId === m.id, blocked = m.warns >= 4;
+      var last = m.kind === 'chat' ? m.thread[m.thread.length - 1] : null;
+      var preview = m.kind === 'chat' ? (last.gone ? 'Message disappeared' : last.from ? last.from : (last.media ? (last.me ? 'You sent a ' : '') + (last.media === 'video' ? '▶ Video' : '📷 Photo') : (last.me ? 'You: ' : '') + last.text)) : (m.quiz ? 'Scored ' + m.quiz.score + '/5 on your quiz' : m.rate ? m.rate + '/10 · ' + (m.text || m.cat) : m.media ? '📷 Photo · ' + m.text : m.text);
+      return {
+        who: m.kind === 'chat' ? m.who : 'Anonymous', kindLabel: m.kind === 'chat' ? '· chat' : '',
+        av: m.kind === 'chat' ? m.av : GHOST, avBg: m.kind === 'chat' ? m.avBg : '', avCls: m.kind === 'chat' ? '' : link.th,
+        preview: preview, italic: 'normal', weight: m.unread ? 800 : 500,
+        ago: m.ago, left: m.left, unread: m.unread,
+        blocked: blocked, warned: m.warns > 0 && !blocked, warnLabel: m.warns + '/3 warned', op: blocked ? 0.6 : 1,
+        dash: (m.pct * 56.5).toFixed(1), ringC: m.pct < 0.3 ? '#ff8a3d' : '#ff3b8d', ringBg: line,
+        bg: s.selMode && s.chosen[m.id] ? (dark ? 'rgba(255,59,141,.14)' : 'rgba(216,27,114,.1)') : isOpen ? (dark ? '#241930' : '#e3deeb') : 'transparent', line: (s.selMode && s.chosen[m.id]) || isOpen ? '#ff3b8d' : 'transparent',
+        freshCls: m.fresh ? 'fresh' : '',
+        open: function () {
+          var items = s.items.map(function (x) { return x.id === m.id ? Object.assign({}, x, { unread: false, fresh: false }) : x; });
+          self.setState({ openId: m.id, items: items, share: false, draft: '', page: 0, chatSel: false, chatChosen: {} });
+        },
+        selMode: s.selMode, chosenStr: s.chosen[m.id] ? 'true' : 'false', chkCls: s.chosen[m.id] ? 'on' : '',
+        // hold to select (or right-click); once selecting, a tap adds or removes
+        press: function () { clearTimeout(self.lp); self.held = false; self.lp = setTimeout(function () { self.held = true; try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {} var c = Object.assign({}, self.state.chosen); c[m.id] = true; self.setState({ selMode: true, chosen: c }); }, 450); },
+        release: function () { clearTimeout(self.lp); },
+        ctx: function (e) { if (e && e.preventDefault) e.preventDefault(); clearTimeout(self.lp); self.held = true; var c = Object.assign({}, s.chosen); c[m.id] = true; self.setState({ selMode: true, chosen: c }); },
+        tap: function () {
+          if (self.held) { self.held = false; return; }
+          if (s.selMode) { var c = Object.assign({}, s.chosen); if (c[m.id]) delete c[m.id]; else c[m.id] = true; self.setState({ chosen: c }); return; }
+          var items = s.items.map(function (x) { return x.id === m.id ? Object.assign({}, x, { unread: false, fresh: false }) : x; });
+          self.setState({ openId: m.id, items: items, share: false, draft: '', page: 0, chatSel: false, chatChosen: {} });
+        },
+        topic: link.title, th: link.th, textQuoted: '“' + m.text + '”',
+        mediaTag: m.media === 'photo' ? 'Photo' : '',
+        sub: m.kind === 'chat' ? 'Anonymous chat · from ' + link.title : 'On ' + link.title,
+        canShare: m.kind === 'one',
+        stash: stashOf([{ id: m.id, topic: link.title, th: link.th.replace('th-', ''), text: shareText(m) }])
+      };
+    }
+    var groups = ['quiz', 'describe', 'rate', 'confess', 'ama', 'custom'].map(function (k) {
+      var its = shown.filter(function (m) { return m.link === k; }).map(function (m) { var d = decorate(m); counter++; d.adAfter = counter % 5 === 0; return d; });
+      return { title: L[k].title, th: L[k].th, n: its.length, items: its };
+    }).filter(function (g) { return g.n > 0; });
+    var selRaw = s.items.filter(function (m) { return m.id === s.openId; })[0];
+    var sel = selRaw ? decorate(selRaw) : { stash: function () {}, who: '', sub: '', av: GHOST, avBg: '', avCls: '', th: '', topic: '', textQuoted: '', ago: '', left: '', mediaTag: '' };
+    var thread = selRaw && selRaw.kind === 'chat' ? selRaw.thread.map(function (b, i) {
+      var key = selRaw.id + ':' + i;
+      if (b.media) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: true, isText: false, align: b.me ? 'flex-end' : 'flex-start', src: b.url && b.media === 'photo' ? b.url : '/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2', alt: b.media === 'video' ? 'Video sent in chat' : 'Photo sent in chat', tag: b.media === 'video' ? (b.me ? '▶ Your video' : '▶ 0:12') : 'Photo', mediaCls: b.me || s.shown[key] ? '' : 'blur', hidden: !b.me && !s.shown[key], reveal: function () { var o = Object.assign({}, s.shown); o[key] = true; self.setState({ shown: o }); } };
+      if (b.from) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: false, isText: true, text: 'Their message: “' + b.from + '”', align: 'stretch', bg: 'transparent', ink: dark ? '#e9dff0' : '#3a3046', border: 'dashed ' + line, radius: '18px', style: 'italic' };
+      if (b.gone) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: false, isText: true, text: 'Message disappeared', align: 'center', bg: 'transparent', ink: dark ? '#bcaec2' : '#665e74', border: 'dashed ' + line, radius: '99px', style: 'italic' };
+      var bsel = s.chatChosen[key], pickB = function () { var c = Object.assign({}, self.state.chatChosen); if (c[key]) delete c[key]; else c[key] = true; self.setState({ chatChosen: c }); };
+      var selVals = { selCls: (b.me ? 'mine' : 'theirs') + (bsel ? ' chosen' : ''), showChk: s.chatSel, chkCls: bsel ? 'on' : '',
+        press: function () { clearTimeout(self.lp); self.held = false; self.lp = setTimeout(function () { self.held = true; var c = Object.assign({}, self.state.chatChosen); c[key] = true; self.setState({ chatSel: true, chatChosen: c }); }, 450); },
+        release: function () { clearTimeout(self.lp); },
+        ctx: function (e) { if (e && e.preventDefault) e.preventDefault(); clearTimeout(self.lp); self.held = true; var c = Object.assign({}, s.chatChosen); c[key] = true; self.setState({ chatSel: true, chatChosen: c }); },
+        tap: function () { if (self.held) { self.held = false; return; } if (s.chatSel) pickB(); } };
+      var bStash = stashOf([{ id: key, topic: b.me ? 'Your reply to ' + selRaw.who : 'Chat · ' + selRaw.who, th: 'default', text: b.text, own: !!b.me }]);
+      return Object.assign(selVals, b.me ? { canShare: false, inApp: true, stash: bStash, isMedia: false, isText: true, text: b.text, align: 'flex-end', bg: '#d81b72', ink: '#ffffff', border: 'solid transparent', radius: '20px 20px 6px 20px', style: 'normal' }
+        : { canShare: true, inApp: false, stash: bStash, isMedia: false, isText: true, text: b.text, align: 'flex-start', bg: dark ? '#241930' : '#e3deeb', ink: dark ? '#fbf6fa' : '#211a2c', border: 'solid ' + line, radius: '20px 20px 20px 6px', style: 'normal' });
+    }).filter(function (x, i) { return !s.deletedBubbles[selRaw.id + ':' + i]; }) : [];
+    var open = !!selRaw;
+    var chosenIds = shown.filter(function (m) { return !!s.chosen[m.id]; }).map(function (m) { return m.id; });
+    var allChosen = shown.length > 0 && chosenIds.length === shown.length;
+    var archCount = Object.keys(s.archived).filter(function (id) { return s.archived[id] && s.items.some(function (x) { return x.id === id; }); }).length;
+    var delOneChat = !!s.del && s.del.ids.length === 1 && s.items.some(function (x) { return x.id === s.del.ids[0] && x.kind === 'chat'; });
+    // what a selection shares: whole messages, and the other person's words from chats (never your own words in public)
+    var shareList = [];
+    chosenIds.forEach(function (id) {
+      var m = s.items.filter(function (x) { return x.id === id; })[0]; if (!m) return;
+      if (m.kind === 'one') shareList.push({ id: m.id, topic: L[m.link].title, th: L[m.link].th.replace('th-', ''), text: shareText(m) });
+      else m.thread.forEach(function (b, i) { if (!b.me && b.text) shareList.push({ id: m.id + ':' + i, topic: 'Chat · ' + m.who, th: 'default', text: b.text }); });
+    });
+    var chatKeys = selRaw && selRaw.kind === 'chat' ? Object.keys(s.chatChosen).filter(function (k) { return s.chatChosen[k] && !s.deletedBubbles[k]; }) : [];
+    var chatList = chatKeys.map(function (k) { var b = selRaw.thread[Number(k.split(':').pop())]; return { id: k, topic: b.me ? 'Your reply to ' + selRaw.who : 'Chat · ' + selRaw.who, th: 'default', text: b.text, own: !!b.me }; });
+    var chatPublic = chatList.filter(function (x) { return !x.own; });
+    var quickCards = [];
+    (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 390); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
+    var pages = open && selRaw.kind === 'one' && !selRaw.quiz && !selRaw.rate ? split(selRaw.text, 390) : [];
+    var pg = Math.min(s.page, Math.max(0, pages.length - 1));
+    var w = selRaw ? selRaw.warns : 0;
+    var r = s.result;
+    var who = selRaw ? (selRaw.kind === 'chat' ? selRaw.who : 'This sender') : '';
+    var resultTitle = '', resultBody = '', resultPreview = '', resultIcon = '/_blob/727ac58e5046d6eefbb35427eff3c1df';
+    if (r) {
+      if (r.support) { resultTitle = 'We sent them support'; resultBody = 'Reports about self-harm don’t give warnings. The sender gets a private message with free help-lines instead.'; resultPreview = 'Someone who got your message is worried about you. You are not alone. Free, confidential help: [HELP-LINE NUMBER].'; resultIcon = '/_blob/7f21763178926824d8503ff516f73544'; }
+      else if (r.n >= 4) { resultTitle = who + ' is blocked from you'; resultBody = 'That was report 4. They can’t send you anything anymore. You can undo this any time in Settings › Safety.'; resultPreview = 'You can no longer message @peach. Your messages were reported 4 times.'; resultIcon = '/_blob/a689d835be296ffdce1f9d9fc18a844f'; }
+      else { resultTitle = 'Warning ' + r.n + ' of 3 sent'; resultBody = (selRaw && selRaw.acct ? who + ' gets a warning notification now.' : 'They don’t have an account, so the warning shows on their device next time they open your link.') + ' ' + (r.n === 3 ? 'One more report blocks them from you.' : (4 - r.n) + ' more reports block them from you.'); resultPreview = self.warning(r.cat, r.n); }
+    }
+    var reasons = this.pickRandom(s.seed);
+    var support = ['Self-harm', 'Suicide talk'];
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      unread: s.items.filter(function (m) { return m.unread; }).length,
+      // bulk selection
+      inArchive: inArchive, notArchive: !inArchive, listTitle: inArchive ? 'Archived' : 'Inbox',
+      archiveNote: 'Archived messages stay here until they disappear. Hold one to bring it back.',
+      leaveArchive: function () { self.setState({ filter: 'all', selMode: false, chosen: {} }); },
+      showHoldTip: !s.selMode && !inArchive,
+      listEmpty: groups.length === 0, emptyTitle: inArchive ? 'Nothing archived' : 'No messages here', emptyBody: inArchive ? 'Hold messages in your inbox and tap Archive to tuck them away.' : 'Try another filter.',
+      selMode: s.selMode, selCount: chosenIds.length + ' selected', noneChosen: chosenIds.length === 0,
+      selAllLabel: allChosen ? 'Clear' : 'Select all',
+      selectAll: function () { var c = {}; if (!allChosen) shown.forEach(function (m) { c[m.id] = true; }); self.setState({ chosen: c }); },
+      cancelSel: function () { self.setState({ selMode: false, chosen: {} }); },
+      noShare: shareList.length === 0, noShareStr: shareList.length === 0 ? 'true' : 'false', shareOp: shareList.length ? 1 : 0.4, sharePe: shareList.length ? 'auto' : 'none',
+      bulkStash: function () { stashOf(shareList)(); self.setState({ selMode: false, chosen: {} }); },
+      bulkStashFromQuick: function () { stashOf(s.quick ? s.quick.list : shareList)(); self.setState({ selMode: false, chosen: {}, quick: null }); },
+      archiveWord: inArchive ? 'Unarchive' : 'Archive',
+      bulkArchive: function () {
+        var a = Object.assign({}, s.archived); chosenIds.forEach(function (id) { if (inArchive) delete a[id]; else a[id] = true; });
+        var n = chosenIds.length, open = chosenIds.indexOf(s.openId) >= 0;
+        self.setState({ archived: a, selMode: false, chosen: {}, openId: open ? null : s.openId, toast: { t: inArchive ? n + ' back in your inbox' : n + ' archived', s: inArchive ? 'They’re in the inbox again.' : 'Find them in ⋮ › Archived.', i: '/_blob/727ac58e5046d6eefbb35427eff3c1df' } });
+        clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3600);
+      },
+      bulkDelete: function () { self.setState({ del: { ids: chosenIds.slice() } }); },
+      // menus
+      listMenuOpen: s.menu === 'list', itemMenuOpen: s.menu === 'item',
+      openListMenu: function () { self.setState({ menu: 'list' }); }, openItemMenu: function () { self.setState({ menu: 'item' }); },
+      closeMenu: function () { self.setState({ menu: null }); },
+      listMenuItems: [
+        { icon: '☑', label: 'Select messages', cls: '', go: function () { self.setState({ menu: null, selMode: true, chosen: {} }); } },
+        { icon: '🗄', label: inArchive ? 'Back to inbox' : 'Archived (' + archCount + ')', cls: '', go: function () { self.setState({ menu: null, filter: inArchive ? 'all' : 'archived', selMode: false, chosen: {} }); } },
+        { icon: '✓', label: 'Mark all as read', cls: '', go: function () { self.setState({ menu: null, items: s.items.map(function (x) { return Object.assign({}, x, { unread: false, fresh: false }); }) }); } }
+      ],
+      itemMenuItems: !selRaw ? [] : [].concat(selRaw.kind === 'chat' ? [{ icon: '☑', label: 'Select messages', cls: '', go: function () { self.setState({ menu: null, chatSel: true, chatChosen: {} }); } }] : [], [
+        { icon: '🗄', label: s.archived[selRaw.id] ? 'Unarchive' : (selRaw.kind === 'chat' ? 'Archive chat' : 'Archive'), cls: '', go: function () {
+          var a = Object.assign({}, s.archived), was = !!a[selRaw.id]; if (was) delete a[selRaw.id]; else a[selRaw.id] = true;
+          self.setState({ menu: null, archived: a, openId: was ? s.openId : null, toast: { t: was ? 'Back in your inbox' : 'Archived', s: was ? '' : 'Find it in ⋮ › Archived.', i: '/_blob/727ac58e5046d6eefbb35427eff3c1df' } });
+          clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3200);
+        } },
+        { icon: '🗑', label: selRaw.kind === 'chat' ? 'Delete chat' : 'Delete', cls: 'bad', go: function () { self.setState({ menu: null, del: { ids: [selRaw.id] } }); } },
+        { icon: '⚑', label: 'Report', cls: 'bad', go: function () { self.setState({ menu: null, report: true, result: null, picked: null, other: false, otherText: '', seed: s.seed + 1 }); } }
+      ]),
+      // delete
+      delOpen: !!s.del, delTitle: s.del ? (s.del.ids.length === 1 ? (delOneChat ? 'Delete this chat?' : 'Delete this message?') : 'Delete ' + s.del.ids.length + ' messages?') : '',
+      delBody: 'It’s gone for you right away. You can’t undo this. Reports you made still count.',
+      cancelDel: function () { self.setState({ del: null }); },
+      confirmDel: function () {
+        var ids = s.del.ids, n = ids.length;
+        self.setState({ items: s.items.filter(function (x) { return ids.indexOf(x.id) < 0; }), del: null, selMode: false, chosen: {}, openId: ids.indexOf(s.openId) >= 0 ? null : s.openId, toast: { t: n === 1 ? 'Deleted' : n + ' deleted', s: '', i: '/_blob/727ac58e5046d6eefbb35427eff3c1df' } });
+        clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 2800);
+      },
+      // quick post (no editing): pick where, then the cards go out in order
+      quickOpen: !!s.quick, quickPick: !!s.quick && !s.quick.dest, quickRun: !!s.quick && !!s.quick.dest,
+      openQuick: function () { if (shareList.length) self.setState({ quick: { list: shareList } }); },
+      closeQuick: function () { clearInterval(self.qt); var done = s.quick && s.quick.dest && s.quick.k >= quickCards.length; self.setState(done ? { quick: null, selMode: false, chosen: {}, chatSel: false, chatChosen: {} } : { quick: null }); },
+      quickTitle: s.quick ? 'Post ' + quickCards.length + ' card' + (quickCards.length === 1 ? '' : 's') : '',
+      quickSub: s.quick ? 'From ' + s.quick.list.length + ' message' + (s.quick.list.length === 1 ? '' : 's') + ', in order, with their own colours. Long ones become several cards.' : '',
+      quickDests: [['WhatsApp Status', '#25d366', '#0b2a1c'], ['Instagram story', 'linear-gradient(135deg,#7a2ff7,#d81b72 55%,#f29b38)', '#ffffff'], ['Snapchat', '#fffc00', '#111111'], ['Save images', 'var(--card)', 'var(--ink)']].map(function (d) {
+        return { name: d[0], bg: d[1], ink: d[2], go: function () {
+          var n = quickCards.length; self.setState({ quick: Object.assign({}, s.quick, { dest: d[0], k: 0 }) }); clearInterval(self.qt);
+          self.qt = setInterval(function () { var q = self.state.quick; if (!q) { clearInterval(self.qt); return; } var k = q.k + 1; self.setState({ quick: Object.assign({}, q, { k: k }) }); if (k >= n) clearInterval(self.qt); }, 700);
+        } };
+      }),
+      quickRunTitle: s.quick && s.quick.dest ? (s.quick.k >= quickCards.length ? 'Posted to ' + s.quick.dest + ' ✓' : 'Posting to ' + s.quick.dest + '…') : '',
+      quickSteps: quickCards.map(function (c, i) { var k = s.quick ? s.quick.k || 0 : 0, done = i < k; return { mark: done ? '✓' : i + 1, label: c, bg: done ? '#5be0a0' : 'var(--card2)', ink: done ? '#0b2a1c' : 'var(--ink)' }; }),
+      quickDone: !!s.quick && !!s.quick.dest && s.quick.k >= quickCards.length,
+      quickBtn: s.quick && s.quick.dest && s.quick.k >= quickCards.length ? 'Done' : 'Stop',
+      // chat selection
+      chatSelMode: !!selRaw && selRaw.kind === 'chat' && s.chatSel, notChatSel: !(selRaw && selRaw.kind === 'chat' && s.chatSel),
+      chatSelCount: chatKeys.length + ' selected', chatNone: chatKeys.length === 0,
+      cancelChatSel: function () { self.setState({ chatSel: false, chatChosen: {} }); },
+      chatShareOp: chatList.length ? 1 : 0.4, chatSharePe: chatList.length ? 'auto' : 'none',
+      chatStash: function () { stashOf(chatList)(); self.setState({ chatSel: false, chatChosen: {} }); },
+      chatNoPublic: chatPublic.length === 0,
+      chatQuick: function () { if (chatPublic.length) self.setState({ quick: { list: chatPublic } }); },
+      chatDelete: function () { var d = Object.assign({}, s.deletedBubbles); chatKeys.forEach(function (k) { d[k] = true; }); self.setState({ deletedBubbles: d, chatSel: false, chatChosen: {} }); },
+      filters: [['all', 'All'], ['unread', 'Unread'], ['chats', 'Chats'], ['blocked', 'Blocked']].map(function (f) { var a = s.filter === f[0]; return { label: f[1], on: a ? 'true' : 'false', cls: a ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
+      groups: groups,
+      listClass: open ? 'ib-list hide' : 'ib-list', detailClass: open ? 'ib-detail open' : 'ib-detail', navClass: open || s.selMode ? 'bnav hide' : 'bnav',
+      empty: !open, hasSel: open, sel: sel,
+      selOne: open && selRaw.kind === 'one', selChat: open && selRaw.kind === 'chat',
+      selPlain: open && !selRaw.quiz && !selRaw.rate, selRate: open && !!selRaw.rate, selQuiz: open && !!selRaw.quiz, selAma: open && selRaw.link === 'ama',
+      pageText: pages.length ? (pg === 0 ? '“' : /[.!?]$/.test(pages[pg - 1]) ? '' : '…') + pages[pg] + (pg === pages.length - 1 ? '”' : /[.!?]$/.test(pages[pg]) ? '' : '…') : '',
+      pageCls: pages.length && (pages.length > 1 || pages[0].length > 150) ? '' : 'd', pageW: pages.length && (pages.length > 1 || pages[0].length > 150) ? 700 : 800,
+      pageLs: pages.length && (pages.length > 1 || pages[0].length > 150) ? '0' : '-.02em', pageLh: pages.length && (pages.length > 1 || pages[0].length > 150) ? 1.45 : 1.16,
+      pageFs: pages.length && (pages.length > 1 || pages[0].length > 150) ? 'clamp(16px, 2.6cqi, 19px)' : !pages.length ? '24px' : pages[pg].length > 120 ? 'clamp(18px, 3cqi, 22px)' : pages[pg].length > 60 ? 'clamp(21px, 3.6cqi, 27px)' : 'clamp(24px, 4.4cqi, 34px)',
+      selPaged: pages.length > 1, pageCount: pages.length, pageNo: (pg + 1) + ' / ' + pages.length,
+      pageDots: pages.map(function (x, i) { return { w: i === pg ? '22px' : '7px', c: i === pg ? 'currentColor' : 'rgba(255,255,255,.45)' }; }),
+      atFirst: pg === 0, atLast: pg >= pages.length - 1, prevOp: pg === 0 ? 0.4 : 1, nextOp: pg >= pages.length - 1 ? 0.4 : 1,
+      pagePrev: function () { if (pg > 0) self.setState({ page: pg - 1 }); }, pageNext: function () { if (pg < pages.length - 1) self.setState({ page: pg + 1 }); },
+      rateN: open && selRaw.rate ? selRaw.rate : '', rateCat: open && selRaw.cat ? selRaw.cat : '', rateWhy: open ? selRaw.text || '' : '', hasRateWhy: open && !!selRaw.text,
+      rateEmoji: open && selRaw.rate >= 9 ? '/_blob/ea3a1403d8fe6d1943450cfacf059348' : open && selRaw.rate >= 6 ? '/_blob/9fa11a307ccc8cbf33b563a8df193335' : '/_blob/443a0e236b2f6d9e6870ebdebbb40c6a',
+      quizScore: open && selRaw.quiz ? selRaw.quiz.score + '/5' : '', quizRankText: open && selRaw.quiz ? '#' + selRaw.quiz.rank + ' on your leaderboard' : '',
+      quizVerdict: open && selRaw.quiz ? ['Do they even know you?', 'Basically strangers', 'Casual friend', 'Real friend', 'Close friend', 'Bestie level'][selRaw.quiz.score] : '',
+      quizRows: open && selRaw.quiz ? selRaw.quiz.rows.map(function (r) { var ok = !r[2]; return { q: r[0], a: r[1], fix: ok ? '' : ' · right answer: ' + r[2], mark: ok ? '✓' : '✗', bg: ok ? '#5be0a0' : '#ff8b98' }; }) : [],
+      hasQuizNote: open && !!selRaw.quiz && !!selRaw.text, quizNoteText: open && selRaw.text ? 'Their note: “' + selRaw.text + '”' : '',
+      amaAnswer: open ? (s.ama[selRaw.id] || '') : '', onAma: function (e) { var o = Object.assign({}, s.ama); o[selRaw.id] = e.target.value.slice(0, 200); self.setState({ ama: o }); },
+      shareStash: open ? stashOf([{ id: selRaw.id, topic: L[selRaw.link].title, th: L[selRaw.link].th.replace('th-', ''), text: shareText(selRaw) }]) : function () {},
+      shareLabel: !open ? '' : pages.length > 1 ? 'Share all ' + pages.length + ' cards to my story' : selRaw.link === 'ama' ? (s.ama[selRaw.id] && s.ama[selRaw.id].trim() ? 'Share question & answer' : 'Share the question') : 'Share to my story',
+      canReply: open && !!selRaw.replyOk, noReply: open && selRaw.kind === 'one' && !selRaw.replyOk,
+      replyLabel: open && selRaw.chatId ? 'Open your chat' : 'Reply privately',
+      replyPrivately: function () {
+        if (!selRaw || !selRaw.replyOk) return;
+        if (selRaw.chatId) { self.setState({ openId: selRaw.chatId, draft: '' }); return; }
+        var NAMES = [['Owl', '/_blob/9fa11a307ccc8cbf33b563a8df193335', 'linear-gradient(135deg,#7ef0c1,#1f8a70)'], ['Peach', '/_blob/1fb2cbc919646a3a048411532a08bd4c', 'linear-gradient(135deg,#ffc3a0,#ff6f91)'], ['Ghost', '/_blob/facd9191837d9eba7e7cedf471a11301', 'linear-gradient(135deg,#b78bff,#5a2ea6)']];
+        var nm = NAMES[s.items.length % NAMES.length], cid = 'c-' + selRaw.id;
+        var from = selRaw.quiz ? 'Scored ' + selRaw.quiz.score + '/5 on your quiz' + (selRaw.text ? '. ' + selRaw.text : '') : selRaw.rate ? selRaw.rate + '/10. ' + (selRaw.text || '') : selRaw.text;
+        var chat = { id: cid, kind: 'chat', link: selRaw.link, who: nm[0], av: nm[1], avBg: nm[2], ago: 'now', left: '24h', pct: 1, unread: false, warns: selRaw.warns, acct: true, started: true, thread: [{ from: from }] };
+        var items = s.items.map(function (x) { return x.id === selRaw.id ? Object.assign({}, x, { chatId: cid }) : x; });
+        self.setState({ items: [chat].concat(items), openId: cid, draft: '', toast: { t: 'Private chat started', s: 'You’re both anonymous. Say something first.', i: '/_blob/bc985c2646b53f3f52fc0ab10fcb6269' } });
+        clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3600);
+      },
+      chatIntro: open && selRaw.started ? 'You started this chat from their message. You two are anonymous to each other, forever.' : 'You two are anonymous to each other, forever. Messages disappear 1 day after they are sent.',
+      attachChat: function (e) {
+        var f = e && e.target && e.target.files && e.target.files[0]; if (!f || !selRaw) return;
+        var url = ''; try { url = URL.createObjectURL(f); } catch (x) {}
+        var kind = f.type && f.type.indexOf('video') === 0 ? 'video' : 'photo', id = selRaw.id;
+        self.setState({ items: s.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: true, media: kind, url: url }]) }) : x; }) });
+        try { e.target.value = ''; } catch (x) {}
+      },
+      hintBtn: open && s.hints[selRaw.id] ? 'Hint ✓' : 'Hint',
+      hintLocked: open && !s.hints[selRaw.id], hintUnlocked: open && !!s.hints[selRaw.id], hintText: open ? hintOf(selRaw.id) : '',
+      hintSheet: !!s.hint, hintOffer: s.hint === 'offer', hintWatching: s.hint === 'watching', hintDone: s.hint === 'done',
+      hintAdText: 'full screen · ' + s.hintT + 's left', hintPct: ((5 - s.hintT) / 5 * 100) + '%',
+      openHint: function () { if (!selRaw) return; self.setState({ hint: s.hints[selRaw.id] ? 'done' : 'offer' }); },
+      startHint: function () {
+        var id = selRaw.id; self.setState({ hint: 'watching', hintT: 5 }); clearInterval(self.ht);
+        self.ht = setInterval(function () { var t = self.state.hintT - 1; if (t <= 0) { clearInterval(self.ht); var h = Object.assign({}, self.state.hints); h[id] = true; self.setState({ hintT: 0, hint: 'done', hints: h }); } else self.setState({ hintT: t }); }, 1000);
+      },
+      closeHint: function () { clearInterval(self.ht); self.setState({ hint: null, hintT: 0 }); },
+      selBlocked: open && w >= 4,
+      selHasMedia: open && !!selRaw.media,
+      mediaHidden: open && !s.shown[s.openId], mediaCls: open && s.shown[s.openId] ? '' : 'blur',
+      revealMedia: function () { var o = Object.assign({}, s.shown); o[s.openId] = true; self.setState({ shown: o }); },
+      undoBlock: function () { self.setState({ items: s.items.map(function (x) { return x.id === s.openId ? Object.assign({}, x, { warns: 3 }) : x; }) }); self.flash('undo'); },
+      thread: thread, typing: s.typing, draft: s.draft,
+      onDraft: function (e) { self.setState({ draft: e.target.value }); },
+      sendReply: function () {
+        var t = s.draft.trim(); if (!t || !selRaw) return;
+        var id = selRaw.id;
+        self.setState({ items: s.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: true, text: t }]) }) : x; }), draft: '', typing: true });
+        clearTimeout(self.t3);
+        self.t3 = setTimeout(function () {
+          self.setState({ items: self.state.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: false, text: 'haha okay, fair. not telling you yet' }]) }) : x; }), typing: false });
+        }, 1900);
+      },
+      share: s.share, openShare: function () { self.setState({ share: true }); }, closeShare: function () { self.setState({ share: false }); },
+      close: function () { self.setState({ openId: null, share: false }); },
+      report: s.report, reported: !!r, notReported: !r,
+      selWarns: w,
+      reportIntro: w >= 4 ? 'This sender is already blocked from you.' : (selRaw && selRaw.acct ? who + ' gets a warning for each report. ' : 'This sender has no account; warnings stay on their device. ') + 'Reports so far: ' + w + ' of 4.',
+      steps: [1, 2, 3, 4].map(function (i) { return { c: i <= w ? (i === 4 ? '#c4213a' : '#ffb020') : line }; }),
+      reasons: reasons.map(function (c) { var on = s.picked === c && !s.other; return { label: c, on: on ? 'true' : 'false', pick: function () { self.setState({ picked: c, other: false }); } }; }),
+      otherOn: s.other, pickOther: function () { self.setState({ other: true, picked: null }); },
+      otherText: s.otherText, onOther: function (e) { self.setState({ otherText: e.target.value }); },
+      shuffle: function () { self.setState({ seed: s.seed + 1, picked: null }); },
+      cantReport: !(s.picked || (s.other && s.otherText.trim().length > 3)),
+      submitReport: function () {
+        var cat = s.other ? 'Other: ' + s.otherText.trim() : s.picked;
+        if (support.indexOf(cat) >= 0) { self.setState({ result: { support: true, cat: cat } }); return; }
+        var n = Math.min(4, w + 1);
+        self.setState({ items: s.items.map(function (x) { return x.id === s.openId ? Object.assign({}, x, { warns: n }) : x; }), result: { n: n, cat: cat } });
+      },
+      resultTitle: resultTitle, resultBody: resultBody, resultPreview: resultPreview, resultIcon: resultIcon,
+      justBlocked: !!(r && r.n >= 4),
+      undoBlockClose: function () { self.setState({ items: s.items.map(function (x) { return x.id === s.openId ? Object.assign({}, x, { warns: 3 }) : x; }), report: false, result: null }); self.flash('undo'); },
+      openReport: function () { self.setState({ report: true, result: null, picked: null, other: false, otherText: '', seed: s.seed + 1 }); },
+      closeReport: function () { self.setState({ report: false, result: null }); },
+      toast: !!s.toast,
+      toastTitle: s.toast && s.toast.t ? s.toast.t : s.toast === 'undo' ? 'Block removed' : 'Someone sent you a message',
+      toastSub: s.toast && s.toast.t ? s.toast.s : s.toast === 'undo' ? 'They can message you again. One more report blocks them again.' : 'on Rate me 1–10 · just now',
+      toastIcon: s.toast && s.toast.t ? s.toast.i : s.toast === 'undo' ? '/_blob/727ac58e5046d6eefbb35427eff3c1df' : '/_blob/ee2791bdeac805bec379541426d39014'
+    };
+  }
+}
+</script>
+</body>
+</html>

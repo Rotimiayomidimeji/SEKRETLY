@@ -1,2 +1,7 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default async function CreateTypePage({ params }: { params: Promise<{ type: string }> }) { const { type } = await params; return <FoundationPage title={`Create a ${type.replaceAll("-", " ")}.`} description="This route is powered by the shared interaction configuration and will connect to the composer in Phase 2." />; }
+import { redirect } from "next/navigation";
+
+// Old address shape (/create/know-me); Create link now takes the topic as ?topic=.
+export default async function CreateTypePage({ params }: PageProps<"/create/[type]">) {
+  const { type } = await params;
+  redirect("/create?topic=" + encodeURIComponent(type));
+}

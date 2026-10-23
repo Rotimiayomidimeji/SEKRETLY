@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Safety and Community Rules</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <nav class="pub-nav" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <div class="pub-links">
+      <a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a><a href="Safety.dc.html" aria-current="page">Safety</a><a href="About.dc.html">About</a><a href="Help.dc.html">Help</a><a href="Contact.dc.html">Contact</a>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        <span>{{modeWord}}</span>
+      </button>
+      <a href="Signup.dc.html" class="btn btn-cta">Get your link</a>
+      <button class="icon-btn pub-menu tap" onClick="{{toggleDrawer}}" aria-label="Open menu" aria-expanded="{{drawerOpen}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="pdr {{drawerCls}}">
+    <div class="pdr-scrim" onClick="{{toggleDrawer}}"></div>
+    <aside class="pdr-panel" role="dialog" aria-label="Menu" aria-hidden="{{drawerHidden}}">
+      <div class="pdr-head">
+        <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <button class="icon-btn tap" onClick="{{toggleDrawer}}" aria-label="Close menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <nav aria-label="Site" style="display: flex; flex-direction: column; gap: 3px">
+        <a href="Landing.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+        <a href="Landing.dc.html#how" class="nav-i" onClick="{{jumpHow}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>How it works</a>
+        <a href="Landing.dc.html#games" class="nav-i" onClick="{{jumpGames}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+        <a href="Safety.dc.html" class="nav-i" aria-current="page" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>Safety</a>
+        <a href="About.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>About</a>
+        <a href="Help.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"></path></svg>Help & FAQ</a>
+        <a href="Contact.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Contact</a>
+      </nav>
+      <div class="pdr-foot">
+        <button class="mode-btn tap" onClick="{{toggleMode}}" style="justify-content: center">Switch to {{modeWord}} mode</button>
+        <a href="Login.dc.html" class="btn btn-block tap">Sign in</a>
+        <a href="Signup.dc.html" class="btn btn-cta btn-block tap">Get your link</a>
+      </div>
+    </aside>
+  </div>
+
+
+  <header style="background: var(--hero); padding: 64px 0 52px">
+    <div class="pub-wrap" style="display: flex; flex-wrap: wrap; gap: 24px 48px; align-items: center">
+      <div style="flex: 1 1 460px; min-width: 0">
+        <p style="font-size: 12.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase" class="pink">Safety center</p>
+        <h1 style="margin-top: 12px; font-size: clamp(40px, 6.4cqi, 76px); line-height: .95; font-weight: 800">Unknown doesn’t mean uncontrolled.</h1>
+        <p class="muted" style="margin-top: 16px; font-size: 18px; line-height: 1.55; max-width: 44ch">Sekretly doesn’t censor words. People can send what they want, but whoever receives it is in control. Here is how that works.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px">
+          <a href="#tools" class="chip">Your tools</a><a href="#rules" class="chip">Community rules</a><a href="#strikes" class="chip">Strikes</a><a href="#help" class="chip">Get help</a>
+        </div>
+      </div>
+      <img class="float" src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 150px; height: 150px; flex: none">
+    </div>
+  </header>
+
+  <main class="pub-wrap">
+    <section id="tools" style="padding-top: 56px">
+      <h2 style="font-size: clamp(30px, 4cqi, 44px)">Your safety tools</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 18px">
+        <sc-for list="{{tools}}" as="t" hint-placeholder-count="8">
+          <article class="card" style="padding: 20px">
+            <span class="pill">{{t.tag}}</span>
+            <h3 style="margin-top: 12px; font-size: 19px">{{t.title}}</h3>
+            <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.55">{{t.body}}</p>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="rules" style="padding-top: 64px; display: flex; flex-wrap: wrap; gap: 32px 56px">
+      <div style="flex: 1 1 320px; min-width: 0">
+        <h2 style="font-size: clamp(30px, 4cqi, 44px)">Community rules</h2>
+        <p class="muted" style="margin-top: 10px; font-size: 16px; line-height: 1.55; max-width: 34ch">Nothing is filtered before it sends. These are the kinds of things people report, and reports are what lead to warnings and blocks.</p>
+      </div>
+      <ol style="flex: 999 1 560px; min-width: 0; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{rules}}" as="r" hint-placeholder-count="10">
+          <li class="card" style="padding: 16px 18px; display: flex; gap: 16px; align-items: flex-start">
+            <span class="d pink" style="font-size: 22px; font-weight: 800; width: 34px; flex: none">{{r.n}}</span>
+            <span><b style="display: block; font-size: 16.5px">{{r.title}}</b><span class="muted" style="font-size: 14.5px; line-height: 1.5">{{r.body}}</span></span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+
+    <section id="strikes" style="padding-top: 64px">
+      <h2 style="font-size: clamp(30px, 4cqi, 44px)">How reports work</h2>
+      <p class="muted" style="margin-top: 10px; font-size: 16px; max-width: 62ch; line-height: 1.55">Warnings count per person. If you get reported by one friend, it doesn’t affect what you send anyone else. The person who blocked you can undo it any time. Serious reports (threats, self-harm, anything involving minors) also go to our team.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 18px">
+        <sc-for list="{{strikes}}" as="k" hint-placeholder-count="3">
+          <div class="card" style="padding: 20px; border-top: 6px solid {{k.c}}">
+            <div class="d" style="font-size: 40px; font-weight: 800; color: {{k.c}}">{{k.n}}</div>
+            <h3 style="font-size: 19px; margin-top: 4px">{{k.title}}</h3>
+            <p class="muted" style="margin-top: 6px; font-size: 14.5px; line-height: 1.5">{{k.body}}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="help" style="padding-top: 64px">
+      <div class="card" style="padding: 26px; display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: center; border-color: var(--bad)">
+        <div style="flex: 1 1 380px; min-width: 0">
+          <h2 style="font-size: 28px">Need help right now?</h2>
+          <p class="muted" style="margin-top: 8px; font-size: 16px; line-height: 1.55">If you or someone else is in danger, call 112. If you are thinking about hurting yourself, please talk to someone: [HELP-LINE NAME] on [HELP-LINE NUMBER], free and confidential.</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a href="Contact.dc.html" class="btn btn-cta btn-lg">Contact our safety team</a>
+          <a href="Help.dc.html" class="btn btn-lg">Help &amp; FAQ</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ft">
+    <div class="ft-in">
+      <div class="ft-top">
+        <div class="ft-brand">
+          <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word" style="color: var(--ink)">Sekretly</span></a>
+          <p>Built for the things you almost said. Anonymous messages and party games, made in Nigeria.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-sm tap">Get your link</a>
+        </div>
+        <div class="ft-cols">
+          <div class="ft-col"><b>Product</b><a href="Signup.dc.html">Create a link</a><a href="Landing.dc.html#games" onClick="{{jumpGames}}">Games</a><a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a></div>
+          <div class="ft-col"><b>Company</b><a href="About.dc.html">About</a><a href="Contact.dc.html">Contact</a><a href="Help.dc.html">Help &amp; FAQ</a></div>
+          <div class="ft-col"><b>Safety</b><a href="Safety.dc.html">Safety center</a><a href="Safety.dc.html">Community rules</a><a href="Safety.dc.html">Report a problem</a></div>
+          <div class="ft-col"><b>Legal</b><a href="Legal.dc.html">Privacy policy</a><a href="Legal.dc.html">Terms of use</a><a href="Legal.dc.html">Cookies &amp; ads</a></div>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 Sekretly · 16+ only</span>
+        <span>Say it. Stay unknown.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1280,"height":2100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, dark = this.state.mode !== 'light';
+    var rules = [
+      ['Be kind, even when honest', 'Honest is fine. Cruel is not. Say it the way you would want to hear it.'],
+      ['No bullying or harassment', 'No targeting, mocking or pile-ons. No sending the same person message after message.'],
+      ['No hate', 'Nothing that attacks people for their ethnicity, religion, gender, sexuality, disability or where they are from.'],
+      ['No sexual content', 'No sexual messages, images or dares. Sekretly is 16+, not adults-only.'],
+      ['No threats or violence', 'No threats, even as a joke. We report credible threats to the police.'],
+      ['No exposing people', 'Never share someone’s phone number, address, photos or secrets without their consent.'],
+      ['No spam or scams', 'No advertising, links to scams, or fake giveaways.'],
+      ['No pretending', 'Do not pretend to be Sekretly staff, or a specific real person.'],
+      ['Safe dares only', 'No dares that are dangerous, illegal, or that put someone else at risk.'],
+      ['16 and older only', 'If you are under 16, you cannot use Sekretly. Accounts that lie about age are removed.']
+    ];
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      drawerCls: self.state.drawer ? 'is-open' : '', drawerOpen: self.state.drawer ? 'true' : 'false', drawerHidden: self.state.drawer ? 'false' : 'true',
+      toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
+      jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
+      jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      tools: [
+        { tag: 'One tap', title: 'Report with a reason', body: 'Every message, chat and game player has a Report button. Pick from our list of reasons, or write your own.' },
+        { tag: 'Automatic', title: 'Senders get warned', body: 'Each report sends the sender a warning that says why. They know exactly what crossed the line.' },
+        { tag: 'Automatic', title: '4th report blocks them', body: 'After 3 warnings, your next report blocks that sender from messaging you. Undo it whenever you like.' },
+        { tag: 'You control', title: 'Photos and videos blurred', body: 'Anything sent to you anonymously starts blurred. You decide whether to look.' },
+        { tag: 'You control', title: 'Your hidden words', body: 'Add words you never want to see. Messages with them arrive covered until you tap.' },
+        { tag: 'You control', title: 'Pause or reset links', body: 'Pause a link when it gets too much. Reset makes every old link stop working for good.' },
+        { tag: 'You control', title: 'Who can reach you', body: 'Turn off two-way chats, or stop people without an account from messaging you.' },
+        { tag: 'Support', title: 'Self-harm support', body: 'Report a message about self-harm and the sender gets free help-lines instead of a warning.' }
+      ],
+      rules: rules.map(function (r, i) { return { n: (i + 1 < 10 ? '0' : '') + (i + 1), title: r[0], body: r[1] }; }),
+      strikes: [
+        { n: '1', c: '#ffc048', title: 'First warning', body: 'The sender gets a notification saying their message was reported, and why.' },
+        { n: '2', c: '#ff9a3d', title: 'Second warning', body: 'Another report from the same person, another warning.' },
+        { n: '3', c: '#ff7a45', title: 'Last warning', body: 'They are told one more report will block them from this person.' },
+        { n: '4', c: '#ff4f6d', title: 'Blocked from you', body: 'The 4th report blocks them from messaging you. You can undo it any time.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

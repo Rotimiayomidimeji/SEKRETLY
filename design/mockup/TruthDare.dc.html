@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Truth or Dare</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.gr-wrap{max-width:1180px;margin:0 auto;padding:10px 14px 18px}
+.gr-top{display:flex;align-items:center;gap:10px;padding:2px 0 10px}
+.gr-grid{display:flex;flex-direction:column;gap:12px}
+@container (min-width:900px){.gr-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}.gr-panel{position:sticky;top:12px}}
+/* turn order strip: who went, who is up now, who is next */
+.gr-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+.gr-strip::-webkit-scrollbar{display:none}
+.gr-tk{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;width:50px;font-size:10px;font-weight:800;color:var(--muted);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.gr-tk i{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:14px;color:#1a0b14;position:relative;transition:box-shadow .3s,opacity .3s}
+.gr-tk.done i{opacity:.4}
+.gr-tk.done i::after{content:"✓";position:absolute;right:-4px;bottom:-4px;width:16px;height:16px;border-radius:50%;background:#5be0a0;color:#0b2a1c;font-size:10px;display:grid;place-items:center}
+.gr-tk.now{transform:scale(1.12);color:var(--ink)}
+.gr-tk.now i{box-shadow:0 0 0 3px var(--bg),0 0 0 6px #ff3b8d,0 0 22px rgba(255,59,141,.6)}
+.gr-tk.next{color:var(--ink)}
+.gr-tk.next i{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--line)}
+.gr-tk.out i{filter:grayscale(1);opacity:.35}
+/* the banner that says whose turn it is */
+.gr-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;margin-bottom:14px;color:#ffffff}
+.gr-banner .av{width:42px;height:42px;border-radius:50%;color:#1a0b14;font-weight:800;font-size:17px;flex:none}
+.gr-banner b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:20px;line-height:1.05;letter-spacing:-.01em}
+.gr-banner span{font-size:13px;opacity:.9}
+.gr-pulse{animation:grPulse 1.4s ease-in-out infinite}
+@keyframes grPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,141,.55)}50%{box-shadow:0 0 0 10px rgba(255,59,141,0)}}
+.gr-panel{border-radius:26px;background:var(--card);border:2px solid var(--line);padding:14px;min-height:240px;transition:border-color .4s,box-shadow .4s}
+.gr-panel.is-me{border-color:#ff3b8d;box-shadow:0 0 0 4px rgba(255,59,141,.14),0 20px 50px rgba(216,27,114,.25)}
+.gr-k{font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.gr-q{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(22px,5.4cqi,30px);font-weight:800;line-height:1.08;letter-spacing:-.02em;margin-top:6px}
+/* cards to pick from */
+.gr-cards{display:grid;gap:8px;margin-top:12px}
+.gr-card{position:relative;text-align:left;border-radius:18px;border:2px solid var(--line);background:var(--card2);color:var(--ink);padding:12px 14px 12px 18px;font-weight:700;font-size:15.5px;line-height:1.3;min-height:64px;overflow:hidden;transition:transform .25s cubic-bezier(.3,1.6,.5,1),border-color .2s;animation:grDeal .5s cubic-bezier(.3,1.4,.5,1) both}
+.gr-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--sp)}
+.gr-card:hover{transform:translateY(-2px);border-color:var(--sp)}
+.gr-card:active{transform:scale(.97)}
+.gr-card:nth-child(2){animation-delay:.08s}.gr-card:nth-child(3){animation-delay:.16s}
+@keyframes grDeal{from{opacity:0;transform:translateY(16px) rotate(-3deg)}}
+.gr-backs{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.gr-backs span{width:64px;height:88px;border-radius:12px;background:repeating-linear-gradient(45deg,#7a3cff 0 8px,#d81b72 8px 16px);box-shadow:0 8px 18px rgba(0,0,0,.3);animation:grShuffle 1.2s ease-in-out infinite}
+.gr-backs span:nth-child(2){animation-delay:.2s}.gr-backs span:nth-child(3){animation-delay:.4s}
+@keyframes grShuffle{50%{transform:translateY(-10px) rotate(4deg)}}
+.gr-opts{margin-top:14px}
+.gr-opts--two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gr-opts--scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.gr-opts--grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.gr-opts--list{display:flex;flex-direction:column;gap:8px}
+.gr-opt{position:relative;min-height:86px;border-radius:20px;border:2px solid;font-weight:800;font-size:15.5px;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 8px;text-align:center;transition:transform .2s cubic-bezier(.3,1.6,.5,1),box-shadow .25s,opacity .25s}
+.gr-opt img{width:34px;height:34px}
+.gr-opt small{font-size:11.5px;font-weight:700;opacity:.8}
+.gr-opt:active{transform:scale(.94)}
+.gr-opt[aria-pressed="true"]{box-shadow:0 0 0 4px rgba(255,255,255,.18),0 12px 30px rgba(0,0,0,.3);transform:translateY(-2px)}
+.gr-opts--scale .gr-opt{min-height:80px;font-size:11px;padding:6px 2px}
+.gr-opts--scale .gr-opt img{width:28px;height:28px}
+.gr-opts--grid .gr-opt{min-height:70px;font-size:13.5px}
+.gr-opts--list .gr-opt{min-height:54px;flex-direction:row;justify-content:flex-start;padding:0 16px;font-size:15px;text-align:left}
+.gr-dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.gr-dots span{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;color:#1a0b14;transition:opacity .3s,transform .3s}
+.gr-bars{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.gr-bar{position:relative;min-height:44px;border-radius:14px;background:var(--card2);overflow:hidden;display:flex;align-items:center;padding:0 12px;gap:8px;font-weight:800;font-size:14px}
+.gr-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:14px;opacity:.85;animation:grGrow 1.2s cubic-bezier(.3,1.2,.5,1) both;transform-origin:left}
+.gr-bar span,.gr-bar b{position:relative}
+.gr-bar b{margin-left:auto}
+@keyframes grGrow{from{transform:scaleX(0)}}
+.gr-tug{display:flex;height:52px;border-radius:16px;overflow:hidden;margin-top:12px;font-weight:800}
+.gr-tug span{display:grid;place-items:center;color:#0b0812;animation:grGrow 1.2s cubic-bezier(.3,1.2,.5,1) both;white-space:nowrap;overflow:hidden}
+.gr-res{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;margin-top:12px}
+.gr-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border-radius:16px;background:var(--card2);font-size:13.5px;font-weight:700}
+.gr-next .av{width:30px;height:30px;border-radius:50%;color:#1a0b14;font-weight:800;font-size:13px}
+.gr-react{display:flex;gap:6px}
+.gr-react button{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0}
+.gr-react img{width:26px;height:26px}
+.gr-mark{display:block;text-align:center;font-size:12px;font-weight:800;color:#ffd23d;text-shadow:0 0 12px rgba(255,210,61,.9);animation:grBounce .9s ease-in-out infinite;margin-bottom:2px}
+@keyframes grBounce{50%{transform:translateY(-7px)}}
+.gr-count{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:92px;font-weight:800;line-height:1;color:#fff;text-shadow:0 0 40px rgba(255,59,141,.85);animation:grBeat 1s cubic-bezier(.3,1.6,.5,1) infinite}
+@keyframes grBeat{0%{transform:scale(1.6);opacity:0}30%{transform:scale(1);opacity:1}}
+.gr-dock{position:sticky;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:8px;padding:10px 12px 16px;background:var(--nav);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);flex-wrap:wrap}
+.gr-over{position:fixed;inset:0;z-index:40;overflow-y:auto;background:var(--bg);animation:fade .4s both}
+.gr-xp{height:14px;border-radius:99px;background:var(--card2);overflow:hidden}
+.gr-xp span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffd23d,#ff3b8d,#7a3cff);animation:grXp 1.6s cubic-bezier(.3,1.1,.5,1) .4s both}
+@keyframes grXp{from{width:38%}}
+.gr-award{display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;background:var(--card);border:1px solid var(--line);animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.gr-award img{width:40px;height:40px;flex:none}
+.gr-pause{position:absolute;inset:0;z-index:7;display:grid;place-items:center;background:rgba(8,5,12,.55);backdrop-filter:blur(4px);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:28px;font-weight:800}
+.gr-rank{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.gr-rank:last-child{border-bottom:0}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+  <div class="gr-wrap">
+    <header class="gr-top">
+      <button class="icon-btn tap" onClick="{{openLeave}}" aria-label="Leave game"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+      <img src="{{g.icon}}" alt="" style="width: 34px; height: 34px; flex: none">
+      <div style="flex: 1; min-width: 0"><b class="d" style="font-size: 17px; display: block; line-height: 1.1">{{g.name}}</b><span class="muted" style="font-size: 12.5px">{{turnLine}}</span></div>
+      <button class="btn btn-sm tap" onClick="{{openTable}}" style="padding: 0 12px">Table</button>
+      <svg width="44" height="44" viewBox="0 0 46 46" role="img" aria-label="{{secs}} seconds left" style="flex: none"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--line)" stroke-width="4"></circle><circle cx="23" cy="23" r="19" fill="none" stroke="{{ringColor}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{ringDash}} 120" transform="rotate(-90 23 23)"></circle><text x="23" y="28" text-anchor="middle" font-size="14" font-weight="800" fill="currentColor">{{secsShown}}</text></svg>
+    </header>
+
+    <div class="gr-strip" aria-label="Turn order">
+      <sc-for list="{{strip}}" as="st" hint-placeholder-count="6"><span class="gr-tk {{st.cls}}"><i style="background: {{st.color}}">{{st.initial}}</i>{{st.label}}</span></sc-for>
+    </div>
+
+    <div class="gr-grid">
+      <section class="g3" aria-label="Game table" onPointerDown="{{orbStart}}" onPointerMove="{{orbMove}}" onPointerUp="{{orbEnd}}" onPointerLeave="{{orbEnd}}">
+        <div class="g3-sky" style="background: {{sc.sky}}"></div>
+        <div class="g3-glow" style="background: {{sc.glow}}"></div>
+        <div class="g3-hud"><span class="g3-chip">{{turnChip}}</span><span class="g3-chip" style="background: {{spiceBg}}">{{spiceChip}}</span></div>
+        <div class="g3-cam">
+          <div class="g3-floor" style="background-image: {{sc.floor}}"></div>
+          <div class="g3-table" style="background: {{sc.table}}">
+            <sc-if value="{{isWyr}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div class="g3-half" style="background: linear-gradient(90deg,rgba(255,59,141,.75),rgba(255,59,141,.2) 50%,transparent 50%)"><b style="left: 18%">A</b></div>
+                <div class="g3-half" style="background: linear-gradient(270deg,rgba(34,225,255,.75),rgba(34,225,255,.2) 50%,transparent 50%)"><b style="right: 18%">B</b></div>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{isTod}}" hint-placeholder-val="{{ false }}"><img class="g3-bottle" src="/_blob/dabc1dc3b2ca85f511896f5fe287b1b4" alt="" style="--spin: {{spin}}"></sc-if>
+          <div class="g3-at" style="transform: translate3d(0, 40px, 0)">
+            <div class="g3-bb">
+              <sc-if value="{{showCount}}" hint-placeholder-val="{{ false }}"><div class="gr-count" style="margin-bottom: 18px">{{countNum}}</div></sc-if>
+              <sc-if value="{{showHolo}}" hint-placeholder-val="{{ true }}">
+                <div class="g3-holo g3-flip" style="margin-bottom: 14px"><img src="{{holoIcon}}" alt="" style="width: 26px; height: 26px"><b>{{holoTitle}}</b><span style="font-size: 11px; font-weight: 700; opacity: .85">{{holoSub}}</span></div>
+              </sc-if>
+              <sc-if value="{{showThermo}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 26px"><span class="g3-chip">{{thermoLabel}}</span><div class="g3-thermo"><div class="g3-merc" style="height: {{mercury}}"></div></div></div>
+              </sc-if>
+              <sc-if value="{{showCols}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: flex-end; gap: 10px; margin-bottom: 18px">
+                  <sc-for list="{{cols}}" as="cl" hint-placeholder-count="3">
+                    <div style="display: flex; flex-direction: column; align-items: center"><span class="g3-colcap">{{cl.cap}}</span><div class="g3-col" style="height: {{cl.h}}; background: {{cl.color}}"></div><span class="g3-colcap" style="margin: 4px 0 0; max-width: 60px; overflow: hidden; text-overflow: ellipsis">{{cl.label}}</span></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <sc-for list="{{cupsets}}" as="cs" hint-placeholder-count="6">
+            <div class="g3-at" style="transform: translate3d({{cs.x}}px, {{cs.y}}px, 0)"><div class="g3-bb"><div class="g3-cups"><sc-for list="{{cs.cups}}" as="cu" hint-placeholder-count="3"><img class="{{cu.cls}}" src="/_blob/4dbcd3e70d8c26a321fd47093a0e9f1f" alt=""></sc-for></div></div></div>
+          </sc-for>
+          <sc-for list="{{seats}}" as="p" hint-placeholder-count="6">
+            <div class="g3-at" style="transform: translate3d({{p.x}}px, {{p.y}}px, 0)">
+              <div class="g3-shadow"></div>
+              <div class="g3-bb">
+                <sc-if value="{{p.spot}}" hint-placeholder-val="{{ false }}"><div class="g3-spot" style="position: absolute; left: 50%; bottom: -10px; translate: -50% 0"></div></sc-if>
+                <div class="g3-fig {{p.cls}}">
+                  <sc-if value="{{p.turn}}" hint-placeholder-val="{{ false }}"><span class="gr-mark">▼ TURN</span></sc-if>
+                  <sc-if value="{{p.crown}}" hint-placeholder-val="{{ false }}"><img class="g3-crown" src="/_blob/886899060459eafd6bc4284897539947" alt="Crown"></sc-if>
+                  <sc-if value="{{p.hasToken}}" hint-placeholder-val="{{ false }}"><img class="pop" src="{{p.token}}" alt="" style="width: 32px; height: 32px; margin-bottom: 2px"></sc-if>
+                  <sc-if value="{{p.hasPop}}" hint-placeholder-val="{{ false }}"><span class="g3-pop" style="font-weight: 800; font-size: 15px; color: {{p.popColor}}; text-shadow: 0 2px 6px rgba(0,0,0,.6)">{{p.pop}}</span></sc-if>
+                  <span class="g3-name" style="background: {{p.tagBg}}">{{p.label}}</span>
+                  <div class="g3-head" style="background: {{p.color}}">{{p.initial}}<sc-if value="{{p.hasBadge}}" hint-placeholder-val="{{ false }}"><span class="g3-badge" style="background: {{p.badgeBg}}">{{p.badge}}</span></sc-if></div>
+                  <div class="g3-body" style="background: {{p.color}}"></div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div class="g3-fx" aria-hidden="true"><sc-for list="{{fx}}" as="f" hint-placeholder-count="0"><img src="{{f.src}}" alt="" style="left: {{f.left}}"></sc-for></div>
+        <sc-if value="{{paused}}" hint-placeholder-val="{{ false }}"><div class="gr-pause">{{pauseText}}</div></sc-if>
+        <div class="g3-hint">{{sc.name}} · drag to look around</div>
+      </section>
+
+      <section class="gr-panel {{panelCls}}" aria-live="polite">
+        <div class="gr-banner {{bannerPulse}}" style="background: {{banner.bg}}; color: {{banner.ink}}">
+          <span class="av" style="background: {{banner.color}}">{{banner.initial}}</span>
+          <span style="flex: 1; min-width: 0"><b>{{banner.title}}</b><span>{{banner.sub}}</span></span>
+        </div>
+
+        <sc-if value="{{phIntro}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center; padding: 6px 0 4px">
+            <div class="gr-q">{{introTitle}}</div>
+            <p class="muted" style="margin-top: 8px; font-size: 14.5px; line-height: 1.5">{{introBody}}</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showPicker}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="gr-k">{{pickKicker}}</div>
+            <div class="gr-cards">
+              <sc-for list="{{cards}}" as="cd" hint-placeholder-count="3"><button class="gr-card" onClick="{{cd.play}}" style="--sp: {{spiceBg}}">{{cd.text}}</button></sc-for>
+            </div>
+            <sc-if value="{{canWrite}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; gap: 8px; margin-top: 10px">
+                <label for="gr-own" class="sr">Write your own</label>
+                <input id="gr-own" class="field" value="{{own}}" onChange="{{onOwn}}" maxlength="120" placeholder="{{ownHint}}" style="flex: 1; min-width: 0; min-height: 48px; font-size: 15px">
+                <button class="btn btn-cta tap" onClick="{{playOwn}}" disabled="{{cantOwn}}">Play</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showWaitPick}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center">
+            <div class="gr-q" style="font-size: 20px">{{waitPickText}}</div>
+            <div class="gr-backs" aria-hidden="true"><span></span><span></span><span></span></div>
+            <p class="muted" style="margin-top: 12px; font-size: 13.5px">{{getReady}}</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{phAsk}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="gr-k">{{askKicker}}</div>
+            <div class="gr-q rise">{{askText}}</div>
+            <sc-if value="{{proofing}}" hint-placeholder-val="{{ false }}">
+              <div class="rise" style="margin-top: 12px; display: flex; flex-direction: column; gap: 10px">
+                <sc-if value="{{proofTruth}}" hint-placeholder-val="{{ false }}">
+                  <div><label for="tod-answer" class="sr">Your answer</label><textarea id="tod-answer" class="field" value="{{answer}}" onChange="{{onAnswer}}" maxlength="280" placeholder="Be honest. The table is waiting…" style="min-height: 96px; font-size: 16px"></textarea></div>
+                </sc-if>
+                <sc-if value="{{proofEmpty}}" hint-placeholder-val="{{ true }}">
+                  <div style="border: 2px dashed var(--line); border-radius: 20px; padding: 14px; text-align: center">
+                    <div style="font-weight: 800">{{captureTitle}}</div>
+                    <div class="muted" style="font-size: 13px; margin-top: 4px">{{proofNote}}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px">
+                      <label class="gr-opt tap" style="min-height: 86px; border-color: #ff5fa2; background: transparent; color: var(--ink); cursor: pointer"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg><span>Photo</span><small>camera or gallery</small><input type="file" accept="image/*" capture="environment" onChange="{{onFile}}" class="sr"></label>
+                      <label class="gr-opt tap" style="min-height: 86px; border-color: #22e1ff; background: transparent; color: var(--ink); cursor: pointer"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="m16 10 5-3v10l-5-3"></path></svg><span>15s video</span><small>record or pick</small><input type="file" accept="video/*" capture="environment" onChange="{{onFile}}" class="sr"></label>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onClick="{{takePhoto}}" style="border: 0; margin-top: 6px; color: var(--muted)">No camera handy? Use a sample photo</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{proofReady}}" hint-placeholder-val="{{ false }}">
+                  <div style="position: relative">
+                    <div class="media pop" style="height: 220px"><sc-if value="{{proofIsVideo}}" hint-placeholder-val="{{ false }}"><video src="{{proofUrl}}" controls playsinline muted onLoadedMetadata="{{onMeta}}" style="display: block; width: 100%; height: 100%; object-fit: cover"></video></sc-if><sc-if value="{{proofIsPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{proofUrl}}" alt="Your photo"></sc-if><span class="media-tag">{{proofTag}}</span></div>
+                    <sc-if value="{{proofLong}}" hint-placeholder-val="{{ false }}"><div class="pill" style="margin-top: 8px; background: #ffd23d; color: #1a0b14">Over 15s · only the first 15 seconds are shared</div></sc-if>
+                    <button class="btn btn-sm tap" onClick="{{retake}}" style="position: absolute; right: 10px; bottom: 10px">Retake</button>
+                  </div>
+                </sc-if>
+                <button class="btn btn-cta btn-lg btn-block tap" onClick="{{sendProof}}" disabled="{{cantSend}}">{{sendLabel}}</button>
+                <sc-if value="{{proofDare}}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost btn-sm" onClick="{{chickenOut}}" style="border: 0; color: var(--muted)">Chicken out instead · −1 point</button></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{hasProof}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 12px">
+                <div class="gr-k" style="margin-bottom: 6px">{{proofTitle}}</div>
+                <sc-if value="{{hasAnswer}}" hint-placeholder-val="{{ false }}"><div class="card" style="padding: 12px 14px; margin-bottom: 8px; font-size: 16px; font-weight: 700; line-height: 1.4">{{answerShown}}</div></sc-if>
+                <sc-if value="{{hasMedia}}" hint-placeholder-val="{{ true }}">
+                <div class="media {{proofCls}}" style="height: 200px">
+                  <sc-if value="{{proofIsVideo}}" hint-placeholder-val="{{ false }}"><video src="{{proofUrl}}" controls playsinline muted onLoadedMetadata="{{onMeta}}" style="display: block; width: 100%; height: 100%; object-fit: cover"></video></sc-if><sc-if value="{{proofIsPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{proofUrl}}" alt="Dare proof"></sc-if>
+                  <span class="media-tag">{{proofTag}}</span>
+                  <sc-if value="{{proofHidden}}" hint-placeholder-val="{{ true }}"><button class="media-cover" onClick="{{showProof}}">Tap to view<span style="font-size: 12px; font-weight: 600; opacity: .85">Blurred until you choose to look</span></button></sc-if>
+                </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{noProofNote}}" hint-placeholder-val="{{ false }}"><div class="pill" style="margin-top: 10px">No proof sent</div></sc-if>
+            <sc-if value="{{hasOpts}}" hint-placeholder-val="{{ true }}">
+              <div class="gr-opts {{optCls}}">
+                <sc-for list="{{opts}}" as="o" hint-placeholder-count="2">
+                  <button class="gr-opt" onClick="{{o.pick}}" aria-pressed="{{o.on}}" disabled="{{o.off}}" style="background: {{o.bg}}; color: {{o.ink}}; border-color: {{o.line}}; opacity: {{o.op}}">
+                    <sc-if value="{{o.hasImg}}" hint-placeholder-val="{{ true }}"><img src="{{o.img}}" alt=""></sc-if>
+                    <span>{{o.label}}</span>
+                    <sc-if value="{{o.hasSub}}" hint-placeholder-val="{{ false }}"><small>{{o.sub}}</small></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{hasGuess}}" hint-placeholder-val="{{ false }}">
+              <div class="rise" style="margin-top: 12px; padding: 12px; border-radius: 18px; background: var(--card2)">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px"><img src="/_blob/4c82053d5937e2d74a47e12be3d967fb" alt="" style="width: 24px; height: 24px">Bonus: which wins? <span class="muted" style="font-weight: 700">+2</span></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px"><sc-for list="{{guess}}" as="gs" hint-placeholder-count="2"><button class="chip tap {{gs.cls}}" onClick="{{gs.pick}}" aria-pressed="{{gs.on}}" style="min-height: 38px">{{gs.label}}</button></sc-for></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{hasWait}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px">
+                <div class="gr-dots" aria-hidden="true"><sc-for list="{{dots}}" as="d" hint-placeholder-count="5"><span style="background: {{d.color}}; opacity: {{d.op}}">{{d.mark}}</span></sc-for></div>
+                <span class="muted" style="font-size: 13px; font-weight: 700">{{waitText}}</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{phReveal}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="gr-k">{{revKicker}}</div>
+            <div class="gr-q pop">{{revTitle}}</div>
+            <sc-if value="{{hasTug}}" hint-placeholder-val="{{ false }}"><div class="gr-tug"><span style="width: {{tugA}}; background: #ff5fa2">A · {{tugA}}</span><span style="width: {{tugB}}; background: #22e1ff">B · {{tugB}}</span></div></sc-if>
+            <sc-if value="{{hasMedia}}" hint-placeholder-val="{{ false }}">
+              <div class="media {{proofCls}}" style="height: 120px; margin-top: 10px"><sc-if value="{{proofIsVideo}}" hint-placeholder-val="{{ false }}"><video src="{{proofUrl}}" controls playsinline muted onLoadedMetadata="{{onMeta}}" style="display: block; width: 100%; height: 100%; object-fit: cover"></video></sc-if><sc-if value="{{proofIsPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{proofUrl}}" alt="Dare proof"></sc-if><span class="media-tag">{{proofTag}}</span><sc-if value="{{proofHidden}}" hint-placeholder-val="{{ true }}"><button class="media-cover" onClick="{{showProof}}" style="font-size: 13px">Tap to view proof</button></sc-if></div>
+            </sc-if>
+            <sc-if value="{{hasBars}}" hint-placeholder-val="{{ true }}">
+              <div class="gr-bars"><sc-for list="{{bars}}" as="br" hint-placeholder-count="2"><div class="gr-bar" style="outline: {{br.ring}}"><i style="width: {{br.pct}}; background: {{br.color}}"></i><span>{{br.label}}</span><b>{{br.count}}</b></div></sc-for></div>
+            </sc-if>
+            <div class="gr-res pop" style="background: {{resBg}}; animation-delay: .5s">
+              <img src="{{resIcon}}" alt="" style="width: 36px; height: 36px; flex: none">
+              <span style="flex: 1; font-size: 14.5px; line-height: 1.35"><b>{{resTitle}}</b><br>{{resSub}}</span>
+              <b class="d" style="font-size: 22px">{{resPts}}</b>
+            </div>
+            <div class="gr-next"><span class="av" style="background: {{nextColor}}">{{nextInitial}}</span><span style="flex: 1">{{nextText}}</span></div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line)">
+          <div class="gr-react" aria-label="Reactions"><sc-for list="{{reacts}}" as="rc" hint-placeholder-count="5"><button class="tap" onClick="{{rc.send}}" aria-label="{{rc.name}}"><img src="{{rc.src}}" alt=""></button></sc-for></div>
+          <div style="text-align: right"><div class="gr-k" style="font-size: 10.5px">You · #{{myRank}}</div><b class="d" style="font-size: 19px">{{myScore}}</b> <span class="pill" style="padding: 3px 8px; font-size: 11px; background: {{comboBg}}">{{comboLabel}}</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="gr-dock">
+    <sc-if value="{{isHost}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center">
+        <span class="pill" style="align-self: center; background: #ffd23d; color: #1a0b14"><img src="/_blob/886899060459eafd6bc4284897539947" alt="" style="width: 16px; height: 16px">Host</span>
+        <button class="btn btn-sm tap" onClick="{{togglePause}}">{{pauseLabel}}</button>
+        <button class="btn btn-sm tap" onClick="{{skip}}">Skip</button>
+        <button class="btn btn-sm tap" onClick="{{openPlayers}}">Players · {{playerCount}}</button>
+        <button class="btn btn-sm btn-danger tap" onClick="{{openEnd}}">End</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{notHost}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center">
+        <span class="pill" style="align-self: center">{{meLabel}}</span>
+        <button class="btn btn-sm tap" onClick="{{openReport}}">Report a player</button>
+        <button class="btn btn-sm tap" onClick="{{openLeave}}">Leave</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{sheetList}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim"><div class="sheet" role="dialog" aria-label="{{sheetTitle}}">
+      <div class="row"><h2 style="flex: 1; font-size: 21px">{{sheetTitle}}</h2><button class="icon-btn tap" onClick="{{closeSheet}}" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+      <p class="muted" style="margin-top: 4px; font-size: 13.5px">{{sheetSub}}</p>
+      <div style="margin-top: 8px">
+        <sc-for list="{{roster}}" as="ro" hint-placeholder-count="5">
+          <div class="gr-rank">
+            <b class="d" style="width: 22px; text-align: center">{{ro.rank}}</b>
+            <span class="av" style="background: {{ro.color}}; width: 38px; height: 38px; border-radius: 50%; color: #1a0b14; font-weight: 800">{{ro.initial}}</span>
+            <span style="flex: 1"><b>{{ro.name}}</b><div class="muted" style="font-size: 12.5px">{{ro.sub}}</div></span>
+            <sc-if value="{{ro.canAct}}" hint-placeholder-val="{{ false }}"><button class="btn btn-sm tap {{ro.btnCls}}" onClick="{{ro.act}}">{{ro.actLabel}}</button></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{sheetEnd}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim"><div class="sheet" role="dialog" aria-label="End game">
+      <h2 style="font-size: 22px">End the game for everyone?</h2>
+      <p class="muted" style="margin-top: 6px; font-size: 14px">{{endSub}}</p>
+      <div class="row" style="gap: 8px; margin-top: 16px"><button class="btn btn-lg tap" onClick="{{closeSheet}}" style="flex: 1">Keep playing</button><button class="btn btn-lg btn-ink tap" onClick="{{endNow}}" style="flex: 1">End game</button></div>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{sheetLeave}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim"><div class="sheet" role="dialog" aria-label="{{leaveTitle}}">
+      <h2 style="font-size: 22px">{{leaveTitle}}</h2>
+      <p class="muted" style="margin-top: 6px; font-size: 14px; line-height: 1.5">{{leaveSub}}</p>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px">
+        <sc-if value="{{isHost}}" hint-placeholder-val="{{ false }}"><button class="btn btn-lg btn-block tap" onClick="{{handOver}}">Make {{handTo}} the host</button></sc-if>
+        <sc-if value="{{isHost}}" hint-placeholder-val="{{ false }}"><button class="btn btn-lg btn-block btn-danger tap" onClick="{{endNow}}">End the game for everyone</button></sc-if>
+        <sc-if value="{{notHost}}" hint-placeholder-val="{{ true }}"><a href="GamesHub.dc.html" class="btn btn-lg btn-block btn-danger tap">Leave the game</a></sc-if>
+        <button class="btn btn-ink btn-lg btn-block tap" onClick="{{closeSheet}}">Stay</button>
+      </div>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{phOver}}" hint-placeholder-val="{{ false }}">
+    <div class="gr-over">
+      <div class="gr-wrap" style="max-width: 760px; padding-bottom: 40px">
+        <section class="g3" aria-label="Podium" style="height: 330px" onPointerDown="{{orbStart}}" onPointerMove="{{orbMove}}" onPointerUp="{{orbEnd}}" onPointerLeave="{{orbEnd}}">
+          <div class="g3-sky" style="background: {{sc.sky}}"></div>
+          <div class="g3-glow" style="background: #ffd23d"></div>
+          <div class="g3-hud"><span class="g3-chip">{{g.name}} · final</span><span class="g3-chip">{{totalTurns}} turns played</span></div>
+          <div class="g3-cam" style="top: 66%">
+            <div class="g3-floor" style="background-image: {{sc.floor}}"></div>
+            <div class="g3-table" style="background: {{sc.table}}"></div>
+            <div class="g3-at" style="transform: translate3d(0, 20px, 0)"><div class="g3-bb">
+              <div style="display: flex; align-items: flex-end; gap: 6px">
+                <sc-for list="{{podium}}" as="pd" hint-placeholder-count="3">
+                  <div style="display: flex; flex-direction: column; align-items: center">
+                    <sc-if value="{{pd.first}}" hint-placeholder-val="{{ false }}"><img class="g3-crown" src="/_blob/886899060459eafd6bc4284897539947" alt="" style="animation-delay: .9s"></sc-if>
+                    <div class="g3-fig g3-hop" style="animation-delay: {{pd.delay}}"><span class="g3-name">{{pd.name}}</span><div class="g3-head" style="background: {{pd.color}}">{{pd.initial}}</div><div class="g3-body" style="background: {{pd.color}}"></div></div>
+                    <div class="g3-pod" style="height: {{pd.h}}; background: {{pd.block}}; animation-delay: {{pd.delay}}">{{pd.place}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div></div>
+          </div>
+          <div class="g3-fx" aria-hidden="true"><sc-for list="{{confetti}}" as="cf" hint-placeholder-count="0"><span class="cf cf{{cf.k}}" style="top: 20%; background: {{cf.color}}; animation-delay: {{cf.delay}}; margin-left: {{cf.shift}}"></span></sc-for></div>
+        </section>
+        <div style="text-align: center; margin-top: 18px">
+          <div class="gr-k">You placed</div>
+          <h1 class="d pop" style="font-size: 44px; line-height: 1; margin-top: 6px">{{placeTitle}}</h1>
+          <p class="muted" style="margin-top: 8px; font-size: 15px">{{placeSub}}</p>
+        </div>
+        <div class="card" style="margin-top: 14px; padding: 4px 16px">
+          <sc-for list="{{finalRanks}}" as="fr" hint-placeholder-count="6">
+            <div class="gr-rank"><b class="d" style="width: 22px; text-align: center">{{fr.rank}}</b><span class="av" style="background: {{fr.color}}; width: 34px; height: 34px; border-radius: 50%; color: #1a0b14; font-weight: 800; font-size: 14px">{{fr.initial}}</span><span style="flex: 1; font-weight: {{fr.w}}">{{fr.name}}</span><span class="muted" style="font-weight: 800">{{fr.score}}</span></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{isMember}}" hint-placeholder-val="{{ true }}">
+          <div class="card" style="margin-top: 12px; padding: 16px">
+            <div class="row" style="gap: 10px"><img src="/_blob/de9a93e835074053a0531968d7b0c460" alt="" style="width: 34px; height: 34px"><b style="flex: 1">Level 7 · Night Owl</b><span class="pill" style="background: #ff3b8d; color: #ffffff">+{{xp}} XP</span></div>
+            <div class="gr-xp" style="margin-top: 10px"><span style="width: 74%"></span></div>
+            <div class="row" style="gap: 10px; margin-top: 12px; font-size: 14px"><img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 28px; height: 28px"><span style="flex: 1"><b>5-day game streak.</b> <span class="muted">Play tomorrow to keep it.</span></span></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isGuest}}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="margin-top: 12px; padding: 16px; display: flex; gap: 12px; align-items: center">
+            <img src="/_blob/0bb83498eeb25491f1a1f03843b26271" alt="" style="width: 44px; height: 44px; flex: none">
+            <span style="flex: 1; font-size: 14px; line-height: 1.4"><b>Keep {{nick}} and your {{myScore}}.</b> <span class="muted">Free account, 20 seconds. Your nickname, XP and streak stay yours.</span></span>
+          </div>
+        </sc-if>
+        <div class="sec-h"><h2>Awards</h2></div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{awards}}" as="aw" hint-placeholder-count="3"><div class="gr-award" style="animation-delay: {{aw.delay}}"><img src="{{aw.icon}}" alt=""><span style="flex: 1"><b>{{aw.title}}</b><div class="muted" style="font-size: 13px">{{aw.who}}</div></span></div></sc-for>
+        </div>
+        <div class="card" style="margin-top: 12px; padding: 14px; display: flex; gap: 12px; align-items: center; background: linear-gradient(135deg,rgba(216,27,114,.18),rgba(122,60,255,.18))">
+          <img src="/_blob/efcc9b0c77557045bbeff6635142d20f" alt="" style="width: 40px; height: 40px; flex: none">
+          <span style="flex: 1; font-size: 14px; line-height: 1.4"><b>Unhinged deck unlocked.</b> <span class="muted">Your table finished a full game. The rematch starts spicier.</span></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px">
+          <sc-if value="{{isHost}}" hint-placeholder-val="{{ true }}"><button class="btn btn-cta btn-lg tap" onClick="{{rematch}}" style="width: 100%">Rematch</button></sc-if>
+          <sc-if value="{{isHost}}" hint-placeholder-val="{{ true }}"><a href="CreateGame.dc.html" onClick="{{newGame}}" class="btn btn-lg tap" style="width: 100%">New game</a></sc-if>
+          <sc-if value="{{notHost}}" hint-placeholder-val="{{ false }}"><button class="btn btn-cta btn-lg tap" onClick="{{rematch}}" style="width: 100%">Play again</button></sc-if>
+          <sc-if value="{{notHost}}" hint-placeholder-val="{{ false }}"><a href="GamesHub.dc.html" class="btn btn-lg tap" style="width: 100%">Back to games</a></sc-if>
+          <sc-if value="{{isGuest}}" hint-placeholder-val="{{ false }}"><a href="Signup.dc.html" class="btn btn-ink btn-lg tap" style="width: 100%">Save my stats</a></sc-if>
+          <a href="ShareStudio.dc.html" class="btn btn-lg tap" style="width: 100%">Share results</a>
+        </div>
+        <div class="ad-wrap"><div class="ad ad-banner"><b>Game over banner</b><span class="ad-m">320 × 100</span><span class="ad-d">728 × 90</span></div></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><img src="{{toastIcon}}" alt="" style="width: 32px; height: 32px; flex: none"><span style="font-size: 14px; line-height: 1.35"><b>{{toastTitle}}</b><br><span class="muted">{{toastSub}}</span></span></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"role":{"editor":"enum","options":["host","player","guest"],"default":"player"},"demo":{"editor":"enum","options":["none","dare","truth","theirs"],"default":"none"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.load();
+    this.state = this.fresh(m || props.mode || 'dark');
+    var d = props.demo;
+    if (d === 'dare' || d === 'truth') Object.assign(this.state, { k: 1, phase: 'act', t: 0, choice: d, proofing: true, hold: true });
+    if (d === 'theirs') Object.assign(this.state, { k: 2, phase: 'answer', t: 0, choice: 'dare', didIt: 'done', proof: { kind: 'photo' }, hold: true });
+  }
+  // read what the lobby handed over: table size, turns, timer, spice, rules, and who you are
+  load() {
+    var cfg = null, join = null, id = this.game();
+    try { cfg = JSON.parse(window.localStorage.getItem('sk-game') || 'null'); join = JSON.parse(window.localStorage.getItem('sk-join') || 'null'); this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (e) { this.nav = ''; }
+    var c = cfg && cfg.game === id ? cfg : {}, j = join && join.game === id ? join : {};
+    this.n = c.max ? Math.max(3, Math.min(8, c.max)) : 6;
+    this.laps = c.laps ? Math.max(1, Math.min(3, c.laps)) : 1;
+    this.timer = c.timer || 15;
+    this.spiceStart = { mild: 0, spicy: 1, unhinged: 2 }[c.spice] || 0;
+    this.esc = c.esc !== false;
+    this.special = c.special || {};
+    this.packs = c.packs || ['Campus life', 'Situationship'];
+    this.guest = j.role === 'guest';
+    this.nick = j.nick || 'MangoMoon';
+    this.nickColor = j.color || '#ffd23d';
+    this.late = !!j.late;
+    this.room = j.room || c.room || '';
+  }
+  cups() { return this.special.lives5 ? 5 : 3; }
+  proofOn() { return this.special.proof !== false; }
+  truthAnswer(k) {
+    var A = {
+      'What’s the last lie you told?': 'Told my mum I was at the library. I was at an owambe.',
+      'Who in here would you call at 2am?': 'KolaNut. They always pick up, even at 2am.',
+      'What’s your most-used emoji and why?': '💀 because everything is killing me.',
+      'Who here would you let read your chats for a day?': 'CocoaRay. They already know everything anyway.',
+      'What’s the most embarrassing thing on your phone?': 'A screenshot of my ex’s new status. Yes, I know.',
+      'Who was your last crush?': 'Someone in this room. Not saying who.',
+      'Who at this table would you date?': 'Honestly? ZoboQueen. Don’t make it weird.',
+      'What’s your biggest red flag?': 'I reply to everyone except the person I like.',
+      'What’s the worst thing you’ve done and never told anyone?': 'I copied an assignment and got a better grade than the owner.'
+    };
+    return A[this.prompt(k).truth] || 'Pass… okay fine. Yes. It was me.';
+  }
+  fresh(mode) {
+    var lives = {}, cups = this.cups(); this.P().forEach(function (p) { lives[p[0]] = cups; });
+    return { mode: mode, k: 0, phase: 'intro', t: 0, card: null, own: '', mine: null, guessPick: null, choice: null, didIt: null, answers: null, paused: false, kicked: [],
+      scores: {}, lives: lives, catches: {}, crowns: {}, chickens: {}, combo: 0, last: null, sheet: null, reported: {}, fx: [], fxId: 0, toast: null, passUsed: false, proofing: false, proof: null, proofShown: false, answer: '' };
+  }
+  game() { return 'tod'; }
+  P() {
+    var all = [['MangoMoon', this.nickColor || '#ffd23d'], ['CocoaRay', '#7ef0c1'], ['BlueFox', '#7fb2ff'], ['KolaNut', '#ff9ad5'], ['PixelOwl', '#ffb35c'], ['ZoboQueen', '#b78bff'], ['JollofJet', '#ff9a4a'], ['SuyaStar', '#5be0a0']];
+    return all.slice(0, this.n || 6);
+  }
+  // turn order: starts at the seat to your right, so you go second; repeats once per lap
+  turns() {
+    var n = this.P().length, one = [n - 1]; for (var i = 0; i < n - 1; i++) one.push(i);
+    var names = this.P().map(function (p) { return p[0]; }), out = [];
+    for (var l = 0; l < this.laps; l++) one.forEach(function (i) { out.push(names[i]); });
+    return out;
+  }
+  E() {
+    return { shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348',
+      crown: '/_blob/886899060459eafd6bc4284897539947', chart: '/_blob/090816a00c88579ebc84a6b78047028a', pepper: '/_blob/69f665bc7243f1656e9ff91e0af97d91',
+      bottle: '/_blob/dabc1dc3b2ca85f511896f5fe287b1b4', thinking: '/_blob/443a0e236b2f6d9e6870ebdebbb40c6a', horns: '/_blob/e7e0f6155c61ff73c4fc4702011dbdda',
+      star: '/_blob/51035f51e6a88e72cbe69865437dd33c', ballot: '/_blob/669adcdde8b5d16eac1dc87c5115c4c0', mic: '/_blob/ae6f72a716ff2083abd4cd249f5d9a51', chicken: '/_blob/540ae45df21261d2e6a14fa43c60c504',
+      cup: '/_blob/4dbcd3e70d8c26a321fd47093a0e9f1f', thermo: '/_blob/1486b4690c22ec28937f6425e686f51b', ice: '/_blob/9d1929a1578f2f66910f73ac1e009dd6', cold: '/_blob/0374a7a5b873eed2d51605792dced5d9',
+      coin: '/_blob/4c82053d5937e2d74a47e12be3d967fb', swords: '/_blob/bb98c97874bd7846658816dcbbdb7780', joy: '/_blob/e99615b731d53b90b0f783b0c69df17d',
+      skull: '/_blob/1da148a428dd1040dbea7b7738d1d7a7', scream: '/_blob/2f66c946c04eb79ed39e9012c4c9f37e', heart: '/_blob/bd77390550723395a99ddb5804a04eb3', devil: '/_blob/efcc9b0c77557045bbeff6635142d20f', angel: '/_blob/727ac58e5046d6eefbb35427eff3c1df' };
+  }
+  // scene and three decks (mild, spicy, unhinged) per game
+  G(id) {
+    var E = this.E();
+    var D = {
+      nhie: { name: 'Never Have I Ever', icon: E.shush, room: 'Friday Night Never', write: 'Never have I ever…',
+        sc: { name: 'Neon lounge', sky: 'radial-gradient(120% 90% at 50% 0%,#4a1263 0%,#160a22 55%,#08050c 100%)', glow: '#ff3b8d', floor: 'linear-gradient(rgba(255,59,141,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(255,59,141,.55) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#8a2a7a,#3a0f3a 70%)' },
+        deck: [['lied to get out of class.', 'pretended to be on a call to avoid someone.', 'eaten someone else’s food from the fridge.', 'fallen asleep in a lecture.', 'sent a message to the wrong group chat.'],
+          ['stalked an ex’s story at 3am.', 'had a crush on a friend’s partner.', 'left someone on read for days on purpose.', 'lied about my age.', 'been caught sneaking out.'],
+          ['had a crush on someone at this table.', 'kissed someone I just met.', 'sent a risky text and deleted it.', 'talked to two people at the same time.', 'screenshot a chat to gossip about it.']] },
+      tod: { name: 'Truth or Dare', icon: E.bottle, room: 'Dare Club 300L',
+        sc: { name: 'Bonfire night', sky: 'radial-gradient(90% 80% at 50% 80%,#7a2d0b 0%,#2a0d05 50%,#0b0503 100%)', glow: '#ff7a1a', floor: 'linear-gradient(rgba(255,160,70,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,160,70,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#b0703a,#5a2b14 70%)' },
+        deck: [[['What’s the last lie you told?', 'Show the last photo in your gallery.'], ['Who in here would you call at 2am?', 'Talk in a fake accent until your next turn.'], ['What’s your most-used emoji and why?', 'Do your best impression of your HOD for 20 seconds.']],
+          [['Who here would you let read your chats for a day?', 'Send “I miss us” to the 5th person in your chats.'], ['What’s the most embarrassing thing on your phone?', 'Let the table pick your next status update.'], ['Who was your last crush?', 'Read your last sent message out loud.']],
+          [['Who at this table would you date?', 'Text your crush “I had a dream about you”.'], ['What’s your biggest red flag?', 'Let someone here send one message from your phone.'], ['What’s the worst thing you’ve done and never told anyone?', 'Post “I’m in love” on your status for 10 minutes.']]] },
+      wyr: { name: 'Would You Rather', icon: E.swords, room: 'Class of 2027 chaos',
+        sc: { name: 'Split arena', sky: 'radial-gradient(120% 90% at 50% 0%,#0d2a5a 0%,#071229 55%,#04060d 100%)', glow: '#22e1ff', floor: 'linear-gradient(rgba(34,225,255,.4) 2px,transparent 2px),linear-gradient(90deg,rgba(34,225,255,.4) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#2a2f4a,#11142a 70%)' },
+        deck: [[['Lose your phone for a week', 'Lose your voice for a week'], ['Only eat jollof forever', 'Never eat jollof again'], ['Always be 10 minutes late', 'Always be 2 hours early'], ['Have no data for a month', 'Have no light for a month']],
+          [['Read your crush’s chats', 'Let your crush read yours'], ['Get exposed in the group chat', 'Get exposed in class'], ['Date someone who snores', 'Date someone who never texts back'], ['Know your future salary', 'Know your future partner']],
+          [['Know who sent every anonymous message', 'Never be able to send one again'], ['Kiss your ex', 'Kiss your best friend’s ex'], ['Have your search history leaked', 'Have your DMs leaked'], ['Date someone at this table', 'Never date again']]] },
+      mlt: { name: 'Most Likely To', icon: E.crown, room: 'Hostel B awards', write: 'Who’s most likely to…',
+        sc: { name: 'Award show', sky: 'radial-gradient(120% 90% at 50% 0%,#3a2a08 0%,#150d22 55%,#07050b 100%)', glow: '#ffd23d', floor: 'linear-gradient(rgba(255,210,61,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,210,61,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#2b2333,#0d0a12 70%)' },
+        deck: [['become famous first', 'be late to their own wedding', 'cry at a movie', 'become a lecturer', 'win a dance battle'],
+          ['text their ex tonight', 'have a secret crush in this room', 'go viral for the wrong reason', 'ghost someone', 'start a fight at an owambe'],
+          ['have a secret second account', 'date two people at once', 'get caught sneaking out', 'confess something wild tonight', 'marry someone they met online']] },
+      hot: { name: 'Hot Takes', icon: E.pepper, room: 'Sunday vibes only', write: 'Your hot take…',
+        sc: { name: 'Hot seat', sky: 'linear-gradient(110deg,#0b2a4a 0%,#170a18 50%,#4a0b12 100%)', glow: '#ff4f6d', floor: 'linear-gradient(rgba(255,120,120,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(120,200,255,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#45404f,#17141d 70%)' },
+        deck: [['Pineapple belongs on pizza.', 'Group projects should be illegal.', 'Morning classes are a scam.', 'Tea is better than coffee.', 'Lagos traffic builds character.'],
+          ['Amapiano is better than Afrobeats.', 'Texting first is not desperate.', 'Situationships are worse than breakups.', 'Your ex is always your ex for a reason.', 'Love at first sight is real.'],
+          ['Cheating is forgivable once.', 'You should check your partner’s phone.', 'Best friends can’t date.', 'Money matters more than love.', 'Everyone here has a secret account.']] },
+      poll: { name: 'Anonymous Polls', icon: E.ballot, room: 'Group chat polls',
+        sc: { name: 'Live studio', sky: 'radial-gradient(120% 90% at 50% 0%,#0b3a3a 0%,#081a1f 55%,#04090b 100%)', glow: '#5be0a0', floor: 'linear-gradient(rgba(91,224,160,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(91,224,160,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#1d3a3a,#0a1719 70%)' },
+        deck: [[['Best place to hang out after exams?', ['Beach', 'Mall', 'Someone’s room', 'Owambe']], ['Best Nigerian snack?', ['Puff-puff', 'Chin chin', 'Suya', 'Meat pie']], ['Worst lecture time?', ['7am', '12pm', '4pm']]],
+          [['Who’s the biggest flirt here?', ['@1', '@2', '@3']], ['Who should plan the next hangout?', ['@2', '@3', '@4', 'Nobody, chaos']], ['Red flag or green flag: double texting?', ['Red', 'Green', 'Depends']]],
+          [['Who here would survive a breakup best?', ['@1', '@3', '@4']], ['Who has the most secrets?', ['@2', '@4', '@1']], ['Should exes stay friends?', ['Yes', 'No', 'Only if one is fine']]]] }
+    };
+    return D[id] || D.nhie;
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.tk = setInterval(function () { self.tick(); }, 500);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); clearTimeout(this.tt); }
+  componentDidUpdate(prev) {
+    if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
+    if (prev.role !== this.props.role) { this.load(); this.setState(this.fresh(this.state.mode)); }
+  }
+  h(k, i, salt) { return ((k + 3) * 73 + (i + 1) * 151 + salt * 37 + (k * i) * 11) % 100; }
+  total() { return this.turns().length; }
+  level(k) { if (!this.esc) return this.spiceStart; return Math.min(2, this.spiceStart + Math.floor(k / this.total() * (3 - this.spiceStart))); }
+  tp(k) { return this.turns()[k]; }
+  alive(name) { return this.state.kicked.indexOf(name) < 0; }
+  inGame() { var self = this; return this.P().map(function (p) { return p[0]; }).filter(function (n) { return self.alive(n); }); }
+  // three cards offered to whoever's turn it is
+  offered(k) {
+    var G = this.G(this.game()), deck = G.deck[this.level(k)], out = [];
+    for (var i = 0; i < 3; i++) out.push(deck[(k * 2 + i) % deck.length]);
+    return out;
+  }
+  pollOpts(card, k) {
+    var names = this.inGame().filter(function (n) { return n !== 'MangoMoon'; });
+    return card[1].map(function (o) { return o.charAt(0) === '@' ? names[(Number(o.slice(1)) + k) % names.length] : o; });
+  }
+  answerers(k) {
+    var id = this.game(), tp = this.tp(k), s = this.state;
+    return this.inGame().filter(function (n) {
+      if ((id === 'nhie' || id === 'tod') && n === tp) return false;
+      if (id === 'nhie' && s.lives[n] === 0) return false;
+      return true;
+    });
+  }
+  // what the other players do on a turn (fixed per turn so the demo is repeatable)
+  others(k) {
+    var self = this, id = this.game(), tp = this.tp(k), lv = this.level(k), out = {};
+    var names = this.inGame();
+    this.answerers(k).forEach(function (n, i) {
+      if (n === 'MangoMoon') return;
+      var r = self.h(k, i, lv);
+      if (id === 'nhie') out[n] = r < [30, 45, 52][lv] ? 'have' : 'never';
+      if (id === 'tod') out[n] = self.state.didIt === 'chicken' ? (r < 85 ? 'chicken' : 'legit') : (r < 80 ? 'legit' : 'chicken');
+      if (id === 'wyr') out[n] = r < 56 ? 'a' : 'b';
+      if (id === 'mlt') { var pool = names.filter(function (x) { return x !== n; }); out[n] = pool[(r + k) % pool.length]; }
+      if (id === 'hot') out[n] = 1 + (r % 5);
+      if (id === 'poll') out[n] = r % self.prompt(k).opts.length;
+    });
+    return out;
+  }
+  prompt(k) {
+    var s = this.state, id = this.game(), cards = this.offered(k);
+    if (id === 'tod') { var c = cards[0]; return { truth: c[0], dare: c[1] }; }
+    var c2 = s.card === 'own' ? null : cards[s.card || 0];
+    if (id === 'nhie') return { q: s.card === 'own' ? s.own : 'Never have I ever ' + c2 };
+    if (id === 'wyr') return { a: c2[0], b: c2[1] };
+    if (id === 'mlt') return { q: 'Who’s most likely to ' + (s.card === 'own' ? s.own.replace(/^who.?s most likely to\s*/i, '') : c2) + '?' };
+    if (id === 'hot') return { q: s.card === 'own' ? s.own : c2 };
+    return { q: c2[0], opts: this.pollOpts(c2, k) };
+  }
+  begin(k) {
+    var tl = this.turns();
+    while (k < tl.length && !this.alive(tl[k])) k++;
+    if (k >= tl.length) { this.setState({ phase: 'over', t: 0 }); return; }
+    this.setState({ k: k, phase: this.game() === 'tod' ? 'spin' : 'pick', t: 0, card: null, own: '', mine: null, guessPick: null, choice: null, didIt: null, answers: null, last: null, proofing: false, proof: null, proofShown: false, answer: '' });
+  }
+  toAnswer() { this.setState({ phase: 'answer', t: 0 }); }
+  tick() {
+    var s = this.state, id = this.game(), T = this.timer;
+    // arriving from a new link (or a different role) restarts the screen instead of showing the last game
+    var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {}
+    if (nv !== this.nav) { this.load(); this.setState(this.fresh(s.mode)); return; }
+    if (s.paused || s.phase === 'over' || s.sheet === 'end' || s.sheet === 'leave') return;
+    // demo boards wait on the upload or the vote until you act
+    if (s.hold && ((s.phase === 'act' && s.proofing) || (s.phase === 'answer' && s.mine === null))) return;
+    var t = s.t + 0.5, tp = this.tp(s.k), me = tp === 'MangoMoon';
+    if (s.phase === 'intro') { if (t >= 4) { this.begin(this.late ? Math.min(2, this.total() - 1) : 0); return; } }
+    else if (s.phase === 'spin') { if (t >= 3.2) { this.setState({ phase: 'choose', t: 0 }); return; } }
+    else if (s.phase === 'choose') { if ((!me && t >= 2.5) || t >= T) { this.setState({ phase: 'act', t: 0, choice: s.choice || ((this.h(s.k, 2, 9) + s.k * 37) % 100 < 50 ? 'truth' : 'dare') }); return; } }
+    else if (s.phase === 'act') { if ((!me && t >= 5) || t >= T + (s.proofing ? 30 : 5)) {
+      var did = s.didIt || (me ? 'chicken' : (this.h(s.k, 4, 3) < 78 ? 'done' : 'chicken'));
+      var auto = s.proof, said = s.answer;
+      if (!me && did === 'done' && this.proofOn()) {
+        if (s.choice === 'dare') auto = { kind: this.h(s.k, 6, 2) < 55 ? 'photo' : 'video' };
+        else { said = this.truthAnswer(s.k); auto = this.h(s.k, 7, 5) < 40 ? { kind: 'photo' } : null; }
+      }
+      this.setState({ phase: 'answer', t: 0, didIt: did, proof: auto, answer: said, proofing: false }); return; } }
+    else if (s.phase === 'pick') { if ((!me && t >= 3) || t >= T + 5) { this.setState({ phase: 'answer', t: 0, card: s.card === null ? 0 : s.card }); return; } }
+    else if (s.phase === 'answer') {
+      var ans = this.answerers(s.k), needMe = ans.indexOf('MangoMoon') >= 0, others = ans.filter(function (n) { return n !== 'MangoMoon'; }).length;
+      var inCount = Math.min(others, Math.floor(t / 0.7));
+      if (((!needMe || s.mine !== null) && inCount >= others && t >= 1.5) || t >= T) { this.resolve(); return; }
+    }
+    else if (s.phase === 'reveal') { if (t >= 5.5) { this.begin(s.k + 1); return; } }
+    this.setState({ t: t });
+  }
+  resolve() {
+    var s = this.state, self = this, id = this.game(), E = this.E(), k = s.k, tp = this.tp(k), meTurn = tp === 'MangoMoon';
+    var o = this.others(k), ans = this.answerers(k), a = {};
+    ans.forEach(function (n) { a[n] = n === 'MangoMoon' ? s.mine : o[n]; });
+    var scores = Object.assign({}, s.scores), lives = Object.assign({}, s.lives), catches = Object.assign({}, s.catches), crowns = Object.assign({}, s.crowns), chickens = Object.assign({}, s.chickens);
+    var add = function (n, v) { scores[n] = (scores[n] || 0) + v; };
+    var before = scores.MangoMoon || 0, title = '', sub = '', icon = this.G(id).icon, good = true, extra = {};
+    if (id === 'nhie') {
+      if (a.MangoMoon === null && ans.indexOf('MangoMoon') >= 0) a.MangoMoon = 'never';
+      var caught = ans.filter(function (n) { return a[n] === 'have'; });
+      caught.forEach(function (n) { lives[n] = Math.max(0, lives[n] - 1); });
+      catches[tp] = (catches[tp] || 0) + caught.length; add(tp, caught.length);
+      if (meTurn) { title = 'You caught ' + caught.length; sub = caught.length ? caught.join(', ') + ' tipped a cup.' : 'Nobody had. Clean table.'; icon = E.cup; good = caught.length > 0; }
+      else if (a.MangoMoon === 'have') { title = 'You tipped a cup'; sub = lives.MangoMoon ? lives.MangoMoon + ' cups left. Honesty counts.' : 'Out of cups. You can still lead turns.'; icon = E.cup; good = false; }
+      else { title = 'Cup safe'; sub = caught.length + ' of ' + ans.length + ' had. Not you.'; icon = E.angel; }
+      extra.caught = caught;
+    } else if (id === 'tod') {
+      if (!meTurn && s.mine === null) a.MangoMoon = 'legit';
+      var lg = 0, ck = 0; ans.forEach(function (n) { if ((n === 'MangoMoon' ? (s.mine || 'legit') : a[n]) === 'legit') lg++; else ck++; });
+      var legit = lg > ck;
+      if (legit) add(tp, 3); else { add(tp, -1); chickens[tp] = (chickens[tp] || 0) + 1; }
+      ans.forEach(function (n) { var v = n === 'MangoMoon' ? (s.mine || 'legit') : a[n]; if ((v === 'legit') === legit) add(n, 1); });
+      if (meTurn) { title = legit ? 'Legend. +3' : 'Chicken!'; sub = legit ? lg + ' of ' + ans.length + ' said legit.' : 'The table called it. You wear the 🐔.'; good = legit; }
+      else { title = legit ? tp + ' did it' : tp + ' chickened out'; sub = ((s.mine || 'legit') === 'legit') === legit ? 'You voted with the table. +1' : 'The table voted the other way.'; good = ((s.mine || 'legit') === 'legit') === legit; }
+      icon = legit ? E.fire : E.chicken; extra.lg = lg; extra.ck = ck;
+    } else if (id === 'wyr') {
+      if (s.mine === null) a.MangoMoon = 'a';
+      var ca = 0, cb = 0; ans.forEach(function (n) { if (a[n] === 'a') ca++; else cb++; });
+      var maj = ca >= cb ? 'a' : 'b';
+      ans.forEach(function (n) { if (a[n] === maj) add(n, 1); });
+      if (s.guessPick === maj) add('MangoMoon', 2);
+      if (Math.abs(ca - cb) <= 1) add(tp, 2);
+      title = a.MangoMoon === maj ? 'You’re with the crowd' : 'Rebel side'; sub = (meTurn && Math.abs(ca - cb) <= 1 ? 'Close split: +2 for a great question. ' : '') + (s.guessPick ? (s.guessPick === maj ? 'Called the winner. +2' : 'Wrong call on the winner.') : '');
+      icon = a.MangoMoon === maj ? E.swords : E.devil; extra.ca = ca; extra.cb = cb;
+    } else if (id === 'mlt') {
+      if (s.mine === null) a.MangoMoon = this.inGame().filter(function (n) { return n !== 'MangoMoon'; })[0];
+      var tally = {}; ans.forEach(function (n) { tally[a[n]] = (tally[a[n]] || 0) + 1; });
+      var win = Object.keys(tally).sort(function (x, y) { return tally[y] - tally[x]; })[0];
+      crowns[win] = (crowns[win] || 0) + 1; add(win, 2);
+      ans.forEach(function (n) { if (a[n] === win && n !== win) add(n, 1); });
+      title = win === 'MangoMoon' ? 'The crown is yours' : 'Crowned: ' + win; sub = a.MangoMoon === win ? 'You read the room. +1' : 'You voted ' + a.MangoMoon + '.'; icon = E.crown; good = a.MangoMoon === win || win === 'MangoMoon';
+      extra.tally = tally; extra.win = win;
+    } else if (id === 'hot') {
+      if (s.mine === null) a.MangoMoon = 3;
+      var raters = ans.filter(function (n) { return n !== tp; }), sum = 0;
+      raters.forEach(function (n) { sum += a[n]; });
+      var avg = Math.round(sum / Math.max(1, raters.length));
+      raters.forEach(function (n) { var d = Math.abs(a[n] - avg); if (d === 0) add(n, 2); else if (d === 1) add(n, 1); });
+      var gd = Math.abs(a[tp] - avg); if (gd === 0) add(tp, 3); else if (gd === 1) add(tp, 1);
+      var LBL = ['', 'Hard no', 'Nah', 'Meh', 'Yeah', 'Facts'];
+      var dm = Math.abs(a.MangoMoon - avg);
+      title = meTurn ? (gd === 0 ? 'You read the room. +3' : 'You guessed ' + LBL[a.MangoMoon]) : (dm === 0 ? 'You read the room' : dm === 1 ? 'Close enough' : 'Spicy outlier');
+      sub = 'The room landed on ' + LBL[avg] + '.'; icon = dm === 0 ? E.thermo : E.pepper; good = dm <= 1;
+      extra.avg = avg; extra.raters = raters;
+    } else {
+      if (s.mine === null) a.MangoMoon = 0;
+      var pr = this.prompt(k), pc = pr.opts.map(function () { return 0; });
+      ans.forEach(function (n) { pc[a[n]]++; });
+      var top = pc.indexOf(Math.max.apply(null, pc));
+      ans.forEach(function (n) { if (a[n] === top) add(n, 1); });
+      if (s.guessPick === top) add('MangoMoon', 2);
+      title = 'Winner: ' + pr.opts[top]; sub = s.guessPick === top ? 'You called it. +2' : (s.guessPick === null ? 'No guess this time.' : 'Not this time.'); icon = E.chart; good = a.MangoMoon === top || s.guessPick === top;
+      extra.pc = pc; extra.top = top;
+    }
+    var mine = (scores.MangoMoon || 0) - before;
+    var combo = good ? s.combo + 1 : 0;
+    if (combo >= 2 && mine > 0) { add('MangoMoon', 1); mine += 1; }
+    this.setState({ phase: 'reveal', t: 0, answers: a, scores: scores, lives: lives, catches: catches, crowns: crowns, chickens: chickens, combo: combo, last: { mine: mine, title: title, sub: sub, icon: icon, good: good, extra: extra } });
+  }
+  react(src) {
+    var self = this, id = this.state.fxId + 1, left = (12 + (id * 37) % 72) + '%';
+    this.setState({ fx: this.state.fx.concat([{ id: id, src: src, left: left }]).slice(-8), fxId: id });
+    setTimeout(function () { self.setState({ fx: self.state.fx.filter(function (f) { return f.id !== id; }) }); }, 2400);
+  }
+  flash(title, sub, icon) { var self = this; this.setState({ toast: { title: title, sub: sub, icon: icon } }); clearTimeout(this.tt); this.tt = setTimeout(function () { self.setState({ toast: null }); }, 3200); }
+  standing() {
+    var s = this.state, id = this.game();
+    return this.P().filter(function (p) { return s.kicked.indexOf(p[0]) < 0; }).map(function (p) {
+      var nm = p[0], sc = s.scores[nm] || 0;
+      var score = id === 'nhie' ? s.lives[nm] * 10 + (s.catches[nm] || 0) : id === 'mlt' ? (s.crowns[nm] || 0) * 10 + sc : sc;
+      var label = id === 'nhie' ? s.lives[nm] + ' cups · ' + (s.catches[nm] || 0) + ' caught' : id === 'mlt' ? (s.crowns[nm] || 0) + ' crowns · ' + sc + ' pts' : sc + ' pts';
+      return { name: nm, color: p[1], score: score, label: label };
+    }).sort(function (a, b) { return b.score - a.score; });
+  }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light', id = this.game(), G = this.G(id), E = this.E();
+    var role = this.props.role === 'host' && !s.handed ? 'host' : (this.props.role === 'guest' || this.guest ? 'guest' : 'player'), host = role === 'host';
+    var P = this.P().filter(function (p) { return s.kicked.indexOf(p[0]) < 0; });
+    var C = {}; this.P().forEach(function (p) { C[p[0]] = p[1]; });
+    var TL = this.turns(), total = TL.length, k = s.k, tp = TL[k], meTurn = tp === 'MangoMoon', ph = s.phase;
+    var lv = this.level(k), SP = ['Mild', 'Spicy', 'Unhinged'], SPC = ['#0d7f4b', '#d9480f', '#c2185b'];
+    var started = ph !== 'intro';
+    var ans = started ? this.answerers(k) : [];
+    var needMe = ans.indexOf('MangoMoon') >= 0;
+    var otherAns = ans.filter(function (n) { return n !== 'MangoMoon'; });
+    var inCount = ph === 'answer' ? Math.min(otherAns.length, Math.floor(s.t / 0.7)) : 0;
+    var revealing = ph === 'reveal', A = s.answers || {};
+    var pr = started && (ph !== 'pick' || s.card !== null) && ph !== 'spin' ? this.prompt(k) : null;
+    var nextIdx = k + 1; while (nextIdx < total && s.kicked.indexOf(TL[nextIdx]) >= 0) nextIdx++;
+    var nextName = TL[nextIdx];
+    var myPos = TL.indexOf('MangoMoon') + 1;
+
+    // whose turn it is: banner, panel glow, strip and 3D marker all agree
+    var banner;
+    var who = function (n) { return { color: C[n], initial: n === 'MangoMoon' ? self.nick.charAt(0) : n.charAt(0) }; };
+    if (ph === 'intro') banner = Object.assign({ title: this.late ? 'You’re in' : 'Game starting', sub: this.late ? 'Joined mid-game · you play from turn ' + Math.min(3, total) : P.length + ' players · ' + total + ' turns · you go #' + myPos, bg: 'linear-gradient(135deg,#d81b72,#7a3cff)', ink: '#ffffff' }, who(TL[0]));
+    else if (ph === 'over') banner = Object.assign({ title: 'Game over', sub: '', bg: '#211a2c', ink: '#ffffff' }, who('MangoMoon'));
+    else if (ph === 'answer' && needMe && s.mine === null) banner = Object.assign({ title: 'Answer now', sub: (meTurn ? 'Your card is out · ' : tp + ' asked · ') + 'tap below', bg: '#ffd23d', ink: '#1a0b14' }, who('MangoMoon'));
+    else if (meTurn && ['pick', 'spin', 'choose', 'act'].indexOf(ph) >= 0) banner = Object.assign({ title: 'Your turn', sub: { pick: 'Pick a card for the table', spin: 'The bottle is spinning to you…', choose: 'Truth or dare?', act: 'Do it, then tap below' }[ph], bg: 'linear-gradient(135deg,#ff3b8d,#7a3cff)', ink: '#ffffff' }, who('MangoMoon'));
+    else if (ph === 'answer') banner = Object.assign({ title: meTurn ? { nhie: 'Your card is out', tod: 'The table is judging you', wyr: 'Your question is out', mlt: 'Your question is out', hot: 'Your take is out', poll: 'Your poll is out' }[id] : (needMe ? 'Answer locked ✓' : tp + '’s turn'), sub: 'Waiting for ' + (otherAns.length - inCount) + ' more', bg: dark ? '#2a1f36' : '#e3deeb', ink: 'var(--ink)' }, who(tp));
+    else if (revealing) banner = Object.assign({ title: 'Results', sub: tp === 'MangoMoon' ? 'Your turn is done' : tp + '’s turn is done', bg: dark ? '#2a1f36' : '#e3deeb', ink: 'var(--ink)' }, who(tp));
+    else banner = Object.assign({ title: tp + '’s turn', sub: { pick: 'Picking a card…', spin: 'Spinning the bottle…', choose: 'Choosing truth or dare…', act: 'Doing their ' + (s.choice || 'truth') + '…' }[ph] || '', bg: C[tp], ink: '#1a0b14' }, who(tp));
+    var myMoment = (meTurn && ['pick', 'choose', 'act'].indexOf(ph) >= 0) || (ph === 'answer' && needMe && s.mine === null);
+
+    // turn order strip
+    var strip = TL.map(function (n, i) {
+      var st = i < k || ph === 'over' ? 'done' : i === k && started ? 'now' : i === nextIdx || (!started && i === 0) ? 'next' : '';
+      if (s.kicked.indexOf(n) >= 0) st = 'out';
+      return { initial: n === 'MangoMoon' ? self.nick.charAt(0) : n.charAt(0), color: C[n], label: n === 'MangoMoon' ? 'You' : (st === 'now' ? 'now' : st === 'next' ? 'next' : n.slice(0, 6)), cls: st };
+    });
+
+    // 3D seats
+    var n = P.length, R = n > 6 ? 196 : 182, sideIdx = { a: 0, b: 0 };
+    var seats = P.map(function (p, i) {
+      var name = p[0], ang = (90 + i * 360 / n) * Math.PI / 180, x = R * Math.cos(ang), y = R * Math.sin(ang), me = name === 'MangoMoon';
+      var pick = me ? s.mine : (revealing ? A[name] : null);
+      if (id === 'wyr' && (pick === 'a' || pick === 'b')) { var q = sideIdx[pick]++, a2 = ((pick === 'a' ? 180 : 0) + (q - 1.5) * 26) * Math.PI / 180; x = 92 * Math.cos(a2) + (pick === 'a' ? -34 : 34); y = 92 * Math.sin(a2); }
+      var isTurn = started && ph !== 'over' && name === tp;
+      var o = { x: Math.round(x), y: Math.round(y), label: me ? 'You' : name, initial: me ? self.nick.charAt(0) : name.charAt(0), color: p[1], turn: isTurn, spot: isTurn && (id === 'tod' ? ph !== 'spin' : true),
+        cls: (me ? 'g3-me ' : '') + (isTurn ? 'g3-hop ' : '') + (id === 'nhie' && s.lives[name] === 0 ? 'g3-out' : ''), tagBg: isTurn ? '#ff3b8d' : 'rgba(8,5,12,.66)',
+        crown: false, hasToken: false, token: '', hasPop: false, pop: '', popColor: '#ffffff', hasBadge: false, badge: '', badgeBg: '#ffd23d' };
+      var sc = s.scores[name] || 0;
+      if (id === 'mlt' && s.crowns[name]) { o.hasBadge = true; o.badge = '👑' + s.crowns[name]; }
+      else if (id === 'tod' && s.chickens[name]) { o.hasBadge = true; o.badge = '🐔' + s.chickens[name]; o.badgeBg = '#ffffff'; }
+      else if (id !== 'nhie' && sc) { o.hasBadge = true; o.badge = sc; }
+      if (id === 'nhie' && (s.catches[name] || 0)) { o.hasBadge = true; o.badge = '🎯' + s.catches[name]; }
+      if (id === 'mlt' && revealing && s.last && s.last.extra.win === name) { o.crown = true; o.spot = true; o.turn = false; }
+      if (id === 'hot' && (revealing || me) && (me ? s.mine : A[name])) { var hv = me ? s.mine : A[name]; o.hasToken = true; o.token = [E.ice, E.cold, E.thinking, E.fire, E.pepper][hv - 1]; o.turn = o.turn && !revealing; }
+      if (id === 'nhie' && revealing && A[name] === 'have') { o.hasPop = true; o.pop = '−1'; o.popColor = '#ff8b98'; }
+      if (revealing && me && s.last && s.last.mine) { o.hasPop = true; o.pop = (s.last.mine > 0 ? '+' : '') + s.last.mine; o.popColor = s.last.mine > 0 ? '#5be0a0' : '#ff8b98'; }
+      return o;
+    });
+    var cupsets = id === 'nhie' ? P.map(function (p, i) {
+      var name = p[0], ang = (90 + i * 360 / n) * Math.PI / 180, lvs = s.lives[name], lost = revealing && A[name] === 'have';
+      var cups = []; for (var c = 0; c < lvs + (lost ? 1 : 0); c++) cups.push({ cls: lost && c === lvs ? 'g3-tip' : '' });
+      return { x: Math.round((R - 62) * Math.cos(ang)), y: Math.round((R - 62) * Math.sin(ang)), cups: cups };
+    }) : [];
+    var ti = Math.max(0, P.map(function (p) { return p[0]; }).indexOf(tp));
+    var spinDeg = (k + 1) * 1080 + (ph === 'spin' && s.t < 0.6 ? 0 : (90 + ti * 360 / n) + 135);
+
+    // centerpiece
+    var countNum = ph === 'intro' ? (s.t < 1 ? '3' : s.t < 2 ? '2' : s.t < 3 ? '1' : 'GO!') : '';
+    var holoTitle = G.name, holoSub = SP[lv] + ' deck', holoIcon = G.icon, showHolo = ph !== 'intro', showThermo = false, showCols = false, mercury = '8%', thermoLabel = 'How hot?', cols = [];
+    if (ph === 'pick') { holoTitle = meTurn ? 'Your pick' : tp + ' picks'; holoSub = 'a card'; }
+    if (id === 'tod') { showHolo = ph !== 'spin'; var ch = s.choice; holoTitle = ch ? ch.toUpperCase() : (ph === 'choose' ? 'Truth or dare?' : 'Spin!'); holoSub = s.proof && (ph === 'answer' || ph === 'reveal') ? 'proof sent 📸' : (meTurn ? 'it’s you!' : tp); holoIcon = ch === 'dare' ? E.horns : ch === 'truth' ? E.mic : E.bottle; }
+    if (id === 'hot' && pr) { showHolo = false; showThermo = true; if (revealing) { mercury = Math.round(s.last.extra.avg / 5 * 100) + '%'; thermoLabel = 'Room: ' + ['', 'Hard no', 'Nah', 'Meh', 'Yeah', 'Facts'][s.last.extra.avg]; } else if (s.mine) mercury = (s.mine * 20) + '%'; }
+    var PC = ['#5be0a0', '#22e1ff', '#ffd23d', '#ff5fa2'];
+    if (id === 'poll' && pr) { showHolo = false; showCols = true; var pcs = revealing ? s.last.extra.pc : null, mx = pcs ? Math.max.apply(null, pcs.concat([1])) : 1;
+      cols = pr.opts.map(function (o, j) { return { label: o, cap: pcs ? pcs[j] : '?', h: pcs ? Math.round(18 + pcs[j] / mx * 110) + 'px' : '14px', color: PC[j % 4] }; }); }
+
+    // picking a card (your turn) or waiting for someone else to pick
+    var offered = started ? this.offered(k) : [];
+    var showPicker = ph === 'pick' && meTurn;
+    var cards = showPicker ? offered.map(function (c, j) {
+      var text = id === 'nhie' ? 'Never have I ever ' + c : id === 'wyr' ? c[0] + '  vs  ' + c[1] : id === 'mlt' ? 'Who’s most likely to ' + c + '?' : id === 'poll' ? c[0] : c;
+      return { text: text, play: function () { self.setState({ card: j, phase: 'answer', t: 0 }); } };
+    }) : [];
+    var canWrite = showPicker && !!G.write;
+    var own = s.own.trim();
+    var waitPick = !meTurn && ['pick', 'spin', 'choose', 'act'].indexOf(ph) >= 0;
+    var waitPickText = { pick: tp + ' is picking a card…', spin: 'The bottle is spinning…', choose: tp + ' is choosing truth or dare…', act: tp + ' is doing their ' + (s.choice || 'truth') + '…' }[ph] || '';
+    var getReady = needMe ? 'Get ready. You’ll answer next.' : 'Sit tight.';
+
+    // answer phase options
+    var opt = function (label, sub, img, color, on, pick, off) { return { label: label, sub: sub || '', hasSub: !!sub, img: img || '', hasImg: !!img, bg: on ? color : (dark ? 'rgba(255,255,255,.04)' : '#ffffff'), ink: on ? '#120a16' : 'var(--ink)', line: color, on: on ? 'true' : 'false', pick: pick, off: !!off, op: off && !on ? 0.5 : 1 }; };
+    var choose = function (v) { return function () { if (self.state.mine === null) self.setState({ mine: v }); }; };
+    var guessFor = function (list) { return list.map(function (x) { return { label: x[1], cls: s.guessPick === x[0] ? 'on' : '', on: s.guessPick === x[0] ? 'true' : 'false', pick: function () { if (self.state.guessPick === null) self.setState({ guessPick: x[0] }); } }; }); };
+    var opts = [], optCls = 'gr-opts--two', askKicker = '', askText = '', hasGuess = false, guess = [];
+    var locked = s.mine !== null, phAsk = false;
+    if (ph === 'answer' && pr) {
+      phAsk = true;
+      if (id === 'nhie') { askKicker = meTurn ? 'Your card' : tp + '’s card'; askText = pr.q; if (needMe) opts = [opt('I have', 'tip a cup', E.cup, '#ff4f6d', s.mine === 'have', choose('have'), locked), opt('Never', 'keep it', E.angel, '#7ef0c1', s.mine === 'never', choose('never'), locked)]; }
+      if (id === 'wyr') { askKicker = (meTurn ? 'Your question' : tp + ' asks') + ' · would you rather'; askText = 'Pick a side'; opts = [opt(pr.a, 'side A', '', '#ff5fa2', s.mine === 'a', choose('a'), locked), opt(pr.b, 'side B', '', '#22e1ff', s.mine === 'b', choose('b'), locked)]; hasGuess = locked && this.special.bonus !== false; guess = guessFor([['a', 'Side A wins'], ['b', 'Side B wins']]); }
+      if (id === 'mlt') { askKicker = (meTurn ? 'Your question' : tp + ' asks') + ' · vote a nickname'; askText = pr.q; optCls = 'gr-opts--grid'; opts = P.filter(function (p) { return p[0] !== 'MangoMoon'; }).map(function (p) { return opt(p[0], '', '', p[1], s.mine === p[0], choose(p[0]), locked); }); }
+      if (id === 'hot') { askKicker = meTurn ? 'You’re in the hot seat · guess the room' : tp + '’s hot take · rate it'; askText = '“' + pr.q + '”'; optCls = 'gr-opts--scale'; opts = [['Hard no', E.ice, '#22e1ff'], ['Nah', E.cold, '#7fb2ff'], ['Meh', E.thinking, '#ffd23d'], ['Yeah', E.fire, '#ff9a4a'], ['Facts', E.pepper, '#ff4f6d']].map(function (x, j) { return opt(x[0], '', x[1], x[2], s.mine === j + 1, choose(j + 1), locked); }); }
+      if (id === 'poll') { askKicker = (meTurn ? 'Your poll' : tp + '’s poll') + ' · vote'; askText = pr.q; optCls = 'gr-opts--list'; opts = pr.opts.map(function (o, j) { return opt(o, '', '', PC[j % 4], s.mine === j, choose(j), locked); }); hasGuess = locked && this.special.bonus !== false; guess = guessFor(pr.opts.map(function (o, j) { return [j, o]; })); }
+      if (id === 'tod') { var ch2 = s.choice || 'truth'; askKicker = meTurn ? 'The table is judging you' : (ch2 === 'dare' ? 'Did ' + tp + ' really do it?' : 'Is ' + tp + ' telling the truth?'); askText = ch2 === 'dare' ? pr.dare : pr.truth; if (needMe) opts = [opt('Legit', ch2 === 'dare' ? '+1 if you match the table' : 'I believe it · +1 if you match', E.fire, '#5be0a0', s.mine === 'legit', choose('legit'), locked), opt('Chicken', ch2 === 'dare' ? 'call them out' : 'that’s cap', E.chicken, '#ffd23d', s.mine === 'chicken', choose('chicken'), locked)]; }
+    }
+    if (id === 'tod' && meTurn && (ph === 'choose' || ph === 'act')) {
+      phAsk = true;
+      if (ph === 'choose') { askKicker = 'The bottle picked you'; askText = 'Truth or dare?'; opts = [opt('Truth', 'answer honestly', E.mic, '#7fb2ff', false, function () { self.setState({ choice: 'truth', phase: 'act', t: 0 }); }), opt('Dare', 'prove it', E.horns, '#ff4f6d', false, function () { self.setState({ choice: 'dare', phase: 'act', t: 0 }); })];
+        if (this.special.pass && !s.passUsed) opts.push(opt('Pass', 'once per game', E.angel, '#b78bff', false, function () { self.setState({ passUsed: true }); self.flash('You passed', 'No chicken badge. That was your one pass.', E.angel); self.begin(s.k + 1); })); }
+      else { var pr2 = this.prompt(k); askKicker = (s.choice || 'truth').toUpperCase() + ' · your turn'; askText = s.choice === 'dare' ? pr2.dare : pr2.truth; var needsProof = this.proofOn();
+        if (!s.proofing) opts = [opt(s.choice === 'dare' ? 'I did it' : 'I’ll answer', needsProof ? (s.choice === 'dare' ? 'next: photo or video proof' : 'type it, add a photo if you want') : 'answer out loud', E.fire, '#5be0a0', false, function () { if (needsProof) self.setState({ proofing: true }); else self.setState({ didIt: 'done', phase: 'answer', t: 0 }); }), opt('Chicken out', '−1 point', E.chicken, '#ffd23d', false, function () { self.setState({ didIt: 'chicken', phase: 'answer', t: 0, proofing: false }); })];
+        else { askKicker = (s.choice === 'dare' ? 'Dare' : 'Truth') + ' · ' + (s.choice === 'dare' ? pr2.dare : pr2.truth); askText = s.choice === 'dare' ? 'Show the table you did it' : 'Your answer'; } }
+    }
+    // proof: capturing yours, or reviewing theirs before you vote
+    var proofOwner = meTurn ? 'Your' : tp + '’s';
+    var proofing = id === 'tod' && meTurn && ph === 'act' && s.proofing;
+    var hasProof = id === 'tod' && !!s.proof && (ph === 'answer' || revealing);
+    var hasAnyProof = id === 'tod' && (ph === 'answer' || revealing) && (!!s.proof || !!(s.answer && s.answer.trim()));
+    var proofHidden = hasProof && !meTurn && !s.proofShown;
+    var proofVals = {
+      proofing: proofing, proofEmpty: proofing && !s.proof, proofReady: proofing && !!s.proof,
+      hasProof: hasAnyProof, proofHidden: proofHidden, proofOpen: hasProof && !proofHidden,
+      proofCls: proofHidden ? 'blur' : '', proofTag: s.proof ? (s.proof.kind === 'video' ? '▶ Video · ' + (s.proof.dur ? Math.floor(Math.min(15, s.proof.dur) / 60) + ':' + ('0' + Math.round(Math.min(15, s.proof.dur) % 60)).slice(-2) : '0:12') : 'Photo') : '',
+      proofTitle: proofOwner + (s.choice === 'dare' ? ' proof' : ' answer'), proofNote: meTurn ? 'Only this table sees it. It disappears when the game ends.' : 'Blurred until you tap. Only this table sees it.',
+      noProofNote: false,
+      proofTruth: proofing && s.choice !== 'dare', proofDare: proofing && s.choice === 'dare',
+      captureTitle: s.choice === 'dare' ? 'Photo or video proof · required' : 'Add a photo or video · optional',
+      answer: s.answer, onAnswer: function (e) { self.setState({ answer: e.target.value.slice(0, 280) }); },
+      cantSend: s.choice === 'dare' ? !s.proof : s.answer.trim().length < 2,
+      sendLabel: s.choice === 'dare' ? (s.proof ? 'Send ' + s.proof.kind + ' to the table' : 'Add a photo or video first') : 'Send my answer',
+      chickenOut: function () { self.setState({ didIt: 'chicken', phase: 'answer', t: 0, proofing: false, proof: null }); },
+      hasAnswer: id === 'tod' && !!(s.answer && s.answer.trim()) && (ph === 'answer' || revealing), answerShown: '“' + (s.answer || '').trim() + '”',
+      hasMedia: hasProof,
+      takePhoto: function () { self.setState({ proof: { kind: 'photo' } }); }, takeVideo: function () { self.setState({ proof: { kind: 'video' } }); },
+      onFile: function (e) {
+        var f = e && e.target && e.target.files && e.target.files[0]; if (!f) return;
+        var url = ''; try { url = URL.createObjectURL(f); } catch (x) {}
+        self.setState({ proof: { kind: f.type && f.type.indexOf('video') === 0 ? 'video' : 'photo', url: url, name: f.name } });
+        try { e.target.value = ''; } catch (x) {}
+      },
+      onMeta: function (e) { var d = e && e.target ? e.target.duration : 0; if (d && self.state.proof && !self.state.proof.dur) self.setState({ proof: Object.assign({}, self.state.proof, { dur: d }) }); },
+      proofUrl: s.proof && s.proof.url ? s.proof.url : '/_blob/fc30e985c9f0bc844ec159e5c5e6bcc2',
+      proofIsVideo: !!(s.proof && s.proof.kind === 'video' && s.proof.url), proofIsPhoto: !(s.proof && s.proof.kind === 'video' && s.proof.url),
+      proofLong: !!(s.proof && s.proof.dur > 15),
+      retake: function () { try { if (s.proof && s.proof.url) URL.revokeObjectURL(s.proof.url); } catch (x) {} self.setState({ proof: null }); },
+      sendProof: function () { self.setState({ didIt: 'done', phase: 'answer', t: 0, proofing: false }); },
+      skipProof: function () { self.setState({ didIt: 'done', phase: 'answer', t: 0, proofing: false, proof: null }); },
+      showProof: function () { self.setState({ proofShown: true }); }
+    };
+    this.proofVals = proofVals;
+    var dots = otherAns.map(function (nm, j) { var on = j < inCount; return { color: C[nm], op: on ? 1 : 0.28, mark: on ? '✓' : nm.charAt(0) }; });
+    var waitText = ph === 'answer' ? inCount + ' of ' + otherAns.length + ' answered' : '';
+
+    // reveal
+    var bars = [], hasBars = false, hasTug = false, tugA = '50%', tugB = '50%', revKicker = '', revTitle = s.last ? s.last.title : '';
+    var bar = function (label, count, tot, color, mine) { return { label: label, count: count, pct: Math.round(count / Math.max(1, tot) * 100) + '%', color: color, ring: mine ? '2px solid currentColor' : 'none' }; };
+    if (revealing && s.last && pr) {
+      var X = s.last.extra;
+      if (id === 'nhie') { var hv2 = X.caught.length, tot2 = ans.length; hasBars = true; revKicker = pr.q; revTitle = hv2 + ' of ' + tot2 + ' have'; bars = [bar('I have' + (hv2 ? ' · ' + X.caught.map(function (x) { return x === 'MangoMoon' ? 'You' : x; }).join(', ') : ''), hv2, tot2, '#ff4f6d', A.MangoMoon === 'have'), bar('Never', tot2 - hv2, tot2, '#7ef0c1', A.MangoMoon === 'never')]; }
+      if (id === 'wyr') { hasTug = true; tugA = Math.round(X.ca / (X.ca + X.cb) * 100) + '%'; tugB = Math.round(X.cb / (X.ca + X.cb) * 100) + '%'; revKicker = pr.a + ' vs ' + pr.b; }
+      if (id === 'mlt') { var tt = 0; Object.keys(X.tally).forEach(function (q) { tt += X.tally[q]; }); hasBars = true; revKicker = pr.q; bars = Object.keys(X.tally).sort(function (x, y) { return X.tally[y] - X.tally[x]; }).slice(0, this.special.full === false ? 1 : 9).map(function (q, j) { return bar((j === 0 ? '👑 ' : '') + (q === 'MangoMoon' ? 'You' : q), X.tally[q], tt, C[q], q === A.MangoMoon); }); }
+      if (id === 'hot') { revKicker = '“' + pr.q + '”'; hasBars = true; var dist = [0, 0, 0, 0, 0]; X.raters.forEach(function (q) { dist[A[q] - 1]++; }); bars = ['Hard no', 'Nah', 'Meh', 'Yeah', 'Facts'].map(function (l, j) { return bar(l, dist[j], X.raters.length, ['#22e1ff', '#7fb2ff', '#ffd23d', '#ff9a4a', '#ff4f6d'][j], A.MangoMoon === j + 1 && !meTurn); }); }
+      if (id === 'poll') { hasBars = true; revKicker = pr.q; bars = pr.opts.map(function (o, j) { return bar(o, X.pc[j], ans.length, PC[j % 4], A.MangoMoon === j); }); }
+      if (id === 'tod') { hasBars = true; revKicker = (s.choice || 'truth').toUpperCase() + ' · ' + (meTurn ? 'you' : tp) + (s.proof ? ' · with a ' + s.proof.kind : ''); bars = [bar('Legit', X.lg, X.lg + X.ck, '#5be0a0', s.mine === 'legit'), bar('🐔 Chicken', X.ck, X.lg + X.ck, '#ffd23d', s.mine === 'chicken')]; }
+    }
+    var last = s.last || { mine: 0, title: '', sub: '', icon: G.icon, good: true };
+    var standing = this.standing();
+    var myRank = standing.map(function (x) { return x.name; }).indexOf('MangoMoon') + 1;
+    var top3 = [standing[1], standing[0], standing[2]].filter(Boolean);
+    var colors = ['#ffd23d', '#ff5fa2', '#7a3cff', '#22e1ff', '#5be0a0', '#ffffff'];
+    var confetti = []; if (ph === 'over') for (var c = 0; c < 18; c++) confetti.push({ k: (c % 6) + 1, color: colors[c % 6], delay: (0.8 + c * 0.04).toFixed(2) + 's', shift: ((c * 37) % 90 - 45) + 'px' });
+    var AW = {
+      nhie: [[E.angel, 'Cleanest hands', 'Kept the most cups'], [E.cup, 'Best catcher', 'Caught the most people'], [E.skull, 'Living dangerously', 'Tipped the most cups']],
+      tod: [[E.fire, 'Fearless', 'Most dares done'], [E.chicken, 'Biggest chicken', 'Most chicken votes'], [E.mic, 'Truth teller', 'Best truth answers']],
+      wyr: [[E.swords, 'Crowd reader', 'With the majority most'], [E.devil, 'Lone rebel', 'Picked the minority most'], [E.coin, 'Question master', 'Asked the closest splits']],
+      mlt: [[E.crown, 'Most crowned', 'Won the most turns'], [E.eyes, 'Room reader', 'Voted with the table most'], [E.star, 'Main character', 'Got votes every turn']],
+      hot: [[E.thermo, 'Room reader', 'Closest to the room'], [E.pepper, 'Spiciest takes', 'Furthest from the room'], [E.ice, 'Coolest head', 'Most “Meh” answers']],
+      poll: [[E.chart, 'Trend setter', 'Voted with the winner most'], [E.coin, 'Oracle', 'Best winner guesses'], [E.ballot, 'Swing vote', 'Decided a close poll']]
+    }[id];
+    var awardWho = [standing[0], standing[standing.length - 1], standing[1]];
+    var roster = [];
+    if (s.sheet === 'table') roster = standing.map(function (x, j) { return { rank: j + 1, name: x.name === 'MangoMoon' ? 'You' : x.name, initial: x.name.charAt(0), color: x.color, sub: x.label + (x.name === tp && started && ph !== 'over' ? ' · their turn now' : ''), canAct: false }; });
+    if (s.sheet === 'players') roster = standing.map(function (x, j) { var me = x.name === 'MangoMoon'; return { rank: j + 1, name: me ? 'You (host)' : x.name, initial: x.name.charAt(0), color: x.color, sub: x.label, canAct: !me, actLabel: 'Kick', btnCls: 'btn-danger', act: function () { self.setState({ kicked: s.kicked.concat([x.name]), sheet: null }); self.flash(x.name + ' was removed', 'Their turns are skipped. They can’t rejoin.', E.devil); if (x.name === tp && started) self.begin(s.k + 1); } }; });
+    if (s.sheet === 'report') roster = standing.filter(function (x) { return x.name !== 'MangoMoon'; }).map(function (x, j) { var done = !!s.reported[x.name]; return { rank: j + 1, name: x.name, initial: x.name.charAt(0), color: x.color, sub: done ? 'Reported · they get a warning' : 'Report what they said or did', canAct: true, actLabel: done ? 'Reported' : 'Report', btnCls: done ? '' : 'btn-ink', act: function () { var o = Object.assign({}, s.reported); o[x.name] = true; self.setState({ reported: o }); } }; });
+    var limit = ph === 'act' || ph === 'pick' ? this.timer + 5 : this.timer;
+    var timed = ['pick', 'choose', 'act', 'answer'].indexOf(ph) >= 0;
+    var secs = timed ? Math.max(0, limit - Math.floor(s.t)) : 0;
+    var RE = [['Haha', E.joy], ['Dead', E.skull], ['Shook', E.scream], ['Fire', E.fire], ['Love', E.heart]];
+    return Object.assign({
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark,
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      g: G, sc: G.sc, isTod: id === 'tod', isWyr: id === 'wyr',
+      turnLine: (this.room || G.room) + ' · ' + P.length + ' players · code K7Q2', totalTurns: total,
+      turnChip: ph === 'over' ? 'Final' : started ? 'Turn ' + (k + 1) + ' of ' + total : total + ' turns', spiceChip: SP[lv] + (lv === 2 ? ' 🔥' : ''), spiceBg: SPC[lv],
+      strip: strip, banner: banner, bannerPulse: myMoment ? 'gr-pulse' : '', panelCls: myMoment ? 'is-me' : '',
+      seats: seats, cupsets: cupsets, spin: spinDeg + 'deg',
+      showHolo: showHolo, holoTitle: holoTitle, holoSub: holoSub, holoIcon: holoIcon, showThermo: showThermo, mercury: mercury, thermoLabel: thermoLabel, showCols: showCols, cols: cols,
+      phIntro: ph === 'intro', introTitle: total + ' turns, everyone leads once' + (this.laps > 1 ? ' per lap' : ''),
+      introBody: 'On your turn you ' + { nhie: 'pick a “Never have I ever” card. Anyone who has tips a cup and you catch them.', tod: 'face the bottle: truth or dare, and the table judges it.', wyr: 'pick the dilemma and everyone walks to a side.', mlt: 'pick the question and everyone votes a nickname.', hot: 'drop a hot take and guess how the room rates it.', poll: 'post a poll; everyone votes and guesses the winner.' }[id] + ' On everyone else’s turn, you answer. ' + (this.esc ? 'Decks get spicier as you go.' : 'Deck: ' + SP[this.spiceStart] + ' all game.') + ' Packs: ' + this.packs.join(', ') + '.' + (this.late ? ' You joined mid-game, so you play from turn ' + Math.min(3, total) + '.' : ''),
+      showPicker: showPicker, pickKicker: 'Pick a card · ' + SP[lv] + ' deck', cards: cards, canWrite: canWrite, own: s.own, ownHint: G.write || '',
+      onOwn: function (e) { self.setState({ own: e.target.value }); }, cantOwn: own.length < 8,
+      playOwn: function () { if (own.length >= 8) self.setState({ card: 'own', phase: 'answer', t: 0 }); },
+      showWaitPick: waitPick, waitPickText: waitPickText, getReady: getReady,
+      phAsk: phAsk, askKicker: askKicker, askText: askText, opts: opts, hasOpts: opts.length > 0, optCls: optCls,
+      hasGuess: hasGuess, guess: guess, hasWait: ph === 'answer', dots: dots, waitText: waitText,
+      phReveal: revealing, revKicker: revKicker, revTitle: revTitle, bars: bars, hasBars: hasBars, hasTug: hasTug, tugA: tugA, tugB: tugB,
+      resTitle: last.title, resSub: last.sub, resIcon: last.icon, resPts: (last.mine > 0 ? '+' : '') + last.mine,
+      resBg: last.good ? 'rgba(91,224,160,.16)' : 'rgba(255,79,109,.14)',
+      nextColor: nextName ? C[nextName] : '#ffd23d', nextInitial: nextName ? nextName.charAt(0) : '★',
+      nextText: nextName ? (nextName === 'MangoMoon' ? 'Next up: YOU. Get ready to lead.' : 'Next up: ' + nextName + (nextIdx + 1 === myPos ? ' · you’re after them' : '')) : 'That was the last turn. Final results next.',
+      reacts: RE.map(function (x) { return { name: x[0], src: x[1], send: function () { self.react(x[1]); } }; }), fx: s.fx,
+      myRank: myRank || 1, myScore: id === 'nhie' ? s.lives.MangoMoon + ' cups' : (s.scores.MangoMoon || 0) + ' pts',
+      comboLabel: s.combo >= 2 ? 'Combo ×' + s.combo + ' 🔥' : 'No combo', comboBg: s.combo >= 2 ? '#ff3b8d' : 'var(--card2)',
+      secs: secs, secsShown: timed ? secs : '–', ringDash: timed ? (secs / limit * 119).toFixed(1) : '0', ringColor: secs <= 5 ? '#ff4f6d' : (myMoment ? '#ff3b8d' : '#ffd23d'),
+      paused: s.paused, pauseText: host ? 'Paused' : 'The host paused the game',
+      nick: this.nick, isHost: host, notHost: !host, isGuest: role === 'guest', isMember: role !== 'guest',
+      meLabel: role === 'guest' ? 'Guest · ' + this.nick : 'You are ' + this.nick, playerCount: P.length,
+      togglePause: function () { self.setState({ paused: !s.paused }); }, pauseLabel: s.paused ? 'Resume' : 'Pause',
+      skip: function () { if (ph === 'answer') self.resolve(); else if (ph === 'reveal' || ph === 'intro') self.begin(ph === 'intro' ? 0 : s.k + 1); else self.setState({ t: 30 }); },
+      openTable: function () { self.setState({ sheet: 'table' }); }, openPlayers: function () { self.setState({ sheet: 'players' }); }, openReport: function () { self.setState({ sheet: 'report' }); },
+      openEnd: function () { self.setState({ sheet: 'end' }); }, closeSheet: function () { self.setState({ sheet: null }); },
+      endNow: function () { self.setState({ sheet: null, phase: 'over' }); },
+      showCount: ph === 'intro', countNum: countNum,
+      openLeave: function () { self.setState({ sheet: 'leave' }); }, sheetLeave: s.sheet === 'leave',
+      leaveTitle: host ? 'Leave your own game?' : 'Leave the game?',
+      leaveSub: host ? 'You’re the host. Hand hosting to someone, or end it for everyone.' : 'You’ll lose your seat and your ' + (id === 'nhie' ? s.lives.MangoMoon + ' cups' : (s.scores.MangoMoon || 0) + ' points') + '. The game carries on without you.',
+      handTo: (P.filter(function (p) { return p[0] !== 'MangoMoon'; })[0] || ['someone'])[0],
+      handOver: function () { self.setState({ handed: true, sheet: null }); self.flash((P.filter(function (p) { return p[0] !== 'MangoMoon'; })[0] || ['They'])[0] + ' is the host now', 'You’re still at the table as a player. Use Leave to go.', E.crown); },
+      newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-wiz'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }, endSub: (total - k) + ' turns left. Scores so far count and everyone sees the results.',
+      sheetList: ['table', 'players', 'report'].indexOf(s.sheet) >= 0, sheetEnd: s.sheet === 'end',
+      sheetTitle: { table: 'Standings', players: 'Players in the room', report: 'Report a player' }[s.sheet] || '',
+      sheetSub: { table: 'Turn ' + (k + 1) + ' of ' + total + '. Updated after every turn.', players: 'Kicked players lose their turns and can’t rejoin.', report: 'They get a warning, same as on links. After 3, the 4th report blocks them from your games.' }[s.sheet] || '',
+      roster: roster,
+      orbStart: function (e) { self.drag = { x: e.clientX, o: self.orb || 0 }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      orbMove: function (e) { if (!self.drag) return; var o = Math.max(-40, Math.min(40, self.drag.o + (e.clientX - self.drag.x) * 0.35)); e.currentTarget.style.setProperty('--orb', o.toFixed(1) + 'deg'); self.drag.cur = o; },
+      orbEnd: function () { if (!self.drag) return; if (self.drag.cur !== undefined) self.orb = self.drag.cur; self.drag = null; },
+      phOver: ph === 'over',
+      podium: top3.map(function (x) { var place = x === standing[0] ? 1 : x === standing[1] ? 2 : 3; return { name: x.name === 'MangoMoon' ? 'You' : x.name, initial: x.name.charAt(0), color: x.color, place: place, first: place === 1, h: [0, 96, 70, 52][place] + 'px', block: ['', 'linear-gradient(180deg,#ffd23d,#c99a12)', 'linear-gradient(180deg,#e6e6f0,#a9a9bd)', 'linear-gradient(180deg,#ffb37a,#b8642f)'][place], delay: (0.2 + (3 - place) * 0.25) + 's' }; }),
+      confetti: confetti,
+      finalRanks: standing.map(function (x, j) { return { rank: j + 1, name: x.name === 'MangoMoon' ? 'You' : x.name, initial: x.name.charAt(0), color: x.color, score: x.label, w: x.name === 'MangoMoon' ? 800 : 600 }; }),
+      placeTitle: '#' + (myRank || 1) + (myRank === 1 ? ' · Winner!' : ' of ' + standing.length), placeSub: standing[0].name === 'MangoMoon' ? 'Everyone else wants a rematch.' : standing[0].name + ' took it after ' + total + ' turns. Run it back?',
+      xp: 40 + Math.max(0, s.scores.MangoMoon || 0) * 5,
+      awards: AW.map(function (a, j) { var w = awardWho[j] || standing[0]; return { icon: a[0], title: a[1], who: (w.name === 'MangoMoon' ? 'You' : w.name) + ' · ' + a[2], delay: (0.3 + j * 0.12) + 's' }; }),
+      rematch: function () { self.setState(self.fresh(s.mode)); self.flash('Rematch!', 'Same table. Unhinged deck unlocked.', E.devil); },
+      toast: !!s.toast, toastTitle: s.toast ? s.toast.title : '', toastSub: s.toast ? s.toast.sub : '', toastIcon: s.toast ? s.toast.icon : ''
+    }, proofVals);
+  }
+}
+</script>
+</body>
+</html>

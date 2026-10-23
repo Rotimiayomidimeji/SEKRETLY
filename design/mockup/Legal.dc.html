@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Privacy and Terms</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+  <nav class="pub-nav" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <div class="pub-links">
+      <a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a><a href="Safety.dc.html">Safety</a><a href="About.dc.html">About</a><a href="Help.dc.html">Help</a><a href="Contact.dc.html">Contact</a>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        <span>{{modeWord}}</span>
+      </button>
+      <a href="Signup.dc.html" class="btn btn-cta">Get your link</a>
+      <button class="icon-btn pub-menu tap" onClick="{{toggleDrawer}}" aria-label="Open menu" aria-expanded="{{drawerOpen}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="pdr {{drawerCls}}">
+    <div class="pdr-scrim" onClick="{{toggleDrawer}}"></div>
+    <aside class="pdr-panel" role="dialog" aria-label="Menu" aria-hidden="{{drawerHidden}}">
+      <div class="pdr-head">
+        <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <button class="icon-btn tap" onClick="{{toggleDrawer}}" aria-label="Close menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <nav aria-label="Site" style="display: flex; flex-direction: column; gap: 3px">
+        <a href="Landing.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+        <a href="Landing.dc.html#how" class="nav-i" onClick="{{jumpHow}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>How it works</a>
+        <a href="Landing.dc.html#games" class="nav-i" onClick="{{jumpGames}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+        <a href="Safety.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>Safety</a>
+        <a href="About.dc.html" class="nav-i" aria-current="page" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>About</a>
+        <a href="Help.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"></path></svg>Help & FAQ</a>
+        <a href="Contact.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Contact</a>
+      </nav>
+      <div class="pdr-foot">
+        <button class="mode-btn tap" onClick="{{toggleMode}}" style="justify-content: center">Switch to {{modeWord}} mode</button>
+        <a href="Login.dc.html" class="btn btn-block tap">Sign in</a>
+        <a href="Signup.dc.html" class="btn btn-cta btn-block tap">Get your link</a>
+      </div>
+    </aside>
+  </div>
+
+
+  <main class="pub-wrap" style="padding-top: 48px">
+    <h1 style="font-size: clamp(38px, 5.6cqi, 64px); line-height: .96; font-weight: 800">Legal</h1>
+    <p class="muted" style="margin-top: 10px; font-size: 15px">Last updated 19 October 2026</p>
+    <div role="tablist" aria-label="Documents" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+        <button role="tab" aria-selected="{{t.on}}" class="chip tap {{t.cls}}" onClick="{{t.pick}}" style="min-height: 46px; font-size: 15px">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 32px 56px; margin-top: 30px">
+      <aside style="flex: 1 1 220px; min-width: 0">
+        <div class="card" style="padding: 18px">
+          <b style="font-size: 14px">In short</b>
+          <ul style="margin: 10px 0 0; padding-left: 18px; font-size: 14.5px; line-height: 1.6" class="muted">
+            <sc-for list="{{summary}}" as="x" hint-placeholder-count="4"><li>{{x}}</li></sc-for>
+          </ul>
+        </div>
+      </aside>
+
+      <article class="prose" style="flex: 999 1 560px; min-width: 0">
+        <sc-if value="{{isPrivacy}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="margin-top: 0">Privacy policy</h2>
+            <p>This policy explains what Sekretly collects, why, and what you can do about it. It follows the Nigeria Data Protection Act 2023.</p>
+            <h3>What we collect</h3>
+            <ul>
+              <li><b>Account details:</b> username, password (stored scrambled), date of birth, avatar, bio, and an optional recovery email.</li>
+              <li><b>Messages and chats:</b> the text you send and receive, until it disappears on your timer.</li>
+              <li><b>Approximate sender info:</b> country, approximate state or region, device type, phone system, browser, mobile network and local time. Never your exact location.</li>
+              <li><b>Game content:</b> nicknames, answers, votes, and dare photos or videos, which are deleted when the game ends.</li>
+              <li><b>Device and connection data:</b> IP address, approximate state or city worked out from it, device, browser, mobile network, how you arrived and pages visited. We use it for security, stopping abuse, stats and (later) approximate hints. Only Sekretly staff can see IP addresses, and we delete them after [30] days. Hints never show an IP address or exact location.</li>
+              <li><b>Reports and warnings:</b> the reason chosen, the reported message, and the warning count between two people.</li>
+              <li><b>Usage data:</b> pages visited and buttons tapped, used to improve the app.</li>
+            </ul>
+            <h3>Why we use it</h3>
+            <p>To run the service, deliver and route messages, keep people safe, handle reports, show stats, and later offer optional hints. We never sell your personal data or your messages.</p>
+            <h3>How long we keep it</h3>
+            <p>Messages are deleted when they expire (1 day to 3 weeks, your choice). Sender info is deleted with the message. Reported messages are kept for 30 days for review. Dare evidence is deleted when the game ends.</p>
+            <h3>Your rights</h3>
+            <p>You can access, correct, export or delete your data. Delete your account from Settings, or contact [legal email] for anything else.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{isTerms}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin-top: 0">Terms of use</h2>
+            <p>By using Sekretly you agree to these terms and our Community Rules.</p>
+            <h3>Who can use Sekretly</h3>
+            <p>You must be 16 or older and give your real date of birth. One person, one account.</p>
+            <h3>Your content</h3>
+            <p>You are responsible for what you send, including photos and videos. You keep ownership of it, and you let us store and show it so the service works.</p>
+            <h3>Reports, warnings and blocks</h3>
+            <p>We don’t filter words before they send. Anyone who receives a message can report it. Each report sends the sender a warning with the reason. After 3 warnings from the same person, their next report blocks the sender from messaging them, until they choose to undo it. Serious reports are also reviewed by our team.</p>
+            <h3>Anonymity has limits</h3>
+            <p>Other users cannot see who you are. We can, privately, and we may share information with authorities when the law requires it or someone is in danger.</p>
+            <h3>Games</h3>
+            <p>Play fair and safe. Do not post dares that are dangerous, illegal or sexual. We may end a game or remove a player.</p>
+            <h3>Ending your account</h3>
+            <p>You can delete your account any time. We may suspend or remove accounts that break these terms, for example after many warnings from different people or one serious report.</p>
+            <h3>The legal bits</h3>
+            <p>Sekretly is provided as is. These terms are governed by the laws of the Federal Republic of Nigeria. We will tell you in the app before important changes take effect.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{isAds}}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h2 style="margin-top: 0">Cookies &amp; ads</h2>
+            <p>Sekretly is free because of ads. This section explains how they work.</p>
+            <h3>Cookies we use</h3>
+            <ul>
+              <li><b>Essential:</b> keep you logged in and remember your light or dark mode.</li>
+              <li><b>Analytics:</b> help us see which features people use. No message text is ever included.</li>
+              <li><b>Advertising:</b> third-party vendors, including Google, use cookies to serve ads based on your previous visits to Sekretly and other websites.</li>
+            </ul>
+            <h3>Google ads</h3>
+            <p>Google’s use of advertising cookies lets it and its partners serve ads to you based on your visits to this and other sites. You can opt out of personalised advertising in Google’s Ads Settings, or opt out of some third-party vendors at aboutads.info.</p>
+            <h3>Where ads appear</h3>
+            <p>Only in labelled boxes: the inbox list, the screen after sending a message, paused link pages, game lobbies, the bottom of Settings, and our help and about pages. Never inside chats, the message box, or a game turn.</p>
+          </div>
+        </sc-if>
+      </article>
+    </div>
+  </main>
+
+  <footer class="ft">
+    <div class="ft-in">
+      <div class="ft-top">
+        <div class="ft-brand">
+          <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word" style="color: var(--ink)">Sekretly</span></a>
+          <p>Built for the things you almost said. Anonymous messages and party games, made in Nigeria.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-sm tap">Get your link</a>
+        </div>
+        <div class="ft-cols">
+          <div class="ft-col"><b>Product</b><a href="Signup.dc.html">Create a link</a><a href="Landing.dc.html#games" onClick="{{jumpGames}}">Games</a><a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a></div>
+          <div class="ft-col"><b>Company</b><a href="About.dc.html">About</a><a href="Contact.dc.html">Contact</a><a href="Help.dc.html">Help &amp; FAQ</a></div>
+          <div class="ft-col"><b>Safety</b><a href="Safety.dc.html">Safety center</a><a href="Safety.dc.html">Community rules</a><a href="Safety.dc.html">Report a problem</a></div>
+          <div class="ft-col"><b>Legal</b><a href="Legal.dc.html">Privacy policy</a><a href="Legal.dc.html">Terms of use</a><a href="Legal.dc.html">Cookies &amp; ads</a></div>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 Sekretly · 16+ only</span>
+        <span>Say it. Stay unknown.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1280,"height":2300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', tab: 'privacy' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var S = {
+      privacy: ['We collect the minimum to run Sekretly', 'IP addresses: staff only, deleted after [30] days', 'Messages delete on your timer', 'We never sell your data'],
+      terms: ['16+ only, one account each', 'You own what you send', 'Reports warn the sender', '4th report from one person blocks you from them'],
+      ads: ['Ads keep Sekretly free', 'Google may use cookies for ads', 'You can opt out of personalised ads', 'No ads in chats or game turns']
+    };
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      drawerCls: self.state.drawer ? 'is-open' : '', drawerOpen: self.state.drawer ? 'true' : 'false', drawerHidden: self.state.drawer ? 'false' : 'true',
+      toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
+      jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
+      jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      tabs: [['privacy', 'Privacy policy'], ['terms', 'Terms of use'], ['ads', 'Cookies & ads']].map(function (t) { var on = s.tab === t[0]; return { label: t[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ tab: t[0] }); } }; }),
+      isPrivacy: s.tab === 'privacy', isTerms: s.tab === 'terms', isAds: s.tab === 'ads',
+      summary: S[s.tab]
+    };
+  }
+}
+</script>
+</body>
+</html>

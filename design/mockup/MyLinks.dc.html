@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · My links</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">4</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+  </nav>
+
+  <div class="main">
+    <div class="wrap" style="max-width: 860px">
+      <header class="topbar">
+        <a href="Home.dc.html" class="icon-btn tap narrow-only" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+        <h1 class="grow" style="font-size: 28px">My links</h1>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+        <a href="Notifications.dc.html" class="icon-btn tap" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg><span class="badge">3</span></a>
+      </header>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <button class="btn tap" onClick="{{pauseAll}}">Pause all</button>
+        <button class="btn tap" onClick="{{resumeAll}}">Resume all</button>
+        <button class="btn btn-danger tap" onClick="{{askReset}}">Reset all</button>
+      </div>
+
+      <ul style="list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+        <sc-for list="{{links}}" as="l" hint-placeholder-count="4">
+          <li class="card rise" style="overflow: hidden">
+            <div class="{{l.th}}" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+              <img src="{{l.emoji}}" alt="" style="width: 40px; height: 40px">
+              <div style="flex: 1; min-width: 0">
+                <a href="LinkDetail.dc.html" onClick="{{l.open}}" class="d" style="display: block; font-size: 19px; font-weight: 800; line-height: 1.1; color: inherit; text-decoration: none">{{l.topic}}</a>
+                <div style="font-size: 12.5px; opacity: .85; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.url}}</div>
+              </div>
+              <span style="font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 5px 9px; border-radius: 99px; background: rgba(0,0,0,.26)">{{l.status}}</span>
+            </div>
+            <div style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px" class="muted">
+              <span><b style="color: var(--ink)">{{l.count}}</b> {{l.unitLabel}}</span><span><b style="color: var(--ink)">{{l.visits}}</b> visits</span><span>{{l.limit}}</span>
+            </div>
+            <div style="display: flex; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap">
+              <button class="btn btn-sm tap" onClick="{{l.toggle}}">{{l.action}}</button>
+              <button class="btn btn-sm tap" onClick="{{l.copy}}">{{l.copyLabel}}</button>
+              <a href="LinkDetail.dc.html" onClick="{{l.open}}" class="btn btn-sm tap">Insights</a>
+              <a href="Create.dc.html" onClick="{{l.edit}}" class="btn btn-sm tap">Edit</a>
+              <button class="btn btn-sm btn-ghost tap" onClick="{{l.del}}" style="color: var(--bad); border: 0; margin-left: auto">Delete</button>
+            </div>
+          </li>
+        </sc-for>
+      </ul>
+      <a href="Create.dc.html" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 16px">New link</a>
+      <p class="muted" style="margin-top: 14px; font-size: 13px; line-height: 1.5">Paused links show visitors a “taking a nap” page and work again at the same address when you resume. Reset makes a new key, and every old link stops forever.</p>
+    </div>
+  </div>
+</div>
+
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+    <a href="Create.dc.html" class="fab" aria-label="Create link"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+
+  <sc-if value="{{resetOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Reset all links">
+        <img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 52px; height: 52px">
+        <h2 style="margin-top: 8px; font-size: 24px">Reset all links?</h2>
+        <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">Every link you have shared stops working forever. Visitors will see “This link no longer exists”. Your messages stay in your inbox.</p>
+        <label for="rs-confirm" class="label" style="margin-top: 14px">Type RESET to confirm</label>
+        <input id="rs-confirm" class="field" value="{{resetText}}" onChange="{{onResetText}}" placeholder="RESET" style="text-transform: uppercase">
+        <button class="btn btn-lg btn-block tap" onClick="{{doReset}}" disabled="{{cantReset}}" style="margin-top: 14px; background: #c4213a; color: #ffffff; border: 0">Reset everything</button>
+        <button class="btn btn-ghost btn-block" onClick="{{closeReset}}" style="margin-top: 6px; border: 0">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><img src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 30px; height: 30px; flex: none"><b style="font-size: 14px">{{toastText}}</b></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', paused: { confess: true }, deleted: {}, copied: null, key: 'k7x2m9', resetOpen: false, resetText: '', toast: '' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearTimeout(this.t); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  flash(msg) { var self = this; this.setState({ toast: msg }); clearTimeout(this.t); this.t = setTimeout(function () { self.setState({ toast: '' }); }, 4300); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var E = { crown: '/_blob/886899060459eafd6bc4284897539947', peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', moon: '/_blob/1df7299954a782c5de8338339634a8e6', unicorn: '/_blob/7ee69e13b899e048010df41d0cf87143', octopus: '/_blob/e910746badea9d78c41ac4aa913de4a6' };
+    var base = [
+      { id: 'know', topic: 'How well do you know me?', th: 'th-default', theme: 'default', slug: 'know-me', emoji: E.crown, count: 31, visits: 140, limit: 'No limit', unit: 'quiz takers' },
+      { id: 'describe', topic: 'Describe me in 3 words', th: 'th-sunset', theme: 'sunset', slug: 'describe-3', emoji: E.peach, count: 23, visits: 118, limit: 'No limit' },
+      { id: 'rate', topic: 'Rate me 1–10', th: 'th-midnight', theme: 'midnight', slug: 'rate-me', emoji: E.moon, count: 12, visits: 64, limit: 'Stops at 50 messages' },
+      { id: 'confess', topic: 'Confess something', th: 'th-bubblegum', theme: 'bubblegum', slug: 'confess', emoji: E.unicorn, count: 8, visits: 31, limit: 'Napped after 24 hours' },
+      { id: 'ama', topic: 'Ask me anything', th: 'th-ocean', theme: 'ocean', slug: 'ama', emoji: E.octopus, count: 0, visits: 5, limit: 'Ends in 3 days' }
+    ];
+    var links = base.filter(function (l) { return !s.deleted[l.id]; }).map(function (l) {
+      var p = !!s.paused[l.id];
+      return Object.assign({}, l, {
+        unitLabel: l.unit || 'messages', status: p ? 'Paused' : 'Live', action: p ? 'Resume' : 'Pause',
+        url: 'sekretly.com/peach/' + s.key + '/' + l.theme + '/' + l.slug,
+        copyLabel: s.copied === l.id ? 'Copied' : 'Copy link',
+        toggle: function () { var n = Object.assign({}, s.paused); n[l.id] = !p; self.setState({ paused: n }); self.flash(p ? 'Link resumed' : 'Link paused'); },
+        copy: function () { self.setState({ copied: l.id }); },
+        edit: function () { try { window.localStorage.setItem('sk-linkedit', JSON.stringify({ id: l.id, topic: l.slug, theme: l.theme })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+        open: function () { try { window.localStorage.setItem('sk-link', l.id); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+        del: function () { var d = Object.assign({}, s.deleted); d[l.id] = true; self.setState({ deleted: d }); self.flash('Link deleted'); }
+      });
+    });
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      links: links,
+      pauseAll: function () { self.setState({ paused: { know: true, describe: true, rate: true, confess: true, ama: true } }); self.flash('All links paused'); },
+      resumeAll: function () { self.setState({ paused: {} }); self.flash('All links live again'); },
+      askReset: function () { self.setState({ resetOpen: true, resetText: '' }); },
+      resetOpen: s.resetOpen,
+      resetText: s.resetText,
+      onResetText: function (e) { self.setState({ resetText: e.target.value }); },
+      cantReset: s.resetText.trim().toUpperCase() !== 'RESET',
+      doReset: function () { self.setState({ resetOpen: false, key: 'p3q9za', paused: {} }); self.flash('New key made. Old links no longer work.'); },
+      closeReset: function () { self.setState({ resetOpen: false }); },
+      toast: !!s.toast, toastText: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

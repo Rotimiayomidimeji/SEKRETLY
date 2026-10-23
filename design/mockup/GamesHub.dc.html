@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Games</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.gh-games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:640px){.gh-games{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (min-width:1180px){.gh-games{grid-template-columns:repeat(6,minmax(0,1fr))}}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">4</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+  </nav>
+
+  <div class="main">
+    <div class="wrap">
+      <header class="topbar">
+        <h1 class="grow" style="font-size: 30px">Games</h1>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+        <a href="Notifications.dc.html" class="icon-btn tap" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg><span class="badge">3</span></a>
+      </header>
+
+      <div class="card row" style="padding: 10px 10px 10px 14px; gap: 8px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--muted); flex: none"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>
+        <label for="gh-code" class="sr">Game code</label>
+        <input id="gh-code" value="{{code}}" onChange="{{onCode}}" placeholder="Got a game code? e.g. MANGO7" maxlength="6" style="flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-size: 16px; font-weight: 700; outline: none; text-transform: uppercase; min-height: 44px">
+        <sc-if value="{{codeOk}}" hint-placeholder-val="{{ false }}"><a href="NHIELobbyJoin.dc.html" onClick="{{joinCode}}" class="btn btn-sm btn-cta tap">Join</a></sc-if>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+        <a href="JoinApp.dc.html" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; gap: 10px; align-items: center"><img src="/_blob/ea3a1403d8fe6d1943450cfacf059348" alt="" style="width: 36px; height: 36px"><span><b class="d" style="font-size: 17px; display: block">4-day streak</b><span class="muted" style="font-size: 12.5px">Play today to keep it</span></span></a>
+        <a href="JoinApp.dc.html" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; gap: 10px; align-items: center"><img class="float" src="/_blob/0bb83498eeb25491f1a1f03843b26271" alt="" style="width: 36px; height: 36px"><span><b class="d" style="font-size: 17px; display: block">Daily pack</b><span class="muted" style="font-size: 12.5px">2 invites waiting</span></span></a>
+      </div>
+      <div class="sec-h"><h2>Start a game</h2><span class="muted" style="font-size: 13px">every table is 3D</span></div>
+      <div class="gh-games">
+        <sc-for list="{{games}}" as="g" hint-placeholder-count="6">
+          <a href="CreateGame.dc.html" onClick="{{g.pick}}" class="card tap lift" style="padding: 14px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; min-height: 168px; position: relative; overflow: hidden">
+            <span class="pill" style="position: absolute; top: 12px; right: 12px; background: {{g.tagBg}}; color: {{g.tagInk}}">{{g.tag}}</span>
+            <span class="av" style="background: {{g.tint}}"><img src="{{g.icon}}" alt=""></span>
+            <b class="d" style="font-size: 17px; line-height: 1.05">{{g.name}}</b>
+            <span class="muted" style="font-size: 12.5px; margin-top: auto">{{g.meta}}</span>
+          </a>
+        </sc-for>
+      </div>
+
+      <div class="sec-h"><h2>Open games</h2><span class="muted" style="font-size: 13px">{{openCount}} looking for players</span></div>
+      <div class="rail" role="tablist" aria-label="Filter games" style="display: flex; gap: 8px; margin-bottom: 12px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button role="tab" aria-selected="{{f.on}}" class="chip tap {{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{open}}" as="o" hint-placeholder-count="5">
+          <li class="card" style="display: flex; align-items: center; gap: 12px; padding: 12px">
+            <span class="av" style="background: {{o.tint}}"><img src="{{o.icon}}" alt=""></span>
+            <div style="flex: 1; min-width: 0">
+              <div style="font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{o.name}}</div>
+              <div class="muted" style="font-size: 13px">{{o.type}} · {{o.left}} left</div>
+              <div style="display: flex; gap: 3px; margin-top: 6px" aria-label="{{o.joined}} of {{o.max}} joined">
+                <sc-for list="{{o.seats}}" as="st" hint-placeholder-count="6"><span style="width: 14px; height: 5px; border-radius: 9px; background: {{st.c}}"></span></sc-for>
+              </div>
+            </div>
+            <span class="muted" style="font-size: 13px; font-weight: 800">{{o.joined}}/{{o.max}}</span>
+            <a href="{{o.href}}" onClick="{{o.join}}" class="btn btn-sm btn-cta tap">Join</a>
+          </li>
+          <sc-if value="{{o.adAfter}}" hint-placeholder-val="{{ false }}">
+            <li class="ad ad-feed"><b>In-feed native ad · game listing</b>after the 3rd open game</li>
+          </sc-if>
+        </sc-for>
+      </ul>
+      <p class="muted" style="margin-top: 12px; font-size: 13px">Creators are never shown. Everyone plays under a random nickname.</p>
+    </div>
+  </div>
+</div>
+
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+    <a href="CreateGame.dc.html" onClick="{{newGame}}" class="fab" aria-label="Create game"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', filter: 'all', code: '' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var E = { shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', die: '/_blob/c31fcca8682736cc92ca4f3073f8c7dd', eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348', sparkles: '/_blob/727ac58e5046d6eefbb35427eff3c1df', letter: '/_blob/ee2791bdeac805bec379541426d39014' };
+    var tint = { nhie: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', tod: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', wyr: 'linear-gradient(135deg,#22e1ff,#3a6bff)', mlt: 'linear-gradient(135deg,#ff8a3d,#c2185b)', hot: 'linear-gradient(135deg,#ffd23d,#ff7a45)', poll: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)' };
+    var off = dark ? 'rgba(255,255,255,.16)' : 'rgba(48,34,72,.14)';
+    var G = [
+      { id: 'nhie', name: 'Never Have I Ever', meta: 'Tip a cup · 3–10', icon: E.shush, tag: 'Hot', tagBg: '#c2185b', tagInk: '#fff' },
+      { id: 'tod', name: 'Truth or Dare', meta: 'Spin the bottle · 2–8', icon: '/_blob/dabc1dc3b2ca85f511896f5fe287b1b4', tag: 'Live', tagBg: '#0d7f4b', tagInk: '#fff' },
+      { id: 'wyr', name: 'Would You Rather', meta: 'Pick a side · 2–20', icon: '/_blob/bb98c97874bd7846658816dcbbdb7780', tag: 'Live', tagBg: '#0d7f4b', tagInk: '#fff' },
+      { id: 'mlt', name: 'Most Likely To', meta: 'Win the crown · 3–15', icon: '/_blob/886899060459eafd6bc4284897539947', tag: 'New', tagBg: '#7a3cff', tagInk: '#fff' },
+      { id: 'hot', name: 'Hot Takes', meta: 'Read the room · 2–20', icon: '/_blob/69f665bc7243f1656e9ff91e0af97d91', tag: 'New', tagBg: '#7a3cff', tagInk: '#fff' },
+      { id: 'poll', name: 'Anonymous Polls', meta: 'Guess the winner · any size', icon: '/_blob/669adcdde8b5d16eac1dc87c5115c4c0', tag: 'Live', tagBg: '#0d7f4b', tagInk: '#fff' }
+    ].map(function (g) { g.tint = tint[g.id]; return g; });
+    var O = [
+      { g: 'nhie', name: 'Friday Night Never', joined: 3, max: 6, left: '1h 20m' },
+      { g: 'nhie', name: 'Hostel B confessions', joined: 7, max: 10, left: '42m' },
+      { g: 'tod', name: 'Dare Club 300L', joined: 2, max: 4, left: '55m' },
+      { g: 'wyr', name: 'Class of 2027 chaos', joined: 2, max: 8, left: '1h 55m' },
+      { g: 'nhie', name: 'Sunday vibes only', joined: 4, max: 8, left: '1h 10m' },
+      { g: 'tod', name: 'No chickens allowed', joined: 3, max: 4, left: '18m' },
+      { g: 'mlt', name: 'Hostel B awards', joined: 5, max: 8, left: '35m' },
+      { g: 'hot', name: 'Sunday vibes only', joined: 4, max: 10, left: '1h 5m' },
+      { g: 'poll', name: 'Group chat polls', joined: 9, max: 20, left: '2h' }
+    ];
+    var gById = {}; G.forEach(function (g) { gById[g.id] = g; });
+    var shown = O.filter(function (o) { return s.filter === 'all' || o.g === s.filter; });
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      code: s.code, onCode: function (e) { self.setState({ code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') }); }, codeOk: s.code.length >= 5,
+      games: G.map(function (g) { return Object.assign({ tint: 'var(--card2)' }, g, { pick: function () { try { window.localStorage.setItem('sk-pick', g.id); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} } }); }),
+      filters: [['all', 'All'], ['nhie', 'Never Have I Ever'], ['tod', 'Truth or Dare'], ['wyr', 'Would You Rather'], ['mlt', 'Most Likely To'], ['hot', 'Hot Takes'], ['poll', 'Polls']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
+      openCount: shown.length,
+      joinCode: function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: 'nhie', room: 'Friday Night Never', role: 'player' })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      open: shown.map(function (o, i) {
+        var joinRoom = function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: o.g, room: o.name, role: 'player' })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} };
+        var g = gById[o.g], seats = [];
+        for (var k = 0; k < o.max; k++) seats.push({ c: k < o.joined ? '#5be0a0' : off });
+        return { name: o.name, type: g.name, icon: g.icon, tint: g.tint, joined: o.joined, max: o.max, left: o.left, seats: seats, adAfter: i === 2, join: joinRoom, href: { nhie: 'NHIELobbyJoin', tod: 'TruthDareLobbyJoin', wyr: 'WYRLobbyJoin', mlt: 'MostLikelyLobbyJoin', hot: 'HotTakesLobbyJoin', poll: 'PollsLobbyJoin' }[o.g] + '.dc.html' };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

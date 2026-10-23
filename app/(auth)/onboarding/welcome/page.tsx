@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function WelcomeOnboardingPage() { return <FoundationPage title="Welcome to the quiet side." description="The onboarding welcome flow will be connected to authentication in Phase 2." />; }
+import { redirect } from "next/navigation";
+
+// Onboarding is one screen now (see app/(auth)/onboarding/page.tsx).
+export default function Page() {
+  redirect("/onboarding");
+}

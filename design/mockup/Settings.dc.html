@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Settings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.st-wrap{display:flex;gap:24px;align-items:flex-start}
+.st-list{flex:1;min-width:0}
+.st-list.hide{display:none}
+.st-detail{display:none;flex:1;min-width:0}
+.st-detail.open{display:block}
+@container (min-width:900px){.st-list,.st-list.hide{display:block;flex:0 0 300px}.st-detail{display:block}.st-back{display:none!important}}
+.seg{display:flex;padding:4px;border-radius:16px;background:var(--card2);gap:4px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font-weight:800;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.st-range{width:100%;accent-color:#d81b72;height:32px}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">4</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+  </nav>
+
+  <div class="main">
+    <div class="wrap">
+      <div class="st-wrap">
+        <section class="{{listCls}}" aria-label="Settings sections">
+          <header class="topbar">
+            <a href="Profile.dc.html" class="icon-btn tap narrow-only" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+            <h1 class="grow" style="font-size: 28px">Settings</h1>
+            <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+              <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+              <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+            </button>
+          </header>
+          <ul class="card" style="list-style: none; margin: 0; padding: 4px 0; overflow: hidden">
+            <sc-for list="{{sections}}" as="x" hint-placeholder-count="11">
+              <li>
+                <button class="list-row tap" onClick="{{x.pick}}" aria-current="{{x.cur}}" style="width: 100%; border: 0; border-bottom: 1px solid var(--line); background: {{x.bg}}; text-align: left">
+                  <img src="{{x.icon}}" alt="" style="width: 28px; height: 28px">
+                  <span style="flex: 1; min-width: 0"><b style="display: block; font-size: 15px">{{x.label}}</b><span class="muted" style="font-size: 12.5px">{{x.sub}}</span></span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--muted)"><path d="m9 18 6-6-6-6"></path></svg>
+                </button>
+              </li>
+            </sc-for>
+          </ul>
+          <a href="Landing.dc.html" class="btn btn-block tap" style="margin-top: 12px">Log out</a>
+          <div class="ad-wrap"><div class="ad ad-banner" style="width: 320px; height: 100px"><b>Banner · settings bottom</b>320 × 100</div></div>
+        </section>
+
+        <section class="{{detailCls}}" aria-label="{{secTitle}}">
+          <header class="topbar">
+            <button class="st-back icon-btn tap" onClick="{{back}}" aria-label="Back to settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></button>
+            <h2 class="grow" style="font-size: 26px">{{secTitle}}</h2>
+          </header>
+
+          <sc-if value="{{secAccount}}" hint-placeholder-val="{{ true }}">
+            <div class="card" style="overflow: hidden">
+              <div class="list-row"><span style="flex: 1"><b>Username</b><div class="muted" style="font-size: 13px">@{{username}}</div></span><button class="btn btn-sm tap" onClick="{{editUser}}">Change</button></div>
+              <div class="list-row"><span style="flex: 1"><b>Password</b><div class="muted" style="font-size: 13px">Changed 12 days ago</div></span><button class="btn btn-sm tap" onClick="{{editPass}}">Change</button></div>
+              <div class="list-row"><span style="flex: 1"><b>Recovery email</b><div class="muted" style="font-size: 13px">{{emailShown}}</div></span><button class="btn btn-sm tap" onClick="{{editEmail}}">Edit</button></div>
+              <div class="list-row"><span style="flex: 1"><b>Install Sekretly</b><div class="muted" style="font-size: 13px">{{installHint}}</div></span><button class="btn btn-sm btn-cta" onClick="{{askInstall}}" disabled="{{installed}}">{{installBtn}}</button></div>
+            </div>
+            <button class="btn btn-danger btn-block tap" onClick="{{askDelete}}" style="margin-top: 14px">Delete account</button>
+          </sc-if>
+
+          <sc-if value="{{secPrivacy}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="padding: 16px">
+              <b>Who can start two-way chats with me</b>
+              <div class="seg" style="margin-top: 10px"><sc-for list="{{chatOpts}}" as="o" hint-placeholder-count="2"><button aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+            </div>
+            <div class="card row" style="padding: 16px; margin-top: 10px">
+              <span style="flex: 1"><b>Visitors without an account can message me</b><div class="muted" style="font-size: 13px">Turn off to only hear from Sekretly users</div></span>
+              <button class="switch" role="switch" aria-checked="{{visitorsStr}}" aria-label="Allow visitors" onClick="{{toggleVisitors}}"></button>
+            </div>
+            <div class="card row" style="padding: 16px; margin-top: 10px">
+              <span style="flex: 1"><b>Public profile</b><div class="muted" style="font-size: 13px">Show avatar, bio and active links</div></span>
+              <button class="switch" role="switch" aria-checked="{{publicStr}}" aria-label="Public profile" onClick="{{togglePublic}}"></button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secMessages}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="padding: 16px">
+              <div class="row"><b style="flex: 1">Inbox messages disappear after</b><span class="pill">{{inboxLabel}}</span></div>
+              <label for="st-inbox" class="sr">Inbox timer</label>
+              <input id="st-inbox" class="st-range" type="range" min="0" max="5" step="1" value="{{inboxIdx}}" onChange="{{onInbox}}">
+              <div class="muted" style="display: flex; justify-content: space-between; font-size: 12px"><span>1 day</span><span>3 weeks</span></div>
+            </div>
+            <div class="card" style="padding: 16px; margin-top: 10px">
+              <div class="row"><b style="flex: 1">Chat messages disappear after</b><span class="pill">{{chatLabel}}</span></div>
+              <label for="st-chat" class="sr">Chat timer</label>
+              <input id="st-chat" class="st-range" type="range" min="0" max="5" step="1" value="{{chatIdx}}" onChange="{{onChat}}">
+              <div class="muted" style="display: flex; justify-content: space-between; font-size: 12px"><span>1 day</span><span>3 weeks</span></div>
+            </div>
+            <p class="muted" style="margin-top: 10px; font-size: 13px; line-height: 1.5">Expired messages are deleted from our servers. Reported messages are kept for 30 days for review.</p>
+          </sc-if>
+
+          <sc-if value="{{secSafety}}" hint-placeholder-val="{{ false }}">
+            <div class="card row" style="padding: 16px; margin-bottom: 10px">
+              <span style="flex: 1"><b>Blur photos and videos until I tap</b><div class="muted" style="font-size: 12.5px">Anything sent to you anonymously starts blurred</div></span>
+              <button class="switch" role="switch" aria-checked="{{blurStr}}" aria-label="Blur media" onClick="{{toggleBlur}}"></button>
+            </div>
+            <div class="card" style="padding: 16px; margin-bottom: 10px">
+              <b>Warnings on my account</b>
+              <p class="muted" style="font-size: 13px; margin-top: 4px; line-height: 1.45">When someone reports a message you sent them, you get a warning. After 3 warnings with the same person, their next report blocks you from messaging them.</p>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px">
+                <sc-for list="{{myWarnings}}" as="mw" hint-placeholder-count="2">
+                  <div>
+                    <div class="row" style="font-size: 14px"><b style="flex: 1">{{mw.to}}</b><span class="muted">{{mw.label}}</span></div>
+                    <div class="warn-steps" style="margin-top: 6px"><sc-for list="{{mw.steps}}" as="st" hint-placeholder-count="4"><span style="background: {{st.c}}"></span></sc-for></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div class="card" style="padding: 16px">
+              <b>My hidden words</b>
+              <p class="muted" style="font-size: 13px; margin-top: 4px">Messages with these words arrive covered.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px">
+                <sc-for list="{{words}}" as="w" hint-placeholder-count="3">
+                  <span class="pill" style="padding: 6px 6px 6px 12px; font-size: 13px">{{w.label}}<button onClick="{{w.remove}}" aria-label="Remove {{w.label}}" style="width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--line); display: grid; place-items: center; padding: 0">×</button></span>
+                </sc-for>
+              </div>
+              <div class="row" style="gap: 8px; margin-top: 12px">
+                <label for="st-word" class="sr">Add a hidden word</label>
+                <input id="st-word" class="field" value="{{newWord}}" onChange="{{onWord}}" placeholder="Add a word" style="flex: 1">
+                <button class="btn tap" onClick="{{addWord}}">Add</button>
+              </div>
+            </div>
+            <div class="card" style="margin-top: 10px; overflow: hidden">
+              <div style="padding: 14px 16px 4px"><b>Blocked senders</b><div class="muted" style="font-size: 12.5px; margin-top: 2px">Blocked automatically after your 4th report. Undo to let them message you again.</div></div>
+              <sc-for list="{{blocked}}" as="bl" hint-placeholder-count="2">
+                <div class="list-row"><span class="av" style="background: {{bl.bg}}; width: 38px; height: 38px; border-radius: 12px"><img src="{{bl.icon}}" alt=""></span><span style="flex: 1; font-size: 14px">{{bl.name}}</span><button class="btn btn-sm tap" onClick="{{bl.unblock}}">Undo</button></div>
+              </sc-for>
+              <sc-if value="{{noBlocked}}" hint-placeholder-val="{{ false }}"><p class="muted" style="padding: 8px 16px 16px; font-size: 14px">Nobody blocked.</p></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secLinks}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="padding: 16px">
+              <p class="muted" style="font-size: 14px; line-height: 1.5">Pause, resume or reset every link at once. Reset makes a new key and old links stop forever.</p>
+              <a href="MyLinks.dc.html" class="btn btn-block tap" style="margin-top: 12px">Open My links</a>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secNotif}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="overflow: hidden">
+              <sc-for list="{{notifs}}" as="n" hint-placeholder-count="7">
+                <div class="list-row"><span style="flex: 1"><b style="font-size: 15px">{{n.label}}</b><div class="muted" style="font-size: 12.5px">{{n.sub}}</div></span><button class="switch" role="switch" aria-checked="{{n.on}}" aria-label="{{n.label}}" onClick="{{n.toggle}}"></button></div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secLook}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="padding: 16px">
+              <b>Appearance</b>
+              <div class="seg" style="margin-top: 10px"><sc-for list="{{lookOpts}}" as="o" hint-placeholder-count="3"><button aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+              <p class="muted" style="font-size: 13px; margin-top: 10px">System follows your phone’s setting.</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secGames}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="overflow: hidden">
+              <div class="list-row"><span style="flex: 1"><b>Allow game invites</b></span><button class="switch" role="switch" aria-checked="{{invitesStr}}" aria-label="Allow game invites" onClick="{{toggleInvites}}"></button></div>
+              <div class="list-row"><span style="flex: 1"><b>Show my games in the listing</b><div class="muted" style="font-size: 12.5px">Others can find and join</div></span><button class="switch" role="switch" aria-checked="{{listingStr}}" aria-label="Show in listing" onClick="{{toggleListing}}"></button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{secHelp}}" hint-placeholder-val="{{ false }}">
+            <div class="card" style="overflow: hidden">
+              <a href="Help.dc.html" class="list-row">Help &amp; FAQ</a>
+              <a href="Contact.dc.html" class="list-row">Contact us</a>
+              <a href="Safety.dc.html" class="list-row">Community rules</a>
+              <a href="Legal.dc.html" class="list-row">Privacy policy</a>
+              <a href="Legal.dc.html" class="list-row">Terms of use</a>
+            </div>
+            <p class="muted" style="margin-top: 12px; font-size: 12.5px">Sekretly v0.1 beta</p>
+          </sc-if>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+    <a href="Create.dc.html" class="fab" aria-label="Create link"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+
+  <sc-if value="{{editOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="{{editTitle}}">
+        <sc-if value="{{editing}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="font-size: 22px">{{editTitle}}</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 14px; line-height: 1.5">{{editHint}}</p>
+            <label for="ed-field" class="label" style="margin-top: 12px">{{editLabel}}</label>
+            <input id="ed-field" class="field" type="{{editType}}" value="{{editVal}}" onChange="{{onEditVal}}" placeholder="{{editPh}}">
+            <div class="hint">{{editCheck}}</div>
+            <button class="btn btn-cta btn-lg btn-block tap" onClick="{{saveEdit}}" disabled="{{cantSave}}" style="margin-top: 12px; opacity: {{saveOp}}">Save</button>
+            <button class="btn btn-ghost btn-block" onClick="{{closeEdit}}" style="margin-top: 6px; border: 0">Cancel</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{editSaved}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center; padding: 6px 0">
+            <img class="pop" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 60px; height: 60px">
+            <h2 style="font-size: 22px; margin-top: 6px">Saved</h2>
+            <p class="muted" style="margin-top: 4px; font-size: 14px">{{savedNote}}</p>
+            <button class="btn btn-ink btn-lg btn-block tap" onClick="{{closeEdit}}" style="margin-top: 14px">Done</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{delOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Delete account">
+        <sc-if value="{{notGone}}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="font-size: 24px">Delete your account?</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">Your links stop working, your messages and chats are deleted, and @peach becomes free for someone else. This cannot be undone.</p>
+            <label for="del-confirm" class="label" style="margin-top: 14px">Type DELETE to confirm</label>
+            <input id="del-confirm" class="field" value="{{delText}}" onChange="{{onDelText}}" placeholder="DELETE" style="text-transform: uppercase">
+            <button class="btn btn-lg btn-block tap" onClick="{{deleteForever}}" disabled="{{cantDelete}}" style="margin-top: 14px; background: #c4213a; color: #ffffff; border: 0; opacity: {{delOp}}">Delete forever</button>
+            <button class="btn btn-ghost btn-block" onClick="{{closeDelete}}" style="margin-top: 6px; border: 0">Keep my account</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{gone}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center; padding: 8px 0">
+            <img class="pop" src="/_blob/facd9191837d9eba7e7cedf471a11301" alt="" style="width: 72px; height: 72px">
+            <h2 style="font-size: 24px; margin-top: 8px">Your account is gone</h2>
+            <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">Everything was deleted. Thanks for being here. You can start fresh any time.</p>
+            <a href="Landing.dc.html" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 16px">Back to Sekretly</a>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{installPrompt}}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 20px">
+      <div role="dialog" aria-label="Install app" class="pop" style="width: min(100%, 340px); background: #ffffff; color: #202124; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.4); padding: 20px; font-family: Roboto, system-ui, sans-serif">
+        <div style="font-size: 18px; font-weight: 500">Install app?</div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px"><span class="logo-mark" style="width: 44px; height: 44px; border-radius: 12px; font-size: 22px">S</span><div><div style="font-weight: 600">Sekretly</div><div style="font-size: 13px; color: #5f6368">sekretly.com</div></div></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px">
+          <button onClick="{{cancelInstall}}" style="min-height: 40px; padding: 0 16px; border-radius: 20px; border: 0; background: transparent; color: #1a73e8; font-weight: 600">Cancel</button>
+          <button onClick="{{doInstall}}" style="min-height: 40px; padding: 0 18px; border-radius: 20px; border: 0; background: #1a73e8; color: #ffffff; font-weight: 600">Install</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"startSection":{"editor":null},"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', look: m || 'system', sec: props.startSection || null, chats: 'everyone', visitors: true, pub: true, inbox: 0, chat: 0, words: ['ugly', 'fake'], newWord: '', blocked: ['b1', 'b2'], blur: true, notif: { msg: true, reply: true, join: true, turn: true, paused: true, warn: true, push: false }, invites: true, listing: true, delOpen: false, installPrompt: false, installed: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  setMode(n) { try { window.localStorage.setItem('sk-mode', n); } catch (e) {} this.setState({ mode: n }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var I = { lock: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', hg: '/_blob/a689d835be296ffdce1f9d9fc18a844f', ghost: '/_blob/facd9191837d9eba7e7cedf471a11301', letter: '/_blob/ee2791bdeac805bec379541426d39014', bell: '/_blob/7f21763178926824d8503ff516f73544', moon: '/_blob/1df7299954a782c5de8338339634a8e6', die: '/_blob/c31fcca8682736cc92ca4f3073f8c7dd', sparkles: '/_blob/727ac58e5046d6eefbb35427eff3c1df', frog: '/_blob/fab7f564a0c6a958be79ebcec7291c73' };
+    var T = ['1 day', '2 days', '3 days', '1 week', '2 weeks', '3 weeks'];
+    var S = [
+      ['account', 'Account', 'Username, password, install, delete', I.frog],
+      ['privacy', 'Privacy', 'Who can reach you', I.eyes],
+      ['messages', 'Messages', 'Disappearing timers', I.hg],
+      ['safety', 'Safety', 'Blocked senders, blur, warnings', I.lock],
+      ['links', 'Links', 'Pause, resume, reset', I.letter],
+      ['notif', 'Notifications', 'Push and in-app', I.bell],
+      ['look', 'Appearance', 'Light, dark or system', I.moon],
+      ['games', 'Games', 'Invites and listing', I.die],
+      ['help', 'Legal and help', 'Rules, privacy, contact', I.sparkles]
+    ];
+    var cur = s.sec || 'account';
+    var curRow = S.filter(function (x) { return x[0] === cur; })[0];
+    var N = [['msg', 'New anonymous message', 'Someone answers your link'], ['reply', 'Chat replies', 'In two-way chats'], ['join', 'Someone joins your game', ''], ['turn', 'Your turn in a game', ''], ['paused', 'Link paused', 'When a limit is hit'], ['warn', 'Account warnings', 'Always recommended'], ['push', 'Push on this device', 'Needs browser permission']];
+    var BL = {
+      b1: { name: 'Fox (chat) · reported 4 times', icon: '/_blob/a1feeb887ae498080201d5cedfa0036a', bg: 'linear-gradient(135deg,#ffb35c,#ff5f8f)' },
+      b2: { name: 'Visitor on Rate me 1–10 · reported 4 times', icon: I.ghost, bg: 'linear-gradient(135deg,#7f8cff,#2b2f7a)' }
+    };
+    var lineC = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
+    var MW = [['To @tolu', 2], ['To @ada', 4]];
+    var v = (s.editVal || '').trim();
+    var editOk = s.edit === 'user' ? (/^[a-z0-9_]{3,20}$/.test(v) && v !== 'maya') : s.edit === 'pass' ? v.length >= 8 : /.+@.+\..+/.test(v);
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { self.setMode(dark ? 'light' : 'dark'); self.setState({ look: dark ? 'light' : 'dark' }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      listCls: s.sec ? 'st-list hide' : 'st-list', detailCls: s.sec ? 'st-detail open' : 'st-detail',
+      back: function () { self.setState({ sec: null }); },
+      sections: S.map(function (x) { var on = x[0] === cur; return { label: x[1], sub: x[2], icon: x[3], cur: on ? 'true' : 'false', bg: on ? 'var(--card2)' : 'transparent', pick: function () { self.setState({ sec: x[0] }); } }; }),
+      secTitle: curRow[1],
+      secAccount: cur === 'account', secPrivacy: cur === 'privacy', secMessages: cur === 'messages', secSafety: cur === 'safety', secLinks: cur === 'links', secNotif: cur === 'notif', secLook: cur === 'look', secGames: cur === 'games', secHelp: cur === 'help',
+      installed: s.installed, installBtn: s.installed ? 'Installed' : 'Install', installHint: s.installed ? 'On your home screen' : 'Opens like an app',
+      askInstall: function () { self.setState({ installPrompt: true }); }, installPrompt: s.installPrompt,
+      cancelInstall: function () { self.setState({ installPrompt: false }); }, doInstall: function () { self.setState({ installPrompt: false, installed: true }); },
+      askDelete: function () { self.setState({ delOpen: true, delText: '', gone: false }); }, delOpen: s.delOpen, closeDelete: function () { self.setState({ delOpen: false }); },
+      delText: s.delText || '', onDelText: function (e) { self.setState({ delText: e.target.value }); },
+      cantDelete: (s.delText || '').trim().toUpperCase() !== 'DELETE', delOp: (s.delText || '').trim().toUpperCase() === 'DELETE' ? 1 : 0.45,
+      deleteForever: function () { if ((s.delText || '').trim().toUpperCase() === 'DELETE') self.setState({ gone: true }); },
+      gone: !!s.gone, notGone: !s.gone,
+      username: s.username || 'peach', emailShown: s.email ? s.email.charAt(0) + '•••••' + s.email.slice(s.email.indexOf('@')) : 'p•••••@gmail.com',
+      editUser: function () { self.setState({ edit: 'user', editVal: s.username || 'peach', saved: false }); },
+      editPass: function () { self.setState({ edit: 'pass', editVal: '', saved: false }); },
+      editEmail: function () { self.setState({ edit: 'email', editVal: '', saved: false }); },
+      editOpen: !!s.edit, editing: !!s.edit && !s.saved, editSaved: !!s.edit && !!s.saved,
+      editTitle: s.edit === 'user' ? 'Change username' : s.edit === 'pass' ? 'Change password' : 'Recovery email',
+      editHint: s.edit === 'user' ? 'Your links move to the new name. Old links keep working for 7 days.' : s.edit === 'pass' ? 'At least 8 characters. Other devices get logged out.' : 'Only used to reset your password. We send a 6-digit code to check it.',
+      editLabel: s.edit === 'user' ? 'New username' : s.edit === 'pass' ? 'New password' : 'Email',
+      editType: s.edit === 'pass' ? 'password' : s.edit === 'email' ? 'email' : 'text',
+      editPh: s.edit === 'user' ? 'peach' : s.edit === 'pass' ? 'At least 8 characters' : 'you@example.com',
+      editVal: s.editVal || '', onEditVal: function (e) { self.setState({ editVal: s.edit === 'user' ? e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20) : e.target.value }); },
+      editCheck: editOk ? (s.edit === 'user' ? '@' + v + ' is free' : 'Looks good') : (s.edit === 'user' ? '3–20 letters, numbers or _' + (v === 'maya' ? ' · @maya is taken' : '') : s.edit === 'pass' ? (8 - v.length) + ' more characters' : 'Enter a valid email'),
+      cantSave: !editOk, saveOp: editOk ? 1 : 0.45,
+      saveEdit: function () { if (!editOk) return; var o = { saved: true }; if (s.edit === 'user') o.username = v; if (s.edit === 'email') o.email = v; self.setState(o); },
+      savedNote: s.edit === 'user' ? 'You are @' + (s.username || 'peach') + ' now.' : s.edit === 'pass' ? 'New password set. Other devices were logged out.' : 'We sent a code to your new email.',
+      closeEdit: function () { self.setState({ edit: null, saved: false }); },
+      chatOpts: [['everyone', 'Everyone'], ['nobody', 'Nobody']].map(function (o) { return { label: o[1], on: s.chats === o[0] ? 'true' : 'false', pick: function () { self.setState({ chats: o[0] }); } }; }),
+      visitorsStr: s.visitors ? 'true' : 'false', toggleVisitors: function () { self.setState({ visitors: !s.visitors }); },
+      publicStr: s.pub ? 'true' : 'false', togglePublic: function () { self.setState({ pub: !s.pub }); },
+      inboxIdx: s.inbox, chatIdx: s.chat, inboxLabel: T[s.inbox], chatLabel: T[s.chat],
+      onInbox: function (e) { self.setState({ inbox: Number(e.target.value) }); },
+      onChat: function (e) { self.setState({ chat: Number(e.target.value) }); },
+      words: s.words.map(function (w) { return { label: w, remove: function () { self.setState({ words: s.words.filter(function (x) { return x !== w; }) }); } }; }),
+      newWord: s.newWord, onWord: function (e) { self.setState({ newWord: e.target.value }); },
+      addWord: function () { var w = s.newWord.trim().toLowerCase(); if (w && s.words.indexOf(w) < 0) self.setState({ words: s.words.concat([w]), newWord: '' }); },
+      blocked: s.blocked.map(function (id) { var b = BL[id]; return { name: b.name, icon: b.icon, bg: b.bg, unblock: function () { self.setState({ blocked: s.blocked.filter(function (x) { return x !== id; }) }); } }; }),
+      noBlocked: s.blocked.length === 0,
+      blurStr: s.blur ? 'true' : 'false', toggleBlur: function () { self.setState({ blur: !s.blur }); },
+      myWarnings: MW.map(function (w) { return { to: w[0], label: w[1] >= 4 ? 'Blocked by them' : w[1] + ' of 3 warnings', steps: [1, 2, 3, 4].map(function (i) { return { c: i <= w[1] ? (i === 4 ? '#c4213a' : '#ffb020') : lineC }; }) }; }),
+      notifs: N.map(function (n) { var on = !!s.notif[n[0]]; return { label: n[1], sub: n[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.notif); o[n[0]] = !on; self.setState({ notif: o }); } }; }),
+      lookOpts: [['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(function (o) { return { label: o[1], on: s.look === o[0] ? 'true' : 'false', pick: function () {
+        var n = o[0] === 'system' ? 'dark' : o[0];
+        try { if (o[0] === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) n = 'light'; } catch (e) {}
+        self.setMode(n); self.setState({ look: o[0] });
+      } }; }),
+      invitesStr: s.invites ? 'true' : 'false', toggleInvites: function () { self.setState({ invites: !s.invites }); },
+      listingStr: s.listing ? 'true' : 'false', toggleListing: function () { self.setState({ listing: !s.listing }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

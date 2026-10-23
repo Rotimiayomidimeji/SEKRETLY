@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Profile</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+    <nav class="side" aria-label="Main">
+      <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+      <a href="Home.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+      <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">4</span></a>
+      <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+      <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+      <a href="GamesHub.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+      <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+      <a href="Profile.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+      <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+    </nav>
+  </sc-if>
+
+  <div class="main" style="padding-bottom: {{mainPad}}">
+    <div class="wrap" style="max-width: 680px">
+      <header class="topbar">
+        <sc-if value="{{isPublic}}" hint-placeholder-val="{{ false }}">
+          <a href="Landing.dc.html" class="logo"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        </sc-if>
+        <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}"><h1 style="font-size: 28px">Profile</h1></sc-if>
+        <span class="grow"></span>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+        <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+          <a href="Settings.dc.html" class="icon-btn tap" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg></a>
+        </sc-if>
+        <sc-if value="{{isPublic}}" hint-placeholder-val="{{ false }}">
+          <a href="Signup.dc.html" class="btn btn-sm btn-cta">Get your link</a>
+        </sc-if>
+      </header>
+
+      <sc-if value="{{hiddenPublic}}" hint-placeholder-val="{{ false }}">
+        <div class="card" style="padding: 32px 20px; text-align: center; margin-top: 20px">
+          <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 72px; height: 72px">
+          <h2 style="margin-top: 10px; font-size: 24px">This profile is private</h2>
+          <p class="muted" style="margin-top: 6px">If @peach shared a link with you, open that link to send a message.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-lg" style="margin-top: 16px">Make your own Sekretly</a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showProfile}}" hint-placeholder-val="{{ true }}">
+        <div>
+          <section class="card" style="padding: 22px; text-align: center; position: relative; overflow: hidden">
+            <div style="position: absolute; inset: 0 0 auto 0; height: 90px; background: var(--cta); opacity: .9"></div>
+            <span class="pop" style="position: relative; width: 112px; height: 112px; margin-top: 20px; border-radius: 36px; background: {{avBg}}; display: inline-grid; place-items: center; border: 4px solid var(--card)">
+              <img src="{{avSrc}}" alt="Avatar, a {{avName}}" style="width: 80px; height: 80px">
+            </span>
+            <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+              <div><button class="btn btn-sm tap" onClick="{{openPicker}}" style="margin-top: 10px">Change avatar</button></div>
+            </sc-if>
+            <h2 style="margin-top: 12px; font-size: 26px">@peach</h2>
+            <sc-if value="{{notEditing}}" hint-placeholder-val="{{ true }}">
+              <p class="muted" style="margin: 8px auto 0; font-size: 15.5px; line-height: 1.5; max-width: 36ch">{{bio}}</p>
+            </sc-if>
+            <sc-if value="{{editing}}" hint-placeholder-val="{{ false }}">
+              <div style="text-align: left; margin-top: 12px">
+                <label for="pf-bio" class="label">Bio</label>
+                <textarea id="pf-bio" class="field" value="{{bio}}" onChange="{{onBio}}" maxlength="150" style="min-height: 90px"></textarea>
+                <div class="hint" style="text-align: right">{{bioCount}}/150</div>
+              </div>
+            </sc-if>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px">
+              <div><div class="d" style="font-size: 22px; font-weight: 800">4</div><div class="muted" style="font-size: 12.5px">links</div></div>
+              <div><div class="d" style="font-size: 22px; font-weight: 800">43</div><div class="muted" style="font-size: 12.5px">messages</div></div>
+              <div><div class="d" style="font-size: 22px; font-weight: 800">5</div><div class="muted" style="font-size: 12.5px">games</div></div>
+            </div>
+            <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; gap: 8px; margin-top: 16px">
+                <button class="btn tap" onClick="{{toggleEdit}}" style="flex: 1">{{editLabel}}</button>
+                <a href="PublicProfile.dc.html" class="btn tap" style="flex: 1">View as visitor</a>
+              </div>
+            </sc-if>
+          </section>
+
+          <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+            <div class="card row" style="padding: 14px; margin-top: 12px">
+              <div style="flex: 1"><b style="font-size: 15px">Public profile</b><div class="muted" style="font-size: 13px">{{pubHint}}</div></div>
+              <button class="switch" role="switch" aria-checked="{{pubStr}}" aria-label="Public profile" onClick="{{togglePub}}"></button>
+            </div>
+          </sc-if>
+
+          <div class="sec-h"><h2>{{linksTitle}}</h2></div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{links}}" as="l" hint-placeholder-count="3">
+              <a href="{{l.href}}" class="{{l.th}} tap" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 22px; text-decoration: none">
+                <img src="{{l.emoji}}" alt="" style="width: 40px; height: 40px">
+                <span class="d" style="flex: 1; font-size: 19px; font-weight: 800; line-height: 1.1">{{l.topic}}</span>
+                <span style="font-size: 13px; font-weight: 800; padding: 8px 12px; border-radius: 99px; background: rgba(255,255,255,.92); color: #2a0a1c">{{l.cta}}</span>
+              </a>
+            </sc-for>
+          </div>
+          <sc-if value="{{isPublic}}" hint-placeholder-val="{{ false }}">
+            <div style="text-align: center; margin-top: 18px">
+              <p class="muted" style="font-size: 13px">Messages are never shown on profiles.</p>
+              <button class="btn btn-ghost btn-sm tap" onClick="{{reportProfile}}" disabled="{{reportedProfile}}" style="border: 0; color: var(--muted); margin-top: 4px">{{reportLabel}}</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+
+  <sc-if value="{{isOwn}}" hint-placeholder-val="{{ true }}">
+    <nav class="bnav" aria-label="Main">
+      <a href="Home.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+      <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">4</span></a>
+      <a href="Create.dc.html" class="fab" aria-label="Create link"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+      <a href="GamesHub.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+      <a href="Profile.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{picker}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim">
+      <div class="sheet" role="dialog" aria-label="Choose avatar">
+        <h2 style="font-size: 22px">Pick your animal</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px">
+          <sc-for list="{{avatars}}" as="a" hint-placeholder-count="6">
+            <button class="tap" onClick="{{a.pick}}" aria-pressed="{{a.on}}" aria-label="{{a.name}}" style="aspect-ratio: 1; border-radius: 24px; border: 3px solid {{a.ring}}; background: {{a.bg}}; display: grid; place-items: center; padding: 0">
+              <img src="{{a.src}}" alt="" style="width: 62%; height: 62%">
+            </button>
+          </sc-for>
+        </div>
+        <button class="btn btn-cta btn-lg btn-block tap" onClick="{{closePicker}}" style="margin-top: 16px">Done</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"view":{"editor":"enum","options":["own","public"],"default":"own"},"$preview":{"width":390,"height":1150}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', av: 2, bio: 'Final year, chronic overthinker, best jollof in Hostel B. Be nice.', editing: false, pub: true, picker: false, reported: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var own = this.props.view !== 'public';
+    var A = [
+      { name: 'fox', src: '/_blob/a1feeb887ae498080201d5cedfa0036a', bg: 'linear-gradient(135deg,#ffb35c,#ff5f8f)' },
+      { name: 'panda', src: '/_blob/4b5463ad60ec0a1915c9b60ecf54e134', bg: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)' },
+      { name: 'frog', src: '/_blob/fab7f564a0c6a958be79ebcec7291c73', bg: 'linear-gradient(135deg,#d6ff6b,#22c4a0)' },
+      { name: 'octopus', src: '/_blob/e910746badea9d78c41ac4aa913de4a6', bg: 'linear-gradient(135deg,#ffd0f0,#a46bff)' },
+      { name: 'unicorn', src: '/_blob/7ee69e13b899e048010df41d0cf87143', bg: 'linear-gradient(135deg,#9fe7ff,#ff9ad5)' },
+      { name: 'koala', src: '/_blob/f0e10078eb17fce65ae1a0a64d3fed2b', bg: 'linear-gradient(135deg,#ffe48a,#ff8a5c)' }
+    ];
+    var av = A[s.av];
+    var L = [
+      { topic: 'Describe me in 3 words', th: 'th-sunset', emoji: '/_blob/1fb2cbc919646a3a048411532a08bd4c' },
+      { topic: 'Rate me 1–10', th: 'th-midnight', emoji: '/_blob/1df7299954a782c5de8338339634a8e6' },
+      { topic: 'Ask me anything', th: 'th-ocean', emoji: '/_blob/e910746badea9d78c41ac4aa913de4a6' }
+    ];
+    return {
+      reportProfile: function () { self.setState({ reported: true }); }, reportedProfile: !!s.reported, reportLabel: s.reported ? 'Reported · our team will take a look' : 'Report this profile',
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      isOwn: own, isPublic: !own,
+      mainPad: own ? '116px' : '40px',
+      hiddenPublic: !own && !s.pub, showProfile: own || s.pub,
+      avSrc: av.src, avBg: av.bg, avName: av.name,
+      bio: s.bio, onBio: function (e) { self.setState({ bio: e.target.value.slice(0, 150) }); }, bioCount: s.bio.length,
+      editing: s.editing && own, notEditing: !(s.editing && own),
+      editLabel: s.editing ? 'Save' : 'Edit profile',
+      toggleEdit: function () { self.setState({ editing: !s.editing }); },
+      pubStr: s.pub ? 'true' : 'false', pubHint: s.pub ? 'Anyone can see your avatar, bio and active links' : 'Only people with your link can reach you',
+      togglePub: function () { self.setState({ pub: !s.pub }); },
+      linksTitle: own ? 'Active links' : 'Send @peach something',
+      links: L.map(function (l) { return { topic: l.topic, th: l.th, emoji: l.emoji, href: own ? 'MyLinks.dc.html' : 'Main.dc.html', cta: own ? 'Manage' : 'Send' }; }),
+      picker: s.picker,
+      openPicker: function () { self.setState({ picker: true }); },
+      closePicker: function () { self.setState({ picker: false }); },
+      avatars: A.map(function (a, i) { var on = s.av === i; return { name: a.name, src: a.src, bg: a.bg, on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ av: i }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

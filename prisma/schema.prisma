@@ -7,138 +7,190 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum InteractionStatus { DRAFT ACTIVE ARCHIVED }
-enum MessageVisibility { PRIVATE PUBLIC }
-enum NotificationType { MESSAGE REPLY REACTION FOLLOW SYSTEM }
-enum ReportReason { HARASSMENT SPAM HATE SELF_HARM OTHER }
-enum AnalyticsEventType { PAGE_VIEW PROFILE_VIEW INTERACTION_VIEW INTERACTION_STARTED INTERACTION_SUBMITTED SIGNUP_STARTED SIGNUP_COMPLETED INTERACTION_CREATED LINK_SHARED SHARE_CARD_CREATED MESSAGE_OPENED REPLY_CREATED EXPLORE_OPENED NOTIFICATION_OPENED }
+// Phase 1: accounts, sessions and the codes for email checks.
+// Phase 2: links (with quiz questions), the anonymous messages they receive, and per-day link stats.
+// Chats, safety, games and admin data are added by their own migrations as each phase is built.
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum CodePurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+enum LinkTopic {
+  DESCRIBE
+  QUIZ
+  CONFESS
+  RATE
+  AMA
+  CUSTOM
+}
+
+enum LinkStatus {
+  LIVE
+  PAUSED
+  DELETED
+}
 
 model User {
-  id String @id @default(cuid())
-  email String @unique
-  name String?
-  image String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profile Profile?
-  interactions Interaction[]
-  messages Message[] @relation("RecipientMessages")
-  replies Reply[]
-  reactions Reaction[]
-  notifications Notification[]
-  reports Report[]
-  blocksMade Block[] @relation("Blocker")
-  blocksReceived Block[] @relation("Blocked")
-  analyticsEvents AnalyticsEvent[]
+  id              String      @id @default(cuid())
+  /// Always stored lowercase; 3–20 letters, numbers or _.
+  username        String      @unique
+  passwordHash    String
+  /// Null for accounts made from a link's "get replies" popup, which only confirm they are 16 or older.
+  birthDate       DateTime?   @db.Date
+  ageConfirmedAt  DateTime?
+  /// The key in every link address (sekretlyy.vercel.app/<username>/<linkKey>/…). "Reset all" replaces it.
+  linkKey         String      @unique
+  /// Avatar picked at sign-up: fox, panda, frog, octopus, unicorn or koala.
+  avatar          String      @default("fox")
+  bio             String?
+  role            Role        @default(MEMBER)
+  status          UserStatus  @default(ACTIVE)
+  /// Optional, only used to reset a forgotten password.
+  recoveryEmail   String?
+  emailVerifiedAt DateTime?
+  onboardedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  lastSeenAt      DateTime?
+  sessions        Session[]
+  codes           EmailCode[]
+  links           Link[]
+  received        Message[]   @relation("received")
+  sent            Message[]   @relation("sent")
 }
 
-model Profile {
-  id String @id @default(cuid())
-  userId String @unique
-  username String @unique
-  displayName String
-  bio String?
-  avatarUrl String?
-  isPublic Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+/// One shareable link: a topic in a theme. Address: /<username>/<owner's linkKey>/<theme>/<slug>.
+model Link {
+  id             String         @id @default(cuid())
+  ownerId        String
+  topic          LinkTopic
+  /// describe-3, know-me, confess, rate-me, ama, or c-xxxx for a custom question
+  slug           String
+  theme          String
+  customQuestion String?
+  /// Optional limits: the link naps after this many messages, or at this time.
+  maxMessages    Int?
+  closesAt       DateTime?
+  status         LinkStatus     @default(LIVE)
+  messageCount   Int            @default(0)
+  visitCount     Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  owner          User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  questions      QuizQuestion[]
+  messages       Message[]
+  days           LinkDay[]
+
+  @@unique([ownerId, theme, slug])
+  @@index([ownerId, status])
 }
 
-model Interaction {
-  id String @id @default(cuid())
-  ownerId String
-  typeSlug String
-  title String
-  prompt String
-  slug String @unique
-  status InteractionStatus @default(DRAFT)
-  allowAnonymous Boolean @default(true)
-  allowPublicResponses Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  messages Message[]
-  analyticsEvents AnalyticsEvent[]
+/// "How well do you know me?" questions, in order.
+model QuizQuestion {
+  id           String   @id @default(cuid())
+  linkId       String
+  position     Int
+  text         String
+  options      String[]
+  correctIndex Int
+  link         Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@unique([linkId, position])
 }
 
+/// An anonymous message sent through a link. `data` holds topic details:
+/// describe { words }, rate { score, category }, quiz { score, of, nickname, picks }.
 model Message {
-  id String @id @default(cuid())
-  interactionId String
-  recipientId String
-  body String
-  visibility MessageVisibility @default(PRIVATE)
-  isRead Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  interaction Interaction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
-  recipient User @relation("RecipientMessages", fields: [recipientId], references: [id], onDelete: Cascade)
-  replies Reply[]
-  reactions Reaction[]
-  reports Report[]
+  id                String    @id @default(cuid())
+  linkId            String
+  recipientId       String
+  topic             LinkTopic
+  text              String
+  data              Json?
+  mediaUrl          String?
+  /// Set when the sender has an account (needed for replies); never shown to the recipient.
+  senderId          String?
+  /// Hashed network + browser of the sender, for spam limits and (later) the warning ladder. Never the raw IP.
+  senderFingerprint String
+  wantsReply        Boolean   @default(false)
+  readAt            DateTime?
+  expiresAt         DateTime
+  createdAt         DateTime  @default(now())
+  link              Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  recipient         User      @relation("received", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender            User?     @relation("sent", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId, createdAt])
+  @@index([linkId, createdAt])
 }
 
-model Reply {
-  id String @id @default(cuid())
-  messageId String
-  authorId String?
-  body String
-  isAnonymous Boolean @default(true)
-  createdAt DateTime @default(now())
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+/// Visits and messages per link per day, for the insights chart, and where visits came from
+/// (detected from the referrer and in-app browser; counts only, nothing about who).
+model LinkDay {
+  linkId        String
+  day           DateTime @db.Date
+  visits        Int      @default(0)
+  messages      Int      @default(0)
+  fromWhatsapp  Int      @default(0)
+  fromInstagram Int      @default(0)
+  fromSnapchat  Int      @default(0)
+  fromOther     Int      @default(0)
+  link          Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@id([linkId, day])
 }
 
-model Reaction {
-  id String @id @default(cuid())
-  messageId String
-  userId String?
-  kind String
-  createdAt DateTime @default(now())
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  @@unique([messageId, userId, kind])
+/// Devices that have sent a message before (hashed). First-timers see the "get replies" popup; returning ones get a toggle.
+model Visitor {
+  fingerprint String   @id
+  firstSeenAt DateTime @default(now())
 }
 
-model Notification {
-  id String @id @default(cuid())
-  userId String
-  type NotificationType
-  title String
-  body String
-  readAt DateTime?
-  createdAt DateTime @default(now())
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+/// One logged-in device. The cookie holds a random token; only its SHA-256 hash is stored here.
+model Session {
+  id         String   @id
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+  userAgent  String?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
-model Report {
-  id String @id @default(cuid())
-  reporterId String
-  messageId String?
-  reason ReportReason
-  details String?
-  createdAt DateTime @default(now())
-  reporter User @relation(fields: [reporterId], references: [id], onDelete: Cascade)
-  message Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+/// A 6-digit code sent by email (hashed). Expires after 10 minutes; 5 wrong tries uses it up.
+model EmailCode {
+  id        String      @id @default(cuid())
+  userId    String
+  purpose   CodePurpose
+  email     String
+  codeHash  String
+  attempts  Int         @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime    @default(now())
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
 }
 
-model Block {
-  id String @id @default(cuid())
-  blockerId String
-  blockedId String
-  createdAt DateTime @default(now())
-  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
-  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
-  @@unique([blockerId, blockedId])
-}
-
-model AnalyticsEvent {
-  id String @id @default(cuid())
-  userId String?
-  interactionId String?
-  type AnalyticsEventType
-  properties Json?
-  createdAt DateTime @default(now())
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  interaction Interaction? @relation(fields: [interactionId], references: [id], onDelete: SetNull)
+/// Counters for rate limits (login tries, sign-ups, code requests). Works across serverless instances.
+model RateLimit {
+  key     String   @id
+  count   Int
+  resetAt DateTime
 }

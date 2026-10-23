@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Truth or Dare lobby</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.lb-wrap{max-width:1180px;margin:0 auto;padding:12px 14px 40px}
+.lb-grid{display:flex;flex-direction:column;gap:12px}
+@container (min-width:900px){.lb-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}.lb-side{position:sticky;top:12px}}
+.lb-code{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:46px;font-weight:800;letter-spacing:.12em;line-height:1}
+.lb-ghost .g3-head,.lb-ghost .g3-body{background:transparent!important;border:2px dashed rgba(255,255,255,.45);box-shadow:none}
+.lb-ghost .g3-name{background:rgba(255,255,255,.12)}
+.lb-new{animation:lbDrop .8s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes lbDrop{from{transform:translateY(-140px) scale(.6);opacity:0}}
+.lb-count{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:96px;font-weight:800;line-height:1;color:#fff;text-shadow:0 0 40px rgba(255,59,141,.8);animation:lbBeat 1s cubic-bezier(.3,1.6,.5,1) infinite}
+@keyframes lbBeat{0%{transform:scale(1.6);opacity:0}30%{transform:scale(1);opacity:1}}
+.lb-nick{display:flex;align-items:center;gap:14px;padding:16px;border-radius:24px}
+.lb-nick .av{width:64px;height:64px;border-radius:50%;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:28px;font-weight:800;color:#1a0b14}
+.lb-rule{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}
+.lb-rule b{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:12.5px;background:var(--card2)}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+  <sc-if value="{{inLobby}}" hint-placeholder-val="{{ true }}">
+  <div class="lb-wrap">
+    <header class="topbar">
+      <a href="{{backHref}}" onClick="{{backClick}}" class="icon-btn tap" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg></a>
+      <img src="{{gm.icon}}" alt="" style="width: 38px; height: 38px; flex: none">
+      <div class="grow"><h1 style="font-size: 20px; line-height: 1.1">{{gm.room}}</h1><div class="muted" style="font-size: 13px">{{gm.name}} · {{roleLine}}</div></div>
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      </button>
+    </header>
+
+    <div class="lb-grid">
+      <section class="g3" aria-label="The table" onPointerDown="{{orbStart}}" onPointerMove="{{orbMove}}" onPointerUp="{{orbEnd}}" onPointerLeave="{{orbEnd}}">
+        <div class="g3-sky" style="background: {{sc.sky}}"></div>
+        <div class="g3-glow" style="background: {{sc.glow}}"></div>
+        <div class="g3-hud"><span class="g3-chip">{{seatChip}}</span><span class="g3-chip">{{lockChip}}</span></div>
+        <div class="g3-cam">
+          <div class="g3-floor" style="background-image: {{sc.floor}}"></div>
+          <div class="g3-table" style="background: {{sc.table}}"></div>
+          <div class="g3-at" style="transform: translate3d(0, 40px, 0)"><div class="g3-bb">
+            <sc-if value="{{counting}}" hint-placeholder-val="{{ false }}"><div class="lb-count" style="margin-bottom: 20px">{{countNum}}</div></sc-if>
+            <sc-if value="{{notCounting}}" hint-placeholder-val="{{ true }}"><div class="g3-holo" style="margin-bottom: 14px"><img src="{{gm.icon}}" alt="" style="width: 26px; height: 26px"><b>{{holoTitle}}</b><span style="font-size: 11px; font-weight: 700; opacity: .85">{{holoSub}}</span></div></sc-if>
+          </div></div>
+          <sc-for list="{{seats}}" as="p" hint-placeholder-count="6">
+            <div class="g3-at" style="transform: translate3d({{p.x}}px, {{p.y}}px, 0)">
+              <div class="g3-shadow"></div>
+              <div class="g3-bb"><div class="g3-fig {{p.cls}}">
+                <span class="g3-name">{{p.label}}</span>
+                <div class="g3-head" style="background: {{p.color}}">{{p.initial}}<sc-if value="{{p.ready}}" hint-placeholder-val="{{ false }}"><span class="g3-badge" style="background: #5be0a0">✓</span></sc-if></div>
+                <div class="g3-body" style="background: {{p.color}}"></div>
+              </div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div class="g3-hint">{{sc.name}} · drag to look around</div>
+      </section>
+
+      <div class="lb-side" style="display: flex; flex-direction: column; gap: 12px">
+        <sc-if value="{{isHost}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <sc-if value="{{scheduled}}" hint-placeholder-val="{{ false }}">
+              <section class="card row" style="padding: 14px; gap: 12px; background: linear-gradient(135deg,rgba(216,27,114,.16),rgba(122,60,255,.16))"><img src="/_blob/a689d835be296ffdce1f9d9fc18a844f" alt="" style="width: 36px; height: 36px"><span style="flex: 1; font-size: 14px; line-height: 1.4"><b>Scheduled for 9:00pm.</b> <span class="muted">Everyone gets a reminder 10 minutes before. You can still start early.</span></span></section>
+            </sc-if>
+            <sc-if value="{{friendsOnly}}" hint-placeholder-val="{{ false }}">
+              <section class="card row" style="padding: 14px; gap: 12px"><img src="/_blob/7356090e8cd14d77123c7e2f69c92dcb" alt="" style="width: 34px; height: 34px"><span style="flex: 1; font-size: 14px; line-height: 1.4"><b>Friends only.</b> <span class="muted">No public link. Invite people from your list below.</span></span></section>
+            </sc-if>
+            <sc-if value="{{notFriendsOnly}}" hint-placeholder-val="{{ true }}">
+            <section class="card" style="padding: 16px">
+              <div class="row" style="align-items: flex-end">
+                <div style="flex: 1"><div class="muted" style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Room code</div><div class="lb-code">K7Q2</div></div>
+                <button class="btn btn-sm tap" onClick="{{copy}}">{{copyLabel}}</button>
+              </div>
+              <div class="muted" style="font-size: 13px; margin-top: 8px">sekretly.com/g/K7Q2 · anyone with the link joins with a random nickname</div>
+              <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+                <button class="btn btn-sm tap" onClick="{{invite}}" style="background: #128c4a; color: #ffffff; border: 0">WhatsApp</button>
+                <button class="btn btn-sm tap" onClick="{{invite}}">Copy link</button>
+                <button class="btn btn-sm tap" onClick="{{toggleQr}}">QR code</button>
+              </div>
+              <sc-if value="{{qr}}" hint-placeholder-val="{{ false }}">
+                <div class="pop" style="margin: 12px auto 0; width: 150px; height: 150px; border-radius: 16px; background: repeating-conic-gradient(#211a2c 0 25%, #ffffff 0 50%) 0 0/18px 18px; border: 10px solid #ffffff" role="img" aria-label="QR code for K7Q2"></div>
+              </sc-if>
+            </section>
+            </sc-if>
+
+            <section class="card" style="overflow: hidden">
+              <div class="row" style="padding: 14px 14px 6px"><b style="flex: 1">Invite friends on Sekretly</b><span class="muted" style="font-size: 12.5px">{{invitedCount}} invited</span></div>
+              <sc-for list="{{friends}}" as="fr" hint-placeholder-count="4">
+                <div class="list-row">
+                  <span class="av" style="background: {{fr.bg}}; width: 40px; height: 40px; border-radius: 14px; color: #1a0b14; font-weight: 800">{{fr.initial}}</span>
+                  <span style="flex: 1"><b>{{fr.name}}</b><div class="muted" style="font-size: 12.5px">{{fr.sub}}</div></span>
+                  <button class="btn btn-sm tap {{fr.cls}}" onClick="{{fr.send}}">{{fr.label}}</button>
+                </div>
+              </sc-for>
+            </section>
+
+            <section class="card" style="padding: 14px">
+              <div class="row"><b style="flex: 1">Room settings</b><a href="CreateGame.dc.html" onClick="{{editSetup}}" class="pink" style="font-size: 13.5px; font-weight: 800">Edit</a></div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px">
+                <sc-for list="{{settings}}" as="st" hint-placeholder-count="5"><span class="pill">{{st}}</span></sc-for>
+              </div>
+              <div class="row" style="margin-top: 12px"><span style="flex: 1; font-size: 14px"><b>Lock the room</b><div class="muted" style="font-size: 12.5px">No new players after you start</div></span><button class="switch" role="switch" aria-checked="{{lockStr}}" aria-label="Lock the room" onClick="{{toggleLock}}"></button></div>
+            </section>
+
+            <sc-if value="{{canStartNow}}" hint-placeholder-val="{{ true }}"><a href="{{roomHref}}" onClick="{{enter}}" class="btn btn-cta btn-lg btn-block tap">{{startLabel}}</a></sc-if>
+            <sc-if value="{{cantStartNow}}" hint-placeholder-val="{{ false }}"><button class="btn btn-cta btn-lg btn-block" disabled="{{ true }}">{{startLabel}}</button></sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{notHost}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <sc-if value="{{isGuest}}" hint-placeholder-val="{{ false }}">
+              <div class="card" style="padding: 12px 14px; display: flex; gap: 10px; align-items: center; font-size: 13.5px; line-height: 1.4">
+                <img src="/_blob/0bb83498eeb25491f1a1f03843b26271" alt="" style="width: 32px; height: 32px; flex: none">
+                <span style="flex: 1"><b>Playing as a guest.</b> <span class="muted">Sign up after to keep your nickname, XP and streak.</span></span>
+              </div>
+            </sc-if>
+            <section class="card lb-nick">
+              <span class="av pop" style="background: {{me.color}}">{{me.initial}}</span>
+              <span style="flex: 1"><span class="muted" style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">You are</span><b class="d" style="display: block; font-size: 26px; line-height: 1.05">{{me.name}}</b><span class="muted" style="font-size: 12.5px">Nobody can see who you really are</span></span>
+              <button class="btn btn-sm tap" onClick="{{reroll}}" disabled="{{noReroll}}">{{rerollLabel}}</button>
+            </section>
+            <section class="card row" style="padding: 14px">
+              <span style="flex: 1"><b>I’m ready</b><div class="muted" style="font-size: 12.5px">{{readyHint}}</div></span>
+              <button class="switch" role="switch" aria-checked="{{readyStr}}" aria-label="I’m ready" onClick="{{toggleReady}}"></button>
+            </section>
+            <section class="card" style="padding: 16px">
+              <b>How {{gm.name}} works</b>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px">
+                <sc-for list="{{rules}}" as="ru" hint-placeholder-count="3"><div class="lb-rule"><b>{{ru.n}}</b><span>{{ru.text}}</span></div></sc-for>
+              </div>
+            </section>
+            <sc-if value="{{showGo}}" hint-placeholder-val="{{ false }}">
+              <div class="card pop" style="padding: 14px; display: flex; gap: 12px; align-items: center; border-color: #ff3b8d; box-shadow: 0 0 0 4px rgba(255,59,141,.15)">
+                <img src="/_blob/886899060459eafd6bc4284897539947" alt="" style="width: 36px; height: 36px; flex: none">
+                <span style="flex: 1; font-size: 14px; line-height: 1.4"><b>{{hostName}} started the game!</b><br><span class="muted">Taking you to the table…</span></span>
+                <button onClick="{{goNow}}" class="btn btn-sm btn-cta tap">Go now</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{waitingHost}}" hint-placeholder-val="{{ true }}"><div class="btn btn-lg btn-block" style="pointer-events: none; opacity: .8">{{waitText}}</div></sc-if>
+            <div class="ad-wrap" style="margin: 0"><div class="ad ad-mrec"><b>Medium rectangle · lobby</b>300 × 250 · only while waiting</div></div>
+            <a href="GamesHub.dc.html" class="btn btn-ghost btn-block" style="border: 0">Leave lobby</a>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{inGame}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="TruthDare" role="player" hint-size="100%,1320px"></dc-import>
+  </sc-if>
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><img src="{{toastIcon}}" alt="" style="width: 32px; height: 32px; flex: none"><span style="font-size: 14px; line-height: 1.35"><b>{{toastTitle}}</b><br><span class="muted">{{toastSub}}</span></span></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"role":{"editor":"enum","options":["host","player","guest"],"default":"host"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.load();
+    this.state = this.freshL(m || props.mode || 'dark');
+  }
+  // what the wizard or the invite handed over; re-read whenever a new link arrives (sk-nav)
+  load() {
+    var g = null, j = null;
+    try { g = JSON.parse(window.localStorage.getItem('sk-game') || 'null'); j = JSON.parse(window.localStorage.getItem('sk-join') || 'null'); this.nav = window.localStorage.getItem('sk-nav') || ''; } catch (e) { this.nav = ''; }
+    this.picked = g && g.game === 'tod' ? g : null;
+    this.joined = j && j.game === 'tod' ? j : null;
+    clearTimeout(this.hostTimer); clearTimeout(this.goTimer); this.hostTimer = null;
+  }
+  freshL(mode) { return { mode: mode, joined: 1, ready: false, rerolls: 1, nick: 0, invited: {}, lock: false, qr: false, copied: false, count: 0, go: false, inGame: false, toast: null }; }
+  role() { var r = this.props.role || 'host'; if (r !== 'host' && this.joined && this.joined.role === 'guest') r = 'guest'; return r; }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    // friends drop into seats; non-hosts see the host start after everyone arrives
+    this.tk = setInterval(function () {
+      var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (e) {}
+      if (nv !== self.nav) { self.load(); self.setState(self.freshL(self.state.mode)); return; }
+      var s = self.state, max = self.max || 6, host = self.role() === 'host';
+      if (s.go) return;
+      if (s.joined < max) { self.setState({ joined: s.joined + 1 }); return; }
+      if (!host && !self.hostTimer) self.hostTimer = setTimeout(function () {
+        self.setState({ go: true });
+        self.goTimer = setTimeout(function () { if (self.enterNow) self.enterNow(); self.setState({ inGame: true }); }, 2200);
+      }, 2500);
+    }, 1400);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); clearTimeout(this.hostTimer); clearTimeout(this.goTimer); clearTimeout(this.tt); }
+  componentDidUpdate(prev) {
+    if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
+    if (prev.role !== this.props.role) { this.load(); this.setState(this.freshL(this.state.mode)); }
+  }
+  flash(title, sub, icon) { var self = this; this.setState({ toast: { title: title, sub: sub, icon: icon } }); clearTimeout(this.tt); this.tt = setTimeout(function () { self.setState({ toast: null }); }, 3000); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var role = this.role(), host = role === 'host';
+    var GM = {
+      nhie: { name: 'Never Have I Ever', icon: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', room: 'Friday Night Never', host: 'NHIEHost', play: 'NHIE', min: 3, rules: ['A statement drops each round, from Mild to Unhinged.', 'Tap “I have” and you tip one of your 3 cups.', 'Last one holding cups wins.'],
+        sc: { name: 'Neon lounge', sky: 'radial-gradient(120% 90% at 50% 0%,#4a1263 0%,#160a22 55%,#08050c 100%)', glow: '#ff3b8d', floor: 'linear-gradient(rgba(255,59,141,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(255,59,141,.55) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#8a2a7a,#3a0f3a 70%)' } },
+      tod: { name: 'Truth or Dare', icon: '/_blob/dabc1dc3b2ca85f511896f5fe287b1b4', room: 'Dare Club 300L', host: 'TruthDareHost', play: 'TruthDare', min: 2, rules: ['The bottle spins and lands on someone.', 'They pick truth or dare. The table judges it.', 'Chicken out and you wear the 🐔.'],
+        sc: { name: 'Bonfire night', sky: 'radial-gradient(90% 80% at 50% 80%,#7a2d0b 0%,#2a0d05 50%,#0b0503 100%)', glow: '#ff7a1a', floor: 'linear-gradient(rgba(255,160,70,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,160,70,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#b0703a,#5a2b14 70%)' } },
+      wyr: { name: 'Would You Rather', icon: '/_blob/bb98c97874bd7846658816dcbbdb7780', room: 'Class of 2027 chaos', host: 'WYRHost', play: 'WYR', min: 2, rules: ['Two options. Pick a side.', 'Your figure walks to your side of the table.', 'Call the winning side for +2.'],
+        sc: { name: 'Split arena', sky: 'radial-gradient(120% 90% at 50% 0%,#0d2a5a 0%,#071229 55%,#04060d 100%)', glow: '#22e1ff', floor: 'linear-gradient(rgba(34,225,255,.4) 2px,transparent 2px),linear-gradient(90deg,rgba(34,225,255,.4) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#2a2f4a,#11142a 70%)' } },
+      mlt: { name: 'Most Likely To', icon: '/_blob/886899060459eafd6bc4284897539947', room: 'Hostel B awards', host: 'MostLikelyHost', play: 'MostLikely', min: 3, rules: ['A “most likely to…” question drops.', 'Vote a nickname, never yourself.', 'Most votes gets the crown. Vote with the table to score.'],
+        sc: { name: 'Award show', sky: 'radial-gradient(120% 90% at 50% 0%,#3a2a08 0%,#150d22 55%,#07050b 100%)', glow: '#ffd23d', floor: 'linear-gradient(rgba(255,210,61,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(255,210,61,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 38%,#2b2333,#0d0a12 70%)' } },
+      hot: { name: 'Hot Takes', icon: '/_blob/69f665bc7243f1656e9ff91e0af97d91', room: 'Sunday vibes only', host: 'HotTakesHost', play: 'HotTakes', min: 2, rules: ['A spicy opinion appears.', 'Rate it from Hard no to Facts.', 'Land close to the room’s average to score.'],
+        sc: { name: 'Hot seat', sky: 'linear-gradient(110deg,#0b2a4a 0%,#170a18 50%,#4a0b12 100%)', glow: '#ff4f6d', floor: 'linear-gradient(rgba(255,120,120,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(120,200,255,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#45404f,#17141d 70%)' } },
+      poll: { name: 'Anonymous Polls', icon: '/_blob/669adcdde8b5d16eac1dc87c5115c4c0', room: 'Group chat polls', host: 'PollsHost', play: 'Polls', min: 2, rules: ['Anyone can drop a poll.', 'Vote, then guess the winner for +2.', 'Columns rise live on the table.'],
+        sc: { name: 'Live studio', sky: 'radial-gradient(120% 90% at 50% 0%,#0b3a3a 0%,#081a1f 55%,#04090b 100%)', glow: '#5be0a0', floor: 'linear-gradient(rgba(91,224,160,.35) 2px,transparent 2px),linear-gradient(90deg,rgba(91,224,160,.35) 2px,transparent 2px)', table: 'radial-gradient(circle at 50% 40%,#1d3a3a,#0a1719 70%)' } }
+    };
+    var jn = role !== 'host' ? this.joined : null;
+    var gid = 'tod';
+    var gm = GM[gid] || GM.nhie;
+    if (jn && jn.room) gm = Object.assign({}, gm, { room: jn.room });
+    else if (this.picked && this.picked.room && this.picked.game === gid) gm = Object.assign({}, gm, { room: this.picked.room });
+    var max = this.picked && this.picked.game === gid && this.picked.max ? Math.max(3, Math.min(8, this.picked.max)) : 6; this.max = max;
+    var NICK = [['MangoMoon', '#ffd23d'], ['JollofJet', '#ff9a4a'], ['SuyaStar', '#ff5fa2']];
+    if (jn && jn.nick && NICK[0][0] !== jn.nick) NICK.unshift([jn.nick, jn.color || '#ff5fa2']);
+    var me = NICK[s.nick % NICK.length];
+    var crew = [['CocoaRay', '#7ef0c1'], ['BlueFox', '#7fb2ff'], ['KolaNut', '#ff9ad5'], ['PixelOwl', '#ffb35c'], ['ZoboQueen', '#b78bff'], ['JollofJet', '#ff9a4a'], ['SuyaStar', '#5be0a0']];
+    var n = max, R = max > 6 ? 196 : 182;
+    var seats = [];
+    for (var i = 0; i < max; i++) {
+      var a = (90 + i * 360 / n) * Math.PI / 180, filled = i < s.joined, nm = i === 0 ? me : crew[i - 1];
+      seats.push({ x: Math.round(R * Math.cos(a)), y: Math.round(R * Math.sin(a)), label: !filled ? 'open seat' : i === 0 ? (host ? 'You · host' : 'You') : nm[0], initial: filled ? nm[0].charAt(0) : '+', color: filled ? nm[1] : 'transparent',
+        cls: !filled ? 'lb-ghost' : (i === 0 ? 'g3-me' : (i === s.joined - 1 && s.joined > 1 ? 'lb-new' : '')), ready: filled && (i === 0 ? s.ready || host : i % 2 === 1 || s.joined >= max) });
+    }
+    var counting = s.count > 0;
+    var canStart = s.joined >= gm.min;
+    var FR = [['Fox', '#ffb35c', 'online now'], ['Moon', '#9db8ff', 'active 5m ago'], ['Ada', '#7ef0c1', 'played with you last week'], ['Tolu', '#ff9ad5', 'online now']];
+    var roomHref = (host ? gm.host : gm.play) + '.dc.html'; this.playHref = roomHref;
+    var friendsOnly = !!(host && this.picked && this.picked.join === 'friends'), scheduled = !!(host && this.picked && this.picked.when === 'later');
+    var hand = function (extra) { try { window.localStorage.setItem('sk-join', JSON.stringify(Object.assign({ game: gid, room: gm.room, role: role, nick: me[0], color: me[1] }, extra || {}))); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} };
+    this.enterNow = function () { hand(); };
+    var settings = this.picked && this.picked.game === gid && this.picked.settings && role === 'host' ? this.picked.settings : [max + ' turns', 'Mild → Unhinged', '15s answers', max + ' players', 'Link + friends', gm.sc.name];
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var x = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', x); } catch (e) {} self.setState({ mode: x }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      gm: gm, sc: gm.sc, backHref: host ? 'CreateGame.dc.html' : 'GamesHub.dc.html', backClick: function () { if (!host) return; try { window.localStorage.setItem('sk-edit', 'review'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      editSetup: function () { try { window.localStorage.setItem('sk-edit', 'setup'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      friendsOnly: friendsOnly, notFriendsOnly: !friendsOnly, scheduled: scheduled,
+      roleLine: host ? 'you’re the host' : role === 'guest' ? 'joined from a link' : 'joined in the app',
+      seatChip: s.joined + ' / ' + max + ' seated', lockChip: s.lock ? 'Locked 🔒' : 'Open room',
+      seats: seats, counting: counting, notCounting: !counting, countNum: s.count,
+      holoTitle: s.go ? 'Starting!' : s.joined >= max ? 'Table full' : 'Waiting…', holoSub: s.go ? 'taking you to the table' : (max - s.joined) + ' seats open',
+      isHost: host, notHost: !host, isGuest: role === 'guest',
+      copy: function () { self.setState({ copied: true }); self.flash('Link copied', 'sekretly.com/g/K7Q2', gm.icon); }, copyLabel: s.copied ? 'Copied ✓' : 'Copy code',
+      invite: function () { self.flash('Invite ready', 'Share it anywhere. Joiners get a random nickname.', '/_blob/faee0cc7c58ac8fcd872c32ba90d5d84'); },
+      qr: s.qr, toggleQr: function () { self.setState({ qr: !s.qr }); },
+      invitedCount: Object.keys(s.invited).length,
+      friends: FR.map(function (f) { var done = !!s.invited[f[0]]; return { name: f[0], initial: f[0].charAt(0), bg: f[1], sub: f[2], label: done ? 'Invited ✓' : 'Invite', cls: done ? '' : 'btn-cta', send: function () { var o = Object.assign({}, s.invited); o[f[0]] = true; self.setState({ invited: o }); } }; }),
+      settings: settings,
+      lockStr: s.lock ? 'true' : 'false', toggleLock: function () { self.setState({ lock: !s.lock }); },
+      canStartNow: host && canStart, cantStartNow: host && !canStart, showGo: !host && s.go, hostName: 'BlueFox',
+      startLabel: canStart ? (scheduled ? 'Start now instead · ' : 'Start game · ') + s.joined + ' players' : 'Waiting for ' + (gm.min - s.joined) + ' more to start',
+      roomHref: roomHref,
+      enter: function () { hand(); },
+      goNow: function () { hand(); clearTimeout(self.goTimer); self.setState({ inGame: true }); },
+      inGame: s.inGame, inLobby: !s.inGame,
+      waitingHost: !host && !s.go, waitText: s.joined < max ? 'Waiting for ' + (max - s.joined) + ' more to join…' : 'Everyone’s here. Waiting for the host to start…',
+      me: { name: me[0], initial: me[0].charAt(0), color: me[1] },
+      reroll: function () { if (s.rerolls > 0) self.setState({ nick: s.nick + 1, rerolls: s.rerolls - 1 }); }, noReroll: s.rerolls === 0, rerollLabel: s.rerolls ? 'Reroll · 1 left' : 'Locked in',
+      readyStr: s.ready ? 'true' : 'false', toggleReady: function () { self.setState({ ready: !s.ready }); }, readyHint: s.ready ? 'The host can see you’re ready' : 'Let the host know you’re in',
+      rules: gm.rules.map(function (t, k) { return { n: k + 1, text: t }; }),
+      orbStart: function (e) { self.drag = { x: e.clientX, o: self.orb || 0 }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      orbMove: function (e) { if (!self.drag) return; var o = Math.max(-40, Math.min(40, self.drag.o + (e.clientX - self.drag.x) * 0.35)); e.currentTarget.style.setProperty('--orb', o.toFixed(1) + 'deg'); self.drag.cur = o; },
+      orbEnd: function () { if (!self.drag) return; if (self.drag.cur !== undefined) self.orb = self.drag.cur; self.drag = null; },
+      toast: !!s.toast, toastTitle: s.toast ? s.toast.title : '', toastSub: s.toast ? s.toast.sub : '', toastIcon: s.toast ? s.toast.icon : ''
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+/* Create: from design/mockup/Create.dc.html */
+body{margin:0;background:#0c0811}
+.cr-prev{order:0}
+.cr-ctrl{order:1}
+@container (min-width:860px){.cr-prev{order:2}.cr-prev-in{position:sticky;top:24px}}
+/* live preview: a scaled-down link page for the chosen topic */
+.cr-mini{border-radius:26px;padding:16px;min-height:236px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:background .5s}
+.cr-ttl{font-family:var(--font-display),system-ui,sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.08;max-width:15ch}
+.cr-box{margin-top:12px;padding:10px;border-radius:16px;background:rgba(0,0,0,.2)}
+.cr-row{display:grid;gap:5px}
+.cr-slot{height:34px;border-radius:10px;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;font-size:11px;font-weight:800;opacity:.85}
+.cr-pill{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:99px;background:rgba(255,255,255,.18);font-size:11px;font-weight:700}
+.cr-opt{height:26px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;padding:0 9px;font-size:11px;font-weight:700}
+.cr-opt.ok{background:#5be0a0;color:#0f2a1c}
+.cr-tile{height:28px;border-radius:8px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:12px;font-weight:800}
+.cr-tile.hi{background:#ffe27a;color:#3a0b1d}
+.cr-lines{height:70px;border-radius:12px;background:repeating-linear-gradient(transparent 0 17px,rgba(255,255,255,.22) 17px 18px)}
+.cr-bar{height:30px;border-radius:10px;background:rgba(255,255,255,.14);display:flex;align-items:center;padding:0 10px;font-size:11.5px;opacity:.85}
+.cr-send{margin-top:10px;height:34px;border-radius:12px;background:rgba(255,255,255,.92);color:#3a0b1d;display:grid;place-items:center;font-size:12px;font-weight:800}
+/* story card */
+.cr-story{width:228px;aspect-ratio:9/16;border-radius:26px;padding:18px 16px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.cr-story .cr-ttl{font-size:19px;max-width:13ch}
+/* quiz builder */
+.qb{border-radius:20px;border:1px solid var(--line);background:var(--card);overflow:hidden;transition:border-color .2s}
+.qb.open{border-color:#ff3b8d}
+.qb-head{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:8px 14px;border:0;background:none;color:var(--ink);text-align:left}
+.qb-n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+.qb-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.qb-opt{display:flex;align-items:center;gap:8px}
+.sk .qb-mark{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:transparent;display:grid;place-items:center;flex:none;color:transparent;font-weight:900;font-size:16px;transition:background .2s,border-color .2s}
+.sk .qb-mark[aria-pressed="true"]{background:#5be0a0;border-color:#5be0a0;color:#0f2a1c}
+.cr-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:16px;background:#211a2c;color:#ffffff;font-weight:700;font-size:14px;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:up .35s cubic-bezier(.2,.8,.2,1) both;white-space:nowrap}

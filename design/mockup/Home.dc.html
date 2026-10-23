@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+<div class="shell">
+
+  <nav class="side" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home page" style="padding: 0 10px 20px"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <a href="Home.dc.html" class="nav-i" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="count">{{count}}</span></a>
+    <a href="Create.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Create link</a>
+    <a href="MyLinks.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>My links</a>
+    <a href="GamesHub.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Notifications.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>Notifications<span class="count">3</span></a>
+    <a href="Profile.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+    <a href="Settings.dc.html" class="nav-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>Settings</a>
+    <button class="btn btn-sm tap" onClick="{{askInstall}}" style="margin-top: auto">Install app</button>
+  </nav>
+
+  <div class="main">
+    <div class="wrap cols" style="max-width: 1180px">
+      <div class="colmain">
+        <header class="topbar">
+          <span class="av" style="background: linear-gradient(135deg,#d6ff6b,#22c4a0)"><img src="/_blob/fab7f564a0c6a958be79ebcec7291c73" alt=""></span>
+          <div class="grow">
+            <div class="muted" style="font-size: 13px">Good evening</div>
+            <div class="d" style="font-size: 22px; font-weight: 800; letter-spacing: -.02em">Hey, peach</div>
+          </div>
+          <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+            <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+            <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+          </button>
+          <a href="Notifications.dc.html" class="icon-btn tap" aria-label="Notifications, 3 unread">
+            <img class="wave" src="/_blob/7f21763178926824d8503ff516f73544" alt="" style="width: 26px; height: 26px">
+            <span class="badge">3</span>
+          </a>
+        </header>
+
+        <a href="Inbox.dc.html" class="tap" style="display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: 26px; text-decoration: none; color: #ffffff; background: radial-gradient(120% 120% at 100% 0%,#7a3cff 0%,#d81b72 55%,#8a0f47 100%); overflow: hidden">
+          <div style="flex: 1; min-width: 0">
+            <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(0,0,0,.22)"><span class="live" style="width: 8px; height: 8px; border-radius: 50%; background: #5be0a0"></span>Inbox</span>
+            <div class="d" style="margin-top: 10px; font-size: clamp(28px, 6cqi, 40px); font-weight: 800; letter-spacing: -.03em; line-height: 1">{{count}} new messages</div>
+            <div style="margin-top: 6px; font-size: 15px; color: rgba(255,255,255,.88)">since you last checked · tap to read</div>
+          </div>
+          <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 88px; height: 88px; flex: none; transform: rotate(-8deg)">
+        </a>
+
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+          <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">43</div><div class="muted" style="font-size: 12.5px">messages this week</div></div>
+          <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">218</div><div class="muted" style="font-size: 12.5px">link visits</div></div>
+          <div class="card" style="padding: 14px"><div class="d" style="font-size: 26px; font-weight: 800">2</div><div class="muted" style="font-size: 12.5px">active chats</div></div>
+        </div>
+
+        <div class="sec-h"><h2>My links</h2><a href="MyLinks.dc.html" class="pink" style="font-weight: 700; font-size: 14px">Manage</a></div>
+        <div class="rail" style="display: flex; gap: 12px; margin: 0 -16px; padding: 0 16px 4px; scroll-snap-type: x mandatory">
+          <sc-for list="{{links}}" as="l" hint-placeholder-count="3">
+            <article class="{{l.th}}" style="flex: none; width: 216px; min-height: 230px; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; scroll-snap-align: start">
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <span style="font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 5px 9px; border-radius: 99px; background: rgba(0,0,0,.24)">{{l.status}}</span>
+                <img src="{{l.emoji}}" alt="" style="width: 38px; height: 38px">
+              </div>
+              <div class="d" style="margin-top: 14px; font-size: 21px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em">{{l.topic}}</div>
+              <div style="margin-top: auto; padding-top: 12px"><span class="d" style="font-size: 26px; font-weight: 800">{{l.count}}</span> <span style="font-size: 13px; opacity: .85">messages · {{l.limit}}</span></div>
+              <button class="tap" onClick="{{l.toggle}}" style="margin-top: 10px; min-height: 44px; border-radius: 14px; border: 0; background: rgba(255,255,255,.95); color: #2a0a1c; font-weight: 800; font-size: 14px">{{l.action}}</button>
+            </article>
+          </sc-for>
+          <a href="Create.dc.html" class="tap" style="flex: none; width: 150px; min-height: 230px; border-radius: 24px; border: 2px dashed var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-decoration: none; font-weight: 700; scroll-snap-align: start">
+            <span class="logo-mark" style="width: 52px; height: 52px; border-radius: 18px; font-size: 28px">+</span>New link
+          </a>
+        </div>
+
+        <div class="ad-wrap"><div class="ad ad-banner"><b>Responsive banner · home feed</b><span class="ad-m">320 × 100 on phones</span><span class="ad-d">728 × 90 on wide screens</span></div></div>
+
+        <div class="sec-h" style="margin-top: 8px"><h2>Play with your people</h2><a href="GamesHub.dc.html" class="pink" style="font-weight: 700; font-size: 14px">All games</a></div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <a href="CreateGame.dc.html" onClick="{{newGame}}" class="card tap" style="padding: 14px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; min-height: 140px">
+            <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 42px; height: 42px">
+            <b class="d" style="font-size: 17px; line-height: 1.05">Never Have I Ever</b>
+            <span class="muted" style="font-size: 13px; margin-top: auto">3–10 players · start one</span>
+          </a>
+          <a href="CreateGame.dc.html" onClick="{{newGame}}" class="card tap" style="padding: 14px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; min-height: 140px">
+            <img src="/_blob/c31fcca8682736cc92ca4f3073f8c7dd" alt="" style="width: 42px; height: 42px">
+            <b class="d" style="font-size: 17px; line-height: 1.05">Truth or Dare</b>
+            <span class="muted" style="font-size: 13px; margin-top: auto">2–4 players · start one</span>
+          </a>
+        </div>
+        <h3 style="font-size: 15px; margin: 18px 0 10px">Open games near you</h3>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{games}}" as="g" hint-placeholder-count="3">
+            <li class="card" style="display: flex; align-items: center; gap: 12px; padding: 12px">
+              <span class="av" style="background: {{g.tint}}"><img src="{{g.icon}}" alt=""></span>
+              <div style="flex: 1; min-width: 0">
+                <div style="font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.name}}</div>
+                <div class="muted" style="font-size: 13px">{{g.type}} · {{g.joined}}/{{g.max}} · {{g.left}} left</div>
+              </div>
+              <a href="{{g.href}}" onClick="{{g.join}}" class="btn btn-sm btn-cta tap">Join</a>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+
+      <aside class="rightrail" aria-label="Sponsored and tips">
+        <div class="ad ad-half"><b>Half page · sticky right rail</b>300 × 600 · wide screens only</div>
+        <div class="card" style="padding: 16px">
+          <b>Get Sekretly as an app</b>
+          <p class="muted" style="font-size: 13.5px; margin-top: 4px">One tap, no app store.</p>
+          <button class="btn btn-sm btn-block tap" onClick="{{askInstall}}" style="margin-top: 10px">Install</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+  <nav class="bnav" aria-label="Main">
+    <a href="Home.dc.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+    <a href="Inbox.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v7H2v-7z"></path></svg>Inbox<span class="badge">{{count}}</span></a>
+    <a href="Create.dc.html" class="fab" aria-label="Create link"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="GamesHub.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+    <a href="Profile.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Profile</a>
+  </nav>
+
+  <sc-if value="{{showDrop}}" hint-placeholder-val="{{ false }}">
+    <div class="drop" role="region" aria-label="Install Sekretly">
+      <div class="card" style="display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; box-shadow: var(--shadow); background: var(--card2)">
+        <span class="logo-mark" style="width: 42px; height: 42px; border-radius: 13px; font-size: 22px">S</span>
+        <div style="flex: 1; min-width: 0">
+          <b style="font-size: 15px">Install Sekretly</b>
+          <div class="muted" style="font-size: 13px">Faster, and never miss a message.</div>
+        </div>
+        <button class="btn btn-sm btn-cta tap" onClick="{{askInstall}}">Install</button>
+        <button class="icon-btn tap" onClick="{{hideDrop}}" aria-label="Dismiss" style="width: 36px; height: 36px; border-radius: 12px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{installPrompt}}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 20px">
+      <div role="dialog" aria-label="Install app" class="pop" style="width: min(100%, 340px); background: #ffffff; color: #202124; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.4); padding: 20px; font-family: Roboto, system-ui, sans-serif">
+        <div style="font-size: 18px; font-weight: 500">Install app?</div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px">
+          <span class="logo-mark" style="width: 44px; height: 44px; border-radius: 12px; font-size: 22px">S</span>
+          <div><div style="font-weight: 600">Sekretly</div><div style="font-size: 13px; color: #5f6368">sekretly.com</div></div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px">
+          <button onClick="{{cancelInstall}}" style="min-height: 40px; padding: 0 16px; border-radius: 20px; border: 0; background: transparent; color: #1a73e8; font-weight: 600">Cancel</button>
+          <button onClick="{{doInstall}}" style="min-height: 40px; padding: 0 18px; border-radius: 20px; border: 0; background: #1a73e8; color: #ffffff; font-weight: 600">Install</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <a href="{{toastHref}}" class="toast" role="status">
+      <img src="{{toastIcon}}" alt="" style="width: 34px; height: 34px; flex: none">
+      <span style="font-size: 14px; line-height: 1.35"><b>{{toastTitle}}</b><br><span class="muted">{{toastSub}}</span></span>
+    </a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', count: 4, drop: false, installPrompt: false, installed: false, toast: null, paused: { confess: true } };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    this.t1 = setTimeout(function () { if (!self.state.installed) self.setState({ drop: true }); }, 2500);
+    this.t2 = setTimeout(function () { self.setState({ count: 5, toast: 'msg' }); }, 9000);
+    this.t3 = setTimeout(function () { if (self.state.toast === 'msg') self.setState({ toast: null }); }, 13400);
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); clearTimeout(this.t4); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var J = function (g, r, late) { return function () { try { window.localStorage.setItem('sk-join', JSON.stringify({ game: g, room: r, role: 'player', late: !!late })); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }; };
+    var E = { peach: '/_blob/1fb2cbc919646a3a048411532a08bd4c', moon: '/_blob/1df7299954a782c5de8338339634a8e6', unicorn: '/_blob/7ee69e13b899e048010df41d0cf87143', shush: '/_blob/7666419731f56fe89d876dc6bf2dcdb2', fire: '/_blob/ea3a1403d8fe6d1943450cfacf059348', eyes: '/_blob/9fa11a307ccc8cbf33b563a8df193335', letter: '/_blob/ee2791bdeac805bec379541426d39014', sparkles: '/_blob/727ac58e5046d6eefbb35427eff3c1df' };
+    var base = [
+      { id: 'describe', topic: 'Describe me in 3 words', count: 23, limit: 'no limit', th: 'th-sunset', emoji: E.peach },
+      { id: 'rate', topic: 'Rate me 1–10', count: 12, limit: 'stops at 50', th: 'th-midnight', emoji: E.moon },
+      { id: 'confess', topic: 'Confess something', count: 8, limit: 'hit 24h limit', th: 'th-bubblegum', emoji: E.unicorn }
+    ];
+    var toasts = {
+      msg: { title: 'Someone sent you a message', sub: 'on Rate me 1–10 · just now', icon: E.letter, href: 'Inbox.dc.html' },
+      installed: { title: 'Sekretly is on your home screen', sub: 'Open it like any other app', icon: E.sparkles, href: 'Home.dc.html' }
+    };
+    var t = s.toast ? toasts[s.toast] : toasts.msg;
+    return {
+      newGame: function () { try { window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} },
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      count: s.count,
+      links: base.map(function (l) {
+        var p = !!s.paused[l.id];
+        return Object.assign({}, l, { status: p ? 'Paused' : 'Live', action: p ? 'Resume link' : 'Pause', toggle: function () { var n = Object.assign({}, s.paused); n[l.id] = !p; self.setState({ paused: n }); } });
+      }),
+      games: [
+        { name: 'Friday Night Never', type: 'Never Have I Ever', joined: 3, max: 6, left: '1h 20m', icon: E.shush, tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', href: 'NHIELobbyJoin.dc.html', join: J('nhie', 'Friday Night Never') },
+        { name: 'Hostel B confessions', type: 'Never Have I Ever', joined: 7, max: 10, left: '42m', icon: E.fire, tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', href: 'NHIELobbyJoin.dc.html', join: J('nhie', 'Hostel B confessions') },
+        { name: 'Class of 2027 chaos', type: 'Would You Rather', joined: 2, max: 8, left: '1h 55m', icon: E.eyes, tint: 'linear-gradient(135deg,#22e1ff,#3a6bff)', href: 'WYRLobbyJoin.dc.html', join: J('wyr', 'Class of 2027 chaos') }
+      ],
+      showDrop: s.drop && !s.installed,
+      hideDrop: function () { self.setState({ drop: false }); },
+      askInstall: function () { self.setState({ installPrompt: true }); },
+      installPrompt: s.installPrompt,
+      cancelInstall: function () { self.setState({ installPrompt: false }); },
+      doInstall: function () {
+        self.setState({ installPrompt: false, installed: true, drop: false, toast: 'installed' });
+        clearTimeout(self.t4); self.t4 = setTimeout(function () { if (self.state.toast === 'installed') self.setState({ toast: null }); }, 4400);
+      },
+      toast: !!s.toast, toastTitle: t.title, toastSub: t.sub, toastIcon: t.icon, toastHref: t.href
+    };
+  }
+}
+</script>
+</body>
+</html>

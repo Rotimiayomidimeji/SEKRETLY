@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Reset password</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" style="background: var(--hero); display: flex; flex-direction: column">
+  <header style="display: flex; align-items: center; gap: 8px; padding: 16px 20px">
+    <a href="Login.dc.html" class="icon-btn tap" aria-label="Back to log in">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"></path></svg>
+    </a>
+    <span style="flex: 1"></span>
+    <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+      <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+      <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+      <span>{{modeWord}}</span>
+    </button>
+  </header>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px 20px 40px">
+    <div class="card rise" style="width: 100%; max-width: 420px; padding: 24px; box-shadow: var(--shadow)">
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px" aria-hidden="true">
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="3"><span style="height: 5px; border-radius: 9px; background: {{b.c}}"></span></sc-for>
+      </div>
+
+      <sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top: 18px">
+          <h1 style="font-size: 30px; font-weight: 800">Forgot your password?</h1>
+          <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">Enter your username. If it has a recovery email, we will send a 6-digit code.</p>
+          <label for="fg-user" class="label" style="margin-top: 18px">Username</label>
+          <input id="fg-user" class="field" value="{{user}}" onChange="{{onUser}}" placeholder="peach">
+          <sc-if value="{{noEmail}}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: var(--card2); font-size: 14px; line-height: 1.5">
+              <b>@{{user}} has no recovery email.</b> We cannot reset this account. You can <a href="Signup.dc.html" class="pink" style="font-weight: 700">start a new one</a>, and add a recovery email this time.
+            </div>
+          </sc-if>
+          <button class="btn btn-cta btn-lg btn-block tap" onClick="{{sendCode}}" disabled="{{noUser}}" style="margin-top: 18px">Send code</button>
+          <p class="muted" style="margin-top: 10px; font-size: 12.5px; text-align: center">Demo: “peach” has an email, “maya” does not.</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top: 18px">
+          <img class="pop" src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 56px; height: 56px">
+          <h1 style="margin-top: 8px; font-size: 30px; font-weight: 800">Check your email</h1>
+          <p class="muted" style="margin-top: 6px; font-size: 15px; line-height: 1.5">We sent a code to <b style="color: var(--ink)">p•••••@gmail.com</b>. It expires in 10 minutes.</p>
+          <label for="fg-code" class="label" style="margin-top: 18px">6-digit code</label>
+          <input id="fg-code" class="field" value="{{code}}" onChange="{{onCode}}" inputmode="numeric" maxlength="6" placeholder="••••••" style="font-size: 26px; letter-spacing: .5em; text-align: center; font-weight: 800">
+          <button class="btn btn-cta btn-lg btn-block tap" onClick="{{verify}}" disabled="{{codeShort}}" style="margin-top: 18px">Verify</button>
+          <button class="btn btn-ghost btn-block" onClick="{{resend}}" style="margin-top: 8px; border: 0">{{resendLabel}}</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top: 18px">
+          <h1 style="font-size: 30px; font-weight: 800">New password</h1>
+          <label for="fg-new" class="label" style="margin-top: 18px">Password</label>
+          <input id="fg-new" class="field" type="password" value="{{np}}" onChange="{{onNp}}" placeholder="At least 8 characters">
+          <div class="hint">{{npHint}}</div>
+          <sc-if value="{{npOk}}" hint-placeholder-val="{{ false }}">
+            <button class="btn btn-cta btn-lg btn-block tap" onClick="{{finish}}" style="margin-top: 18px">Save and log in</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top: 18px; text-align: center">
+          <img class="pop" src="/_blob/727ac58e5046d6eefbb35427eff3c1df" alt="" style="width: 72px; height: 72px">
+          <h1 style="margin-top: 8px; font-size: 30px; font-weight: 800">You are back in</h1>
+          <p class="muted" style="margin-top: 6px; font-size: 15px">We logged you out of other devices, just in case.</p>
+          <a href="Home.dc.html" class="btn btn-cta btn-lg btn-block tap" style="margin-top: 18px">Go to home</a>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', step: 0, user: '', tried: false, code: '', np: '', resent: false };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var line = dark ? 'rgba(255,255,255,.11)' : 'rgba(48,34,72,.13)';
+    var hasEmail = s.user.trim().toLowerCase() !== 'maya';
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      bars: [0, 1, 2].map(function (i) { return { c: i <= Math.min(s.step, 2) ? '#d81b72' : line }; }),
+      s0: s.step === 0, s1: s.step === 1, s2: s.step === 2, s3: s.step === 3,
+      user: s.user, onUser: function (e) { self.setState({ user: e.target.value.trim(), tried: false }); },
+      noUser: s.user.length < 3,
+      noEmail: s.tried && !hasEmail,
+      sendCode: function () { if (hasEmail) self.setState({ step: 1 }); else self.setState({ tried: true }); },
+      code: s.code, onCode: function (e) { self.setState({ code: e.target.value.replace(/\D/g, '').slice(0, 6) }); },
+      codeShort: s.code.length < 6,
+      verify: function () { self.setState({ step: 2 }); },
+      resend: function () { self.setState({ resent: true }); },
+      resendLabel: s.resent ? 'New code sent' : 'Resend code',
+      np: s.np, onNp: function (e) { self.setState({ np: e.target.value }); },
+      npOk: s.np.length >= 8,
+      npHint: s.np.length >= 8 ? 'Looks good' : (8 - s.np.length) + ' more characters',
+      finish: function () { self.setState({ step: 3 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

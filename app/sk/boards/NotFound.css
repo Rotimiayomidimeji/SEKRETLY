@@ -1,0 +1,5 @@
+/* NotFound: from design/mockup/NotFound.dc.html */
+body{margin:0;background:#0c0811}
+.nf-big{font-family:var(--font-display),system-ui,sans-serif;font-size:clamp(96px,26cqi,200px);font-weight:800;letter-spacing:-.06em;line-height:.85;background:var(--cta);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nf-dot{width:10px;height:10px;border-radius:50%;background:var(--bad);display:inline-block;animation:nfPulse 1.4s ease-in-out infinite}
+@keyframes nfPulse{50%{opacity:.3;transform:scale(.7)}}

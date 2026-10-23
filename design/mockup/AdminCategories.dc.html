@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Report categories</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+.ac-wrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.ac-list{flex:1 1 280px;min-width:0;max-width:100%}
+.ac-detail{flex:999 1 520px;min-width:0}
+.ac-item{width:100%;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-size:14px;font-weight:600}
+.ac-item[aria-current="true"]{background:var(--card2);font-weight:800}
+.ph{font-family:ui-monospace,Menlo,monospace;font-size:12px;padding:1px 6px;border-radius:6px;background:rgba(255,59,141,.16);color:var(--pink)}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}">
+<div class="shell">
+  <nav class="side" aria-label="Admin">
+    <a href="Admin.dc.html" class="logo" style="padding: 0 10px 4px"><span class="logo-mark">S</span><span class="logo-word">Admin</span></a>
+    <span class="muted" style="font-size: 12px; padding: 0 12px 16px">admin · full access</span>
+    <a href="Admin.dc.html" class="nav-i">Overview</a>
+    <a href="AdminTraffic.dc.html" class="nav-i">Traffic manager</a>
+    <a href="AdminUsers.dc.html" class="nav-i">Users</a>
+    <a href="AdminReports.dc.html" class="nav-i">Reports &amp; warnings<span class="count">4</span></a>
+    <a href="AdminCategories.dc.html" class="nav-i" aria-current="page">Report categories</a>
+    <a href="AdminAds.dc.html" class="nav-i">Ads &amp; AdSense</a>
+    <a href="AdsMap.dc.html" class="nav-i">Ad placement map</a>
+    <a href="Home.dc.html" class="nav-i" style="margin-top: auto">Back to app</a>
+  </nav>
+  <nav class="anav" aria-label="Admin">
+    <a href="Admin.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"></rect><rect x="14" y="3" width="7" height="5" rx="2"></rect><rect x="14" y="12" width="7" height="9" rx="2"></rect><rect x="3" y="16" width="7" height="5" rx="2"></rect></svg><span>Overview</span></a>
+    <a href="AdminTraffic.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg><span>Traffic</span></a>
+    <a href="AdminUsers.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"></path></svg><span>Users</span></a>
+    <a href="AdminReports.dc.html" class="anav-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22V4"></path><path d="M5 4h12l-2 4 2 4H5"></path></svg><span>Reports</span><b class="anav-badge">4</b></a>
+    <details class="anav-more">
+      <summary class="anav-i" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg><span>More</span></summary>
+      <div class="anav-sheet">
+        <div class="anav-grab" aria-hidden="true"></div>
+        <a href="AdminCategories.dc.html" class="anav-s" aria-current="page">Report categories</a>
+        <a href="AdminAds.dc.html" class="anav-s">Ads &amp; AdSense</a>
+        <a href="AdsMap.dc.html" class="anav-s">Ad placement map</a>
+        <a href="Home.dc.html" class="anav-s" style="color: var(--muted)">← Back to the app</a>
+      </div>
+    </details>
+  </nav>
+
+  <div class="main" style="padding-bottom: 40px">
+    <div class="wrap" style="max-width: 1180px">
+      <header class="topbar">
+        <div class="grow"><h1 style="font-size: 28px">Report categories</h1><div class="muted" style="font-size: 13px">No banned words. Reporters pick a category, and the sender gets one of its warning messages at random.</div></div>
+        <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        </button>
+      </header>
+      <div class="rail adm-nav-rail" style="gap: 8px; margin-bottom: 14px">
+        <a href="Admin.dc.html" class="chip">Overview</a><a href="AdminTraffic.dc.html" class="chip">Traffic</a><a href="AdminUsers.dc.html" class="chip">Users</a><a href="AdminReports.dc.html" class="chip">Reports</a><a href="AdminCategories.dc.html" class="chip on">Categories</a><a href="AdminAds.dc.html" class="chip">Ads</a>
+      </div>
+
+      <section class="card" style="padding: 16px; display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center">
+        <div style="flex: 1 1 320px">
+          <b>What reporters see</b>
+          <div class="muted" style="font-size: 13px; margin-top: 4px">Each time someone taps Report, they get <b style="color: var(--ink)">{{minShow}}–{{maxShow}}</b> random categories, plus “Other reason”.</div>
+          <div class="row" style="gap: 8px; margin-top: 10px">
+            <span class="muted" style="font-size: 13px">Min</span><button class="icon-btn tap" onClick="{{minDec}}" aria-label="Fewer minimum" style="width: 36px; height: 36px">−</button><b>{{minShow}}</b><button class="icon-btn tap" onClick="{{minInc}}" aria-label="More minimum" style="width: 36px; height: 36px">+</button>
+            <span class="muted" style="font-size: 13px; margin-left: 12px">Max</span><button class="icon-btn tap" onClick="{{maxDec}}" aria-label="Fewer maximum" style="width: 36px; height: 36px">−</button><b>{{maxShow}}</b><button class="icon-btn tap" onClick="{{maxInc}}" aria-label="More maximum" style="width: 36px; height: 36px">+</button>
+          </div>
+        </div>
+        <div style="flex: 2 1 420px">
+          <div class="row"><span class="muted grow" style="font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Sample report sheet</span><button class="btn btn-sm btn-ghost" onClick="{{reshuffle}}" style="border: 0; color: var(--pink)">Shuffle</button></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px">
+            <sc-for list="{{sample}}" as="c" hint-placeholder-count="7"><span class="reason" style="display: inline-flex; align-items: center; min-height: 36px; font-size: 13px">{{c}}</span></sc-for>
+            <span class="reason" style="display: inline-flex; align-items: center; min-height: 36px; font-size: 13px; border-style: dashed; color: var(--pink)">Other reason</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="ac-wrap" style="margin-top: 12px">
+        <section class="card ac-list" style="overflow: hidden">
+          <div style="padding: 12px">
+            <label for="ac-q" class="sr">Search categories</label>
+            <input id="ac-q" class="field" value="{{q}}" onChange="{{onQ}}" placeholder="Search {{catCount}} categories" style="min-height: 42px; font-size: 14px">
+          </div>
+          <div style="max-height: 760px; overflow-y: auto; border-top: 1px solid var(--line)">
+            <sc-for list="{{list}}" as="c" hint-placeholder-count="14">
+              <button class="ac-item" onClick="{{c.pick}}" aria-current="{{c.cur}}" style="opacity: {{c.op}}">
+                <span class="grow">{{c.name}}</span>
+                <sc-if value="{{c.serious}}" hint-placeholder-val="{{ false }}"><span class="pill" style="padding: 2px 7px; font-size: 10.5px; background: rgba(196,33,58,.18); color: var(--bad)">Serious</span></sc-if>
+                <span class="muted" style="font-size: 12px">{{c.count}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div class="row" style="gap: 8px; padding: 12px; border-top: 1px solid var(--line)">
+            <label for="ac-new" class="sr">New category name</label>
+            <input id="ac-new" class="field" value="{{newCat}}" onChange="{{onNewCat}}" placeholder="New category" style="min-height: 42px; font-size: 14px">
+            <button class="btn btn-sm btn-cta tap" onClick="{{addCat}}">Add</button>
+          </div>
+        </section>
+
+        <section class="card ac-detail" style="padding: 18px">
+          <div class="row" style="flex-wrap: wrap; gap: 10px">
+            <h2 class="grow" style="font-size: 24px">{{cur}}</h2>
+            <span class="row" style="gap: 8px; font-size: 13px; font-weight: 700">Active <button class="switch" role="switch" aria-checked="{{activeStr}}" aria-label="Category active" onClick="{{toggleActive}}"></button></span>
+            <span class="row" style="gap: 8px; font-size: 13px; font-weight: 700">Serious <button class="switch" role="switch" aria-checked="{{seriousStr}}" aria-label="Send to human review" onClick="{{toggleSerious}}"></button></span>
+          </div>
+          <p class="muted" style="font-size: 13px; margin-top: 6px">{{seriousHint}}</p>
+
+          <div class="card" style="margin-top: 14px; padding: 12px 14px; background: var(--card2)">
+            <div class="muted" style="font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase">Preview · what the sender gets (warning 2 of 3 to @peach)</div>
+            <div class="row" style="gap: 10px; margin-top: 8px; align-items: flex-start">
+              <span class="av" style="width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#ffb020,#c4213a)"><img src="/_blob/7f21763178926824d8503ff516f73544" alt=""></span>
+              <p style="font-size: 14.5px; line-height: 1.45">{{preview}}</p>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 18px"><h3 class="grow" style="font-size: 16px">Warning messages <span class="muted" style="font-weight: 500">· {{msgCount}} · picked at random</span></h3><span class="muted" style="font-size: 12.5px">Placeholders: <span class="ph">{receiver}</span> <span class="ph">{n}</span></span></div>
+          <ol style="list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{msgs}}" as="m" hint-placeholder-count="10">
+              <li class="row" style="gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); font-size: 14px">
+                <span class="muted mono" style="width: 26px; flex: none">{{m.n}}</span>
+                <span class="grow" style="line-height: 1.4">{{m.text}}</span>
+                <button class="btn btn-sm btn-ghost tap" onClick="{{m.use}}" style="border: 0">Preview</button>
+                <button class="icon-btn tap" onClick="{{m.del}}" aria-label="Delete message" style="width: 34px; height: 34px; border-radius: 10px">×</button>
+              </li>
+            </sc-for>
+          </ol>
+          <div class="row" style="justify-content: space-between; margin-top: 10px">
+            <button class="btn btn-sm tap" onClick="{{prev}}" disabled="{{noPrev}}">Previous</button>
+            <span class="muted" style="font-size: 13px">Page {{page}} of {{pages}}</span>
+            <button class="btn btn-sm tap" onClick="{{next}}" disabled="{{noNext}}">Next</button>
+          </div>
+          <div class="row" style="gap: 8px; margin-top: 14px">
+            <label for="ac-msg" class="sr">New warning message</label>
+            <input id="ac-msg" class="field" value="{{newMsg}}" onChange="{{onNewMsg}}" placeholder="e.g. {receiver} reported your message as abusive. Warning {n} of 3." style="font-size: 14px">
+            <button class="btn btn-cta tap" onClick="{{addMsg}}">Add message</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', cur: 'Abusive', q: '', page: 1, minS: 5, maxS: 10, seed: 2, extraCats: [], inactive: {}, seriousOver: {}, added: {}, deleted: {}, newCat: '', newMsg: '', previewIdx: 0 };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var CATS = ['Abusive', 'Harassment', 'Bullying', 'Insults', 'Threats', 'Intimidation', 'Hate speech', 'Racism', 'Tribalism', 'Religious hate', 'Sexism', 'Body shaming', 'Disability mockery', 'Sexual content', 'Unwanted nudity', 'Explicit photo', 'Explicit video', 'Non-consensual image', 'Unwanted advances', 'Creepy or inappropriate', 'Grooming concern', 'Underage concern', 'Stalking', 'Doxxing / private info', 'Exposing secrets', 'Blackmail', 'Extortion', 'Impersonation', 'Scam', 'Fraud', 'Phishing link', 'Malware link', 'Spam', 'Flooding', 'Advertising', 'Selling things', 'Gambling promo', 'Drugs', 'Weapons', 'Violence', 'Graphic gore', 'Self-harm', 'Suicide talk', 'Misinformation', 'False rumour', 'Defamation', 'Trolling', 'Mocking', 'Profanity', 'Other harmful'].concat(s.extraCats);
+    var SERIOUS = ['Threats', 'Grooming concern', 'Underage concern', 'Non-consensual image', 'Blackmail', 'Extortion', 'Self-harm', 'Suicide talk', 'Weapons'];
+    var isSerious = function (c) { return s.seriousOver[c] !== undefined ? s.seriousOver[c] : SERIOUS.indexOf(c) >= 0; };
+    var gen = function (c) {
+      var T = ['Your message to {receiver} was reported as “' + c + '”.', '{receiver} flagged something you sent as “' + c + '”.', 'Heads up: a message you sent was marked “' + c + '” by the person who got it.', 'A message you sent to {receiver} was reported for “' + c + '”.', '{receiver} didn’t like that one. It was reported as “' + c + '”.', 'Your recent message was reported under “' + c + '”.', 'Someone you messaged reported it as “' + c + '”.', 'Your message to {receiver} crossed a line for them: “' + c + '”.', 'Reported: your message to {receiver} was marked “' + c + '”.', '{receiver} reported your message for “' + c + '”.'];
+      var S = [' This is warning {n} of 3.', ' After 3 warnings, the next report blocks you from messaging {receiver}.', ' Keep it respectful.', ' Think before you send next time.', ' Warning {n} of 3. You can still message others as normal.'];
+      var out = [];
+      T.forEach(function (t) { S.forEach(function (x) { out.push(t + x); }); });
+      return out.concat(s.added[c] || []).filter(function (txt) { return !(s.deleted[c] || {})[txt]; });
+    };
+    var all = gen(s.cur);
+    var per = 10, pages = Math.max(1, Math.ceil(all.length / per)), page = Math.min(s.page, pages);
+    var fill = function (t) { return t.replace(/\{receiver\}/g, '@peach').replace(/\{n\}/g, '2'); };
+    var q = s.q.trim().toLowerCase();
+    var sample = (function () { var arr = CATS.filter(function (c) { return !s.inactive[c]; }), out = [], x = s.seed * 9301 + 49297, n = s.minS + (s.seed * 7) % (s.maxS - s.minS + 1); while (out.length < n && arr.length) { x = (x * 9301 + 49297) % 233280; out.push(arr.splice(Math.floor(x / 233280 * arr.length), 1)[0]); } return out; })();
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      minShow: s.minS, maxShow: s.maxS,
+      minDec: function () { self.setState({ minS: Math.max(3, s.minS - 1) }); }, minInc: function () { self.setState({ minS: Math.min(s.maxS, s.minS + 1) }); },
+      maxDec: function () { self.setState({ maxS: Math.max(s.minS, s.maxS - 1) }); }, maxInc: function () { self.setState({ maxS: Math.min(15, s.maxS + 1) }); },
+      sample: sample, reshuffle: function () { self.setState({ seed: s.seed + 1 }); },
+      q: s.q, onQ: function (e) { self.setState({ q: e.target.value }); }, catCount: CATS.length,
+      list: CATS.filter(function (c) { return !q || c.toLowerCase().indexOf(q) >= 0; }).map(function (c) { var on = c === s.cur; return { name: c, cur: on ? 'true' : 'false', serious: isSerious(c), count: gen(c).length, op: s.inactive[c] ? 0.45 : 1, pick: function () { self.setState({ cur: c, page: 1, previewIdx: 0 }); } }; }),
+      newCat: s.newCat, onNewCat: function (e) { self.setState({ newCat: e.target.value }); },
+      addCat: function () { var c = s.newCat.trim(); if (c && CATS.indexOf(c) < 0) self.setState({ extraCats: s.extraCats.concat([c]), cur: c, newCat: '', page: 1 }); },
+      cur: s.cur,
+      activeStr: s.inactive[s.cur] ? 'false' : 'true', toggleActive: function () { var o = Object.assign({}, s.inactive); o[s.cur] = !o[s.cur]; self.setState({ inactive: o }); },
+      seriousStr: isSerious(s.cur) ? 'true' : 'false', toggleSerious: function () { var o = Object.assign({}, s.seriousOver); o[s.cur] = !isSerious(s.cur); self.setState({ seriousOver: o }); },
+      seriousHint: isSerious(s.cur) ? 'Serious: warnings still go out automatically, and every report also lands in the admin review queue.' : 'Normal: warnings and the 4th-report block happen automatically. No admin needed.',
+      preview: fill(all[Math.min(s.previewIdx, all.length - 1)] || ''),
+      msgCount: all.length,
+      msgs: all.slice((page - 1) * per, page * per).map(function (t, i) { var idx = (page - 1) * per + i; return { n: idx + 1, text: t, use: function () { self.setState({ previewIdx: idx }); }, del: function () { var d = Object.assign({}, s.deleted); var dc = Object.assign({}, d[s.cur] || {}); dc[t] = true; d[s.cur] = dc; self.setState({ deleted: d }); } }; }),
+      page: page, pages: pages, noPrev: page <= 1, noNext: page >= pages,
+      prev: function () { self.setState({ page: Math.max(1, page - 1) }); }, next: function () { self.setState({ page: Math.min(pages, page + 1) }); },
+      newMsg: s.newMsg, onNewMsg: function (e) { self.setState({ newMsg: e.target.value }); },
+      addMsg: function () { var t = s.newMsg.trim(); if (!t) return; var a = Object.assign({}, s.added); a[s.cur] = (a[s.cur] || []).concat([t]); self.setState({ added: a, newMsg: '', page: Math.ceil((all.length + 1) / per), previewIdx: all.length }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

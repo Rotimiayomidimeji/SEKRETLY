@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function StoriesPage() { return <FoundationPage title="Stories from the other side of the link." description="A future editorial surface for community stories and shared moments." />; }
+import { redirect } from "next/navigation";
+
+// Not part of the designed product (see design/mockup); kept as a redirect so old links still land somewhere useful.
+export default function Page() {
+  redirect("/");
+}

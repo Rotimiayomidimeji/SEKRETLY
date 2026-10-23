@@ -1,0 +1,6 @@
+# Prisma writes these; reformatting them breaks migrate (e.g. quotes in migration_lock.toml)
+prisma/migrations
+# Generated from design/mockup by scripts/port-mockup.mjs
+components/sk
+app/sk/boards
+design/mockup

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sekretly · Help and FAQ</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./sk.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#0c0811}
+</style>
+</helmet>
+<div class="sk" data-mode="{{mode}}" data-ads="{{ads}}">
+  <nav class="pub-nav" aria-label="Main">
+    <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+    <div class="pub-links">
+      <a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a><a href="Safety.dc.html">Safety</a><a href="About.dc.html">About</a><a href="Help.dc.html" aria-current="page">Help</a><a href="Contact.dc.html">Contact</a>
+    </div>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <button class="mode-btn tap" onClick="{{toggleMode}}" aria-label="Switch to {{modeWord}} mode">
+        <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13.2A8.5 8.5 0 1 1 10.8 3a7 7 0 0 0 10.2 10.2z"></path></svg></sc-if>
+        <span>{{modeWord}}</span>
+      </button>
+      <a href="Signup.dc.html" class="btn btn-cta">Get your link</a>
+      <button class="icon-btn pub-menu tap" onClick="{{toggleDrawer}}" aria-label="Open menu" aria-expanded="{{drawerOpen}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="pdr {{drawerCls}}">
+    <div class="pdr-scrim" onClick="{{toggleDrawer}}"></div>
+    <aside class="pdr-panel" role="dialog" aria-label="Menu" aria-hidden="{{drawerHidden}}">
+      <div class="pdr-head">
+        <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word">Sekretly</span></a>
+        <button class="icon-btn tap" onClick="{{toggleDrawer}}" aria-label="Close menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <nav aria-label="Site" style="display: flex; flex-direction: column; gap: 3px">
+        <a href="Landing.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 3l9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+        <a href="Landing.dc.html#how" class="nav-i" onClick="{{jumpHow}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>How it works</a>
+        <a href="Landing.dc.html#games" class="nav-i" onClick="{{jumpGames}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="5"></rect><path d="M7 11v3M5.5 12.5h3"></path></svg>Games</a>
+        <a href="Safety.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"></path></svg>Safety</a>
+        <a href="About.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>About</a>
+        <a href="Help.dc.html" class="nav-i" aria-current="page" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"></path></svg>Help & FAQ</a>
+        <a href="Contact.dc.html" class="nav-i" onClick="{{toggleDrawer}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Contact</a>
+      </nav>
+      <div class="pdr-foot">
+        <button class="mode-btn tap" onClick="{{toggleMode}}" style="justify-content: center">Switch to {{modeWord}} mode</button>
+        <a href="Login.dc.html" class="btn btn-block tap">Sign in</a>
+        <a href="Signup.dc.html" class="btn btn-cta btn-block tap">Get your link</a>
+      </div>
+    </aside>
+  </div>
+
+
+  <header style="background: var(--hero); padding: 64px 0 48px">
+    <div class="pub-wrap" style="text-align: center">
+      <h1 style="font-size: clamp(40px, 6cqi, 72px); line-height: .96; font-weight: 800">How can we help?</h1>
+      <div style="max-width: 560px; margin: 22px auto 0; position: relative">
+        <label for="hp-q" class="sr">Search help</label>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 18px; color: var(--muted)"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="hp-q" class="field" value="{{q}}" onChange="{{onQ}}" placeholder="Search: pause link, delete account, games…" style="min-height: 58px; padding-left: 46px; border-radius: 20px; font-size: 17px">
+      </div>
+    </div>
+  </header>
+
+  <main class="pub-wrap" style="padding-top: 32px">
+    <div class="rail" role="tablist" aria-label="Topics" style="display: flex; gap: 8px; padding-bottom: 4px">
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="7">
+        <button role="tab" aria-selected="{{c.on}}" class="chip tap {{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 32px 48px; margin-top: 22px">
+      <section style="flex: 999 1 560px; min-width: 0">
+        <p class="muted" style="font-size: 14px">{{resultLabel}}</p>
+        <ul style="list-style: none; margin: 10px 0 0; padding: 0" class="card">
+          <sc-for list="{{faqs}}" as="f" hint-placeholder-count="8">
+            <li style="border-bottom: 1px solid var(--line)">
+              <button class="tap" onClick="{{f.toggle}}" aria-expanded="{{f.open}}" style="width: 100%; min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: transparent; border: 0; color: var(--ink); text-align: left; font-weight: 700; font-size: 16px">
+                <span style="flex: 1">{{f.q}}</span>
+                <span aria-hidden="true" class="pink" style="font-size: 22px; line-height: 1">{{f.sign}}</span>
+              </button>
+              <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+                <p class="muted rise" style="padding: 0 18px 18px; font-size: 15.5px; line-height: 1.6">{{f.a}}</p>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+        <sc-if value="{{none}}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding: 24px; text-align: center; margin-top: 10px">
+            <img src="/_blob/facd9191837d9eba7e7cedf471a11301" alt="" style="width: 56px; height: 56px">
+            <p style="margin-top: 8px; font-weight: 700">No answers for “{{q}}”</p>
+            <a href="Contact.dc.html" class="btn btn-sm" style="margin-top: 12px">Ask the team</a>
+          </div>
+        </sc-if>
+        <div class="ad-wrap" style="margin-top: 26px"><div class="ad ad-banner"><b>Responsive banner</b><span class="ad-m">320 × 100 on phones</span><span class="ad-d">728 × 90 on wide screens</span></div></div>
+      </section>
+      <aside style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <a href="Safety.dc.html" class="card tap" style="padding: 18px; display: flex; gap: 12px; align-items: center; text-decoration: none">
+          <img src="/_blob/7666419731f56fe89d876dc6bf2dcdb2" alt="" style="width: 40px; height: 40px">
+          <span><b style="display: block">Safety center</b><span class="muted" style="font-size: 14px">Rules, reporting and strikes</span></span>
+        </a>
+        <a href="Contact.dc.html" class="card tap" style="padding: 18px; display: flex; gap: 12px; align-items: center; text-decoration: none">
+          <img src="/_blob/ee2791bdeac805bec379541426d39014" alt="" style="width: 40px; height: 40px">
+          <span><b style="display: block">Still stuck?</b><span class="muted" style="font-size: 14px">Message the team, we reply in 2 days</span></span>
+        </a>
+        <div class="card" style="padding: 18px; border-color: var(--bad)">
+          <b>In danger right now?</b>
+          <p class="muted" style="font-size: 14px; margin-top: 4px">Call 112. For self-harm support call [HELP-LINE NUMBER].</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="ft">
+    <div class="ft-in">
+      <div class="ft-top">
+        <div class="ft-brand">
+          <a href="Landing.dc.html" class="logo" aria-label="Sekretly home"><span class="logo-mark">S</span><span class="logo-word" style="color: var(--ink)">Sekretly</span></a>
+          <p>Built for the things you almost said. Anonymous messages and party games, made in Nigeria.</p>
+          <a href="Signup.dc.html" class="btn btn-cta btn-sm tap">Get your link</a>
+        </div>
+        <div class="ft-cols">
+          <div class="ft-col"><b>Product</b><a href="Signup.dc.html">Create a link</a><a href="Landing.dc.html#games" onClick="{{jumpGames}}">Games</a><a href="Landing.dc.html#how" onClick="{{jumpHow}}">How it works</a></div>
+          <div class="ft-col"><b>Company</b><a href="About.dc.html">About</a><a href="Contact.dc.html">Contact</a><a href="Help.dc.html">Help &amp; FAQ</a></div>
+          <div class="ft-col"><b>Safety</b><a href="Safety.dc.html">Safety center</a><a href="Safety.dc.html">Community rules</a><a href="Safety.dc.html">Report a problem</a></div>
+          <div class="ft-col"><b>Legal</b><a href="Legal.dc.html">Privacy policy</a><a href="Legal.dc.html">Terms of use</a><a href="Legal.dc.html">Cookies &amp; ads</a></div>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <span>© 2026 Sekretly · 16+ only</span>
+        <span>Say it. Stay unknown.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["dark","light"],"default":"dark"},"ads":{"editor":"enum","options":["on","off"],"default":"on"},"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var m = null;
+    try { m = window.localStorage.getItem('sk-mode'); } catch (e) {}
+    this.state = { mode: m || props.mode || 'dark', q: '', cat: 'All', open: { 0: true } };
+  }
+  componentDidMount() {
+    var self = this;
+    this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
+    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }
+  componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  renderVals() {
+    var self = this, s = this.state, dark = s.mode !== 'light';
+    var F = [
+      ['Getting started', 'Do I need an account to send a message?', 'No. Anyone with your link can send you one anonymous message. You need an account to chat back and forth, make your own links, or play games.'],
+      ['Getting started', 'How old do I have to be?', 'You must be 16 or older. We ask for your date of birth when you sign up and never show it on your profile.'],
+      ['Getting started', 'Is Sekretly free?', 'Yes. Sekretly is paid for by a small number of clearly labelled ads. Ads never appear inside chats, the message box, or during a game turn.'],
+      ['Getting started', 'Can I install Sekretly like an app?', 'Yes. On Android, tap Install when Chrome offers it, or open the menu and choose Add to Home screen. On iPhone, open Sekretly in Safari, tap Share, then Add to Home Screen. Notifications on iPhone need iOS 16.4 or newer.'],
+      ['Links', 'How do I create a link?', 'Tap the + button, pick a theme, pick a topic or write your own, set optional limits, then share. It takes about ten seconds.'],
+      ['Links', 'Can I pause my link?', 'Yes. Pause or resume any link from My links. If you set a message cap or a time limit, the link pauses on its own when it is reached.'],
+      ['Links', 'What does “Reset all links” do?', 'It makes a new private key for your account, so every old link stops working forever. Use it if a link was shared somewhere you did not want.'],
+      ['Messages & chats', 'Can anyone see who sent a message?', 'No. Not you, not other users. We privately record which account or device sent a message only to route replies and to handle reports.'],
+      ['Messages & chats', 'How long do messages last?', 'You choose in Settings, from 1 day to 3 weeks. The default is 1 day. When a message expires it is deleted from our servers.'],
+      ['Messages & chats', 'Why can’t I reply to some messages?', 'Messages from people without an account are one-way. You can still share them to your story.'],
+      ['Messages & chats', 'What is a hidden message?', 'A message that contains a word on your personal hidden-words list. It still arrives, but stays covered until you tap to reveal it.'],
+      ['Games', 'How do I join a game?', 'Open a game link from a friend, or tap a game in the Games listing. You need an account to play.'],
+      ['Games', 'Will other players see my username?', 'No. Everyone gets a random nickname and colour that only exists inside that game.'],
+      ['Games', 'What if I do not respond in Truth or Dare?', 'After 20 seconds your turn is skipped. Miss two turns in a row and you are removed from the game.'],
+      ['Safety', 'How do I report someone?', 'Tap Report on any message, chat or game player and pick a reason from the list, or choose “Other reason” and write your own. Reports are anonymous.'],
+      ['Safety', 'What happens when I report a message?', 'The sender gets a warning that tells them why. After 3 warnings, your next report blocks them from messaging you. Warnings only count between the two of you.'],
+      ['Safety', 'I blocked someone by mistake. Can I undo it?', 'Yes. Go to Settings › Safety › Blocked senders and tap Undo, or tap Undo at the top of the chat.'],
+      ['Safety', 'Does Sekretly block bad words?', 'No. Sekretly doesn’t filter words before they send. The person who receives a message decides whether to report it.'],
+      ['Messages & chats', 'Can I send photos and videos?', 'Yes, in anonymous messages and chats. They arrive blurred, and the receiver taps to view them.'],
+      ['Messages & chats', 'Can I find out who sent a message?', 'No. Hints are coming soon. They give a vague clue, like the state or time of day, never a name or number.'],
+      ['Account', 'I forgot my password.', 'Tap “Forgot password” on the log in screen and we will email a code to your recovery email. Without a recovery email, the account cannot be recovered.'],
+      ['Account', 'How do I delete my account?', 'Go to Settings, Account, Delete account. Your links stop working and your messages are deleted.']
+    ];
+    var cats = ['All', 'Getting started', 'Links', 'Messages & chats', 'Games', 'Safety', 'Account'];
+    var q = s.q.trim().toLowerCase();
+    var list = F.map(function (f, i) { return { i: i, c: f[0], q: f[1], a: f[2] }; }).filter(function (f) {
+      if (s.cat !== 'All' && f.c !== s.cat) return false;
+      if (q && (f.q + ' ' + f.a).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    return {
+      mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
+      drawerCls: self.state.drawer ? 'is-open' : '', drawerOpen: self.state.drawer ? 'true' : 'false', drawerHidden: self.state.drawer ? 'false' : 'true',
+      toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
+      jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
+      jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
+      toggleMode: function () { var n = dark ? 'light' : 'dark'; try { window.localStorage.setItem('sk-mode', n); } catch (e) {} self.setState({ mode: n }); },
+      ads: this.props.ads === 'off' ? 'off' : 'on',
+      q: s.q,
+      onQ: function (e) { self.setState({ q: e.target.value }); },
+      cats: cats.map(function (c) { var on = s.cat === c; return { label: c, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ cat: c }); } }; }),
+      faqs: list.map(function (f) { var o = !!s.open[f.i]; return { q: f.q, a: f.a, open: o, sign: o ? '−' : '+', toggle: function () { var n = Object.assign({}, s.open); n[f.i] = !o; self.setState({ open: n }); } }; }),
+      none: list.length === 0,
+      resultLabel: list.length + (list.length === 1 ? ' answer' : ' answers') + (s.cat !== 'All' ? ' in ' + s.cat : '')
+    };
+  }
+}
+</script>
+</body>
+</html>
