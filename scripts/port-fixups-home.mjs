@@ -102,6 +102,8 @@ export const HOME_FIXUPS = {
 
   // props: items (from loadNotifications), unread, markRead(ids), markAllRead()
   Notifications: [
+    // this is the notifications page: its own menu entry needs no count
+    [`unread: unread, hasUnread: unread > 0,`, `unread: unread, hasUnread: false,`],
     between(`    var N = [\n`, `\n    var shown =`, `    var N = this.props.items || [];`),
     [
       `read: function () { var r = Object.assign({}, s.read); r[n.id] = true; self.setState({ read: r });`,

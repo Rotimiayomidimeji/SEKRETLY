@@ -2,6 +2,7 @@ import "server-only";
 
 import type { NotificationKind } from "@prisma/client";
 
+import { unreadCount } from "@/features/inbox/queries";
 import { db } from "@/lib/db";
 
 // How each kind looks on the Notifications screen: its filter tab, emoji and tint (as in the mockup).
@@ -47,3 +48,9 @@ export async function loadNotifications(userId: string) {
 }
 
 export const unreadNotifications = (userId: string) => db.notification.count({ where: { userId, readAt: null } });
+
+/** The unread counts every app screen shows in its menus (Inbox and Notifications); 0 shows nothing. */
+export async function navCounts(userId: string) {
+  const [navInbox, navNotif] = await Promise.all([unreadCount(userId), unreadNotifications(userId)]);
+  return { navInbox, navNotif };
+}

@@ -1,0 +1,76 @@
+/* ShareStudio: from design/mockup/ShareStudio.dc.html */
+body{margin:0;background:#0c0811}
+/* stage: the focused card big in the middle, neighbours peeking, swipe or tap to move */
+.ss-stage{--cw:250px;position:relative;height:calc(var(--cw) * 16 / 9 + 40px);margin:4px -16px 0;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-mask-image:linear-gradient(transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(transparent,#000 5%,#000 95%,transparent)}
+@container (min-width:700px){.ss-stage{--cw:290px;margin:4px 0 0;border-radius:32px}}
+.ss-glow{position:absolute;left:50%;top:50%;width:calc(var(--cw) * 1.5);height:calc(var(--cw) * 1.5);margin:calc(var(--cw) * -.75) 0 0 calc(var(--cw) * -.75);border-radius:50%;filter:blur(70px);opacity:.42;transition:background .6s;animation:ssBreathe 6s ease-in-out infinite;pointer-events:none}
+@keyframes ssBreathe{50%{transform:scale(1.12);opacity:.55}}
+.ss-slot{position:absolute;left:50%;top:20px;width:var(--cw);margin-left:calc(var(--cw) / -2);transform:translateX(calc(var(--cw) * var(--d) * .8)) scale(var(--s)) rotate(calc(var(--d) * 3.5deg));transition:transform .55s cubic-bezier(.2,.9,.25,1.12),opacity .4s,filter .4s;cursor:pointer}
+.ss-slot.is-focus{cursor:default}
+.ss-slot.is-far{pointer-events:none}
+/* one story card (9:16). Everything inside .ss-face is what gets posted. */
+.ss-card{position:relative;container-type:inline-size;aspect-ratio:9/16;border-radius:26px;overflow:hidden;box-shadow:0 22px 50px rgba(0,0,0,.35);transition:filter .35s,opacity .35s,box-shadow .35s}
+.ss-off .ss-card{filter:saturate(.25) brightness(.8);opacity:.55}
+.ss-face{position:absolute;inset:0;display:flex;flex-direction:column;padding:21cqi 7.5cqi 6.5cqi}
+.ss-quote{position:absolute;left:5cqi;top:26cqi;font-family:var(--font-display),system-ui,sans-serif;font-size:34cqi;font-weight:800;line-height:1;opacity:.16;pointer-events:none}
+.ss-topic{display:flex;align-items:center;gap:2.4cqi;font-size:4.2cqi;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.88}
+.ss-topic img{width:7.5cqi;height:7.5cqi}
+.sk .ss-text{margin:auto 0;padding:4cqi 0 6cqi;overflow-wrap:anywhere}
+.sk .ss-t-xl{font-family:var(--font-display),system-ui,sans-serif;font-size:10.6cqi;font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.sk .ss-t-l{font-family:var(--font-display),system-ui,sans-serif;font-size:8.2cqi;font-weight:800;line-height:1.14;letter-spacing:-.015em}
+.sk .ss-t-m{font-family:var(--font-body),system-ui,sans-serif;font-size:6.9cqi;font-weight:700;line-height:1.36}
+.sk .ss-t-s{font-family:var(--font-body),system-ui,sans-serif;font-size:5.7cqi;font-weight:700;line-height:1.36}
+.sk .ss-top .ss-text{margin:0;padding:3.5cqi 0 3cqi}
+.ss-top .ss-quote{display:none}
+.ss-top .ss-foot{margin-top:auto}
+.ss-wm{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-28deg);font-family:var(--font-display),system-ui,sans-serif;font-size:17cqi;font-weight:800;letter-spacing:.12em;white-space:nowrap;opacity:.07;pointer-events:none;user-select:none}
+.ss-foot{display:flex;flex-direction:column;gap:3cqi}
+.ss-pages{display:flex;align-items:center;gap:1.6cqi;font-size:4.2cqi;font-weight:800}
+.ss-pages i{width:2.4cqi;height:2.4cqi;border-radius:50%;background:currentColor;opacity:.3}
+.ss-pages i.on{width:6cqi;border-radius:3cqi;opacity:1}
+.ss-brand{display:flex;justify-content:space-between;align-items:center;font-size:3.9cqi;opacity:.85}
+.ss-brand b{letter-spacing:.14em}
+.ss-lock{display:inline-flex;align-items:center;gap:1.6cqi;align-self:flex-start;font-size:3.9cqi;font-weight:800;padding:1.4cqi 3cqi;border-radius:99px;background:rgba(0,0,0,.35)}
+/* controls on top of the card (never posted) */
+.ss-ctl{position:absolute;top:10px;left:10px;right:10px;z-index:3;display:flex;align-items:center;gap:6px}
+.sk .ss-circle{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(0,0,0,.22);display:grid;place-items:center;padding:0;color:#1a0b14;transition:background .25s,border-color .25s,transform .25s cubic-bezier(.3,1.6,.5,1)}
+.sk .ss-circle.on{background:#ffffff}
+.sk .ss-circle.posted{background:#5be0a0;border-color:#5be0a0;animation:ssTick .5s cubic-bezier(.3,1.7,.5,1)}
+.sk .ss-circle.lock{background:rgba(0,0,0,.4);border-color:rgba(255,255,255,.45)}
+.ss-circle:active{transform:scale(.86)}
+@keyframes ssTick{0%{transform:scale(.4)}100%{transform:scale(1)}}
+.ss-num{margin-left:auto;min-width:34px;height:34px;padding:0 9px;border-radius:12px;display:grid;place-items:center;font-family:var(--font-display),system-ui,sans-serif;font-weight:800;font-size:16px;background:rgba(0,0,0,.3);color:#ffffff;backdrop-filter:blur(8px)}
+.sk .ss-paint{width:34px;height:34px;border-radius:12px;border:0;background:rgba(0,0,0,.3);display:grid;place-items:center;padding:0;backdrop-filter:blur(8px)}
+.ss-paint img{width:22px;height:22px;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ss-paint:hover img,.ss-paint[aria-expanded="true"] img{transform:rotate(-16deg) scale(1.12)}
+.ss-sent .ss-card{animation:ssSend .7s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes ssSend{0%{transform:none}35%{transform:translateY(-16px) scale(1.03);box-shadow:0 30px 60px rgba(91,224,160,.35)}100%{transform:none}}
+.ss-arrow{position:absolute;top:50%;z-index:20;width:44px;height:44px;margin-top:-22px;border-radius:50%;border:1px solid var(--line);background:var(--card2);color:var(--ink);display:none;place-items:center;box-shadow:var(--shadow)}
+.ss-arrow--l{left:14px}.ss-arrow--r{right:14px}
+@container (min-width:700px){.ss-arrow{display:grid}}
+.ss-progress{position:absolute;left:0;right:0;margin:0 auto;width:max-content;top:4px;z-index:30;display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:#211a2c;color:#ffffff;font-size:13px;font-weight:800;box-shadow:var(--shadow);white-space:nowrap;animation:up .3s both}
+.ss-progress i{width:8px;height:8px;border-radius:50%;background:#5be0a0;animation:ssBlink 1s infinite}
+@keyframes ssBlink{50%{opacity:.25}}
+/* caption + paint row */
+.ss-cap{display:flex;align-items:center;gap:10px;margin-top:6px}
+.ss-nav{width:42px;height:42px;border-radius:14px;flex:none}
+.ss-swrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding:12px;border-radius:20px;background:var(--card);border:1px solid var(--line);animation:up .3s both}
+.sk .ss-sw{width:36px;height:36px;border-radius:50%;border:3px solid transparent;padding:0;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.ss-sw:hover{transform:scale(1.12)}
+/* filmstrip: posting order */
+.ss-film{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 8px;scrollbar-width:none}
+.ss-film::-webkit-scrollbar{display:none}
+.ss-grp{flex:none;display:flex;flex-direction:column;gap:6px}
+.ss-grp-h{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap}
+.ss-grp-h img{width:16px;height:16px}
+.ss-thumbs{display:flex;gap:6px}
+.sk .ss-thumb{position:relative;width:38px;height:66px;border-radius:10px;border:2px solid transparent;padding:0;display:grid;place-items:center;font-family:var(--font-display),system-ui,sans-serif;font-weight:800;font-size:15px;color:#ffffff;text-shadow:0 1px 4px rgba(0,0,0,.55);transition:transform .25s cubic-bezier(.3,1.6,.5,1),border-color .2s,opacity .2s}
+.sk .ss-thumb.focus{border-color:var(--ink);transform:translateY(-4px)}
+.sk .ss-thumb.off{opacity:.35}
+.ss-thumb .ok{position:absolute;right:-5px;top:-5px;width:18px;height:18px;border-radius:50%;background:#5be0a0;color:#0b2a1c;font-size:11px;display:grid;place-items:center;animation:ssTick .4s cubic-bezier(.3,1.7,.5,1)}
+/* where to post */
+.ss-dest{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sk .ss-d{min-height:64px;border-radius:18px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:800;padding:6px 2px;transition:border-color .2s,transform .2s}
+.sk .ss-d[aria-pressed="true"]{border-color:var(--pink);transform:translateY(-2px)}
+.ss-d span{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:900}
+.ss-step{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px}

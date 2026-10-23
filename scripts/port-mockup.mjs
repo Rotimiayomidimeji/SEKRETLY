@@ -16,8 +16,9 @@ import { LINK_FIXUPS } from "./port-fixups-links.mjs";
 import { INBOX_FIXUPS } from "./port-fixups-inbox.mjs";
 import { HOME_FIXUPS } from "./port-fixups-home.mjs";
 import { MYSTERY_FIXUPS } from "./port-fixups-mystery.mjs";
+import { SHARE_FIXUPS } from "./port-fixups-share.mjs";
 
-const FIXUPS = { ...BASE_FIXUPS, ...LINK_FIXUPS, ...INBOX_FIXUPS, ...HOME_FIXUPS, ...MYSTERY_FIXUPS };
+const FIXUPS = { ...BASE_FIXUPS, ...LINK_FIXUPS, ...INBOX_FIXUPS, ...HOME_FIXUPS, ...MYSTERY_FIXUPS, ...SHARE_FIXUPS };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MOCK = path.join(ROOT, "design/mockup");

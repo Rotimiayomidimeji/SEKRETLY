@@ -30,6 +30,7 @@
 @import "./sk/boards/WeeklyWrap.css";
 @import "./sk/boards/Crews.css";
 @import "./sk/boards/CrewDaily.css";
+@import "./sk/boards/ShareStudio.css";
 
 html {
   -webkit-text-size-adjust: 100%;

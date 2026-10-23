@@ -5,7 +5,9 @@ import Inbox from "@/components/sk/Inbox";
 import { deleteBubbles, deleteItems, markAllRead, markRead, report, sendChat, setArchived, startChat, undoBlock } from "@/features/inbox/actions";
 import { loadInbox } from "@/features/inbox/queries";
 import { guess, react, releaseHeld, searchPeople } from "@/features/mystery/actions";
+import { unreadNotifications } from "@/features/notifications/queries";
 import { requireUser } from "@/lib/auth/session";
+import { db } from "@/lib/db";
 import { getMode } from "@/lib/sk/mode";
 
 export const metadata: Metadata = { title: "Sekretly · Inbox" };
@@ -14,7 +16,9 @@ export const metadata: Metadata = { title: "Sekretly · Inbox" };
 export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
   const user = await requireUser("/inbox");
   const { open, filter } = await searchParams;
-  const { items } = await loadInbox(user.id);
+  // the inbox is where message and reply notifications lead, so being here clears them from the bell
+  await db.notification.updateMany({ where: { userId: user.id, readAt: null, kind: { in: ["MESSAGE", "REPLY"] } }, data: { readAt: new Date() } });
+  const [{ items }, navNotif] = await Promise.all([loadInbox(user.id), unreadNotifications(user.id)]);
   return (
     <>
       <LiveRefresh />
@@ -22,6 +26,7 @@ export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
         mode={await getMode()}
         ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
         username={user.username}
+        navNotif={navNotif}
         items={items}
         startOpen={typeof open === "string" && items.some((i) => i.id === open) ? open : null}
         markRead={markRead}

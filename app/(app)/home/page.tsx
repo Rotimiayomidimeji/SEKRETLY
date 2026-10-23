@@ -68,6 +68,7 @@ export default async function HomePage() {
         greeting={greeting()}
         unread={unread}
         notifUnread={notifUnread}
+        navNotif={notifUnread}
         links={links}
         setPaused={setLinkPaused}
         streak={streak.current}
