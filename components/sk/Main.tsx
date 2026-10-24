@@ -39,7 +39,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
       var fd = new FormData(); fd.append('file', f); fd.append('linkId', self.props.linkId);
       var preview = ''; try { preview = URL.createObjectURL(f); } catch (x) {}
       self.setState({ uploading: true, media: f.type.indexOf('video') === 0 ? 'video' : 'photo', mediaUrl: null, mediaInfo: null, mediaPreview: preview, sendErr: null });
-      fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+      import('@/lib/upload-client').then(function (m) { return m.uploadMedia(fd); }).then(function (r) {
         if (!r || !r.ok) { self.setState({ uploading: false, media: null, sendErr: (r && r.error) || 'Couldn’t attach that. Try again.' }); return; }
         self.setState({ uploading: false, media: r.kind, mediaUrl: r.url, mediaInfo: { name: f.name, size: r.size } });
       }).catch(function () { self.setState({ uploading: false, media: null, sendErr: 'Couldn’t attach that. Try again.' }); });

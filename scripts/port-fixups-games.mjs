@@ -108,6 +108,8 @@ const ENGINE = [
   ),
   [`    this.tk = setInterval(function () { self.tick(); }, 500);`, `    this.tk = setInterval(function () { self.tick(); }, 500);\n    this.pl = setInterval(function () { self.poll(); }, 1000);\n    this.apply(this.props.view || {});`],
   [`clearInterval(this.tk); clearTimeout(this.tt); }`, `clearInterval(this.tk); clearInterval(this.pl); clearTimeout(this.tt); }`],
+  // "Save this table as a crew" opens Crews with this table's players
+  [`href="Crews.dc.html" onClick="{{saveCrew}}"`, `href="/crews?from={{code}}"`],
   // scoreboards show real nicknames, including your own
   [`    var s = this.state, id = this.game();\n    return this.P().filter(`, `    var s = this.state, id = this.game(), myNick = this.myNick;\n    return this.P().filter(`],
   [`      return { name: nm, color: p[1], score: score, label: label };`, `      return { name: nm === 'MangoMoon' ? myNick : nm, color: p[1], score: score, label: label };`],
@@ -131,7 +133,8 @@ const LOBBY = (gid) => [
     `    this.tk = setInterval(function () {
       self.props.load(self.props.code).then(function (v) {
         if (!v) return;
-        if (v.status !== 'LOBBY') { window.location.href = '/g/' + v.code; return; }
+        // go to the table once (a second assignment would cancel the first while it loads)
+        if (v.status !== 'LOBBY') { if (!self.leaving) { self.leaving = true; clearInterval(self.tk); window.location.href = '/g/' + v.code; } return; }
         self.setState({ view: v });
       });
     }, 1500);
@@ -142,7 +145,7 @@ const LOBBY = (gid) => [
   [
     `      enter: function () { hand(); },`,
     `      enter: function () { hand(); },
-      startNow: function () { self.props.start(self.props.code).then(function (r) { if (r && r.ok) window.location.href = '/g/' + self.props.code; else self.flash((r && r.error) || 'Couldn’t start', '', gm.icon); }); },`,
+      startNow: function () { self.props.start(self.props.code).then(function (r) { if (r && r.ok) { self.leaving = true; clearInterval(self.tk); window.location.href = '/g/' + self.props.code; } else self.flash((r && r.error) || 'Couldn’t start', '', gm.icon); }); },`,
   ],
   line(/      copy: function \(\) \{ self\.setState\(\{ copied: true \}\); self\.flash\('Link copied', 'sekretly\.com\/g\/K7Q2', gm\.icon\); \},/,
     `      copy: function () { var u = (self.props.origin || '') + '/join/' + self.props.code; try { navigator.clipboard.writeText(u); } catch (e) {} self.setState({ copied: true }); self.flash('Link copied', u.replace(/^https?:\\/\\//, ''), gm.icon); },`),

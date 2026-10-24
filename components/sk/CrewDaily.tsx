@@ -11,7 +11,8 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
   constructor(props) {
     super(props);
     var m = null; // light/dark arrives as props.mode from the sk-mode cookie
-    this.state = { mode: m || props.mode || 'dark', phase: props.phase || 'answer', pick: -1, why: '', left: 1 * 3600 + 58 * 60 + 40, nudged: {} };
+    var X = props.crew || {};
+    this.state = { mode: m || props.mode || 'dark', phase: X.revealed ? 'reveal' : X.myPick ? 'wait' : 'answer', pick: -1, why: '', left: X.secondsLeft || 0, nudged: {} };
   }
   componentDidMount() {
     var self = this;
@@ -22,39 +23,32 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
   componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tick); }
   componentDidUpdate(prev) {
     if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode });
-    if (prev.phase !== this.props.phase && this.props.phase) this.setState({ phase: this.props.phase });
+
   }
   renderVals() {
     var self = this, s = this.state, dark = s.mode !== 'light';
     var p = function (n) { return n < 10 ? '0' + n : String(n); };
-    var M = [
-      { name: 'Moon', icon: '/sk/panda.png', tint: 'linear-gradient(135deg,#7ef0c1,#3aa0ff)', done: true, votes: 3 },
-      { name: 'PixelOwl', icon: '/sk/octopus.png', tint: 'linear-gradient(135deg,#ffd0f0,#a46bff)', done: true, votes: 2 },
-      { name: 'Fox', icon: '/sk/fox.png', tint: 'linear-gradient(135deg,#ffb35c,#ff5f8f)', done: true, votes: 1 },
-      { name: 'You', icon: '/sk/frog.png', tint: 'linear-gradient(135deg,#d6ff6b,#22c4a0)', done: false, me: true, votes: 2 },
-      { name: 'KolaNut', icon: '/sk/koala.png', tint: 'linear-gradient(135deg,#ffe48a,#ff8a5c)', done: true, votes: 0 },
-      { name: 'Zobo', icon: '/sk/unicorn.png', tint: 'linear-gradient(135deg,#9fe7ff,#ff9ad5)', done: false, votes: 0 },
-      { name: 'ChinChin', icon: '/sk/peach.png', tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', done: true, votes: 0 },
-      { name: 'Suya', icon: '/sk/shushing_face.png', tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', done: false, votes: 0 }
-    ];
+    var X = this.props.crew || { members: [], results: [], whys: [] };
+    var M = X.members;
     var meDone = s.phase !== 'answer';
     var done = M.filter(function (m) { return m.done || (m.me && meDone); }).length;
-    var maxV = 3;
+    var maxV = Math.max(1, X.results.reduce(function (a, r) { return Math.max(a, r.votes); }, 0));
     return {
       mode: dark ? 'dark' : 'light',
       isAnswer: s.phase === 'answer', isWait: s.phase === 'wait', isReveal: s.phase === 'reveal',
       phaseLabel: s.phase === 'reveal' ? 'revealed' : 'reveals 9pm',
       answered: M.map(function (m) { var d = m.done || (m.me && meDone); return { name: m.name, icon: m.icon, tint: m.tint, op: d ? 1 : 0.35, label: m.name + (d ? ' answered' : ' has not answered') }; }),
       answeredText: done + ' of ' + M.length + ' answered · you see who, never what',
-      members: M.filter(function (m) { return !m.me; }).map(function (m, i) { var on = s.pick === i; return { name: m.name, icon: m.icon, tint: m.tint, on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'var(--line)', pick: function () { self.setState({ pick: i }); } }; }),
+      members: M.filter(function (m) { return !m.me; }).map(function (m, i) { var on = s.pick === i; return { name: m.name, icon: m.icon, tint: m.tint, on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'var(--line)', pick: function () { self.setState({ pick: i }); } }; }), crewName: X.name, question: X.question,
       why: s.why, onWhy: function (e) { self.setState({ why: e.target.value.slice(0, 140) }); },
       noPick: s.pick < 0,
-      submit: function () { if (s.pick >= 0) self.setState({ phase: 'wait' }); },
-      myPick: s.pick >= 0 ? M.filter(function (m) { return !m.me; })[s.pick].name : 'Moon',
+      submit: function () { if (s.pick < 0) return; var t = M.filter(function (m) { return !m.me; })[s.pick]; self.setState({ phase: 'wait' }); self.props.vote(X.id, t.id, s.why); },
+      myPick: s.pick >= 0 ? M.filter(function (m) { return !m.me; })[s.pick].name : (X.myPick || ''),
       hh: p(Math.floor(s.left / 3600)), mm: p(Math.floor(s.left % 3600 / 60)), ss: p(s.left % 60),
       waiting: M.filter(function (m) { return !m.done && !m.me; }).map(function (m) { var n = !!s.nudged[m.name]; return { name: m.name, icon: m.icon, tint: m.tint, nudged: n, label: n ? 'Nudged' : 'Nudge', nudge: function () { var x = Object.assign({}, s.nudged); x[m.name] = true; self.setState({ nudged: x }); } }; }),
       reveal: function () { self.setState({ phase: 'reveal' }); },
-      results: M.filter(function (m) { return m.votes > 0; }).sort(function (a, b) { return b.votes - a.votes; }).map(function (m) { return { name: m.name, icon: m.icon, tint: m.tint, votes: m.votes, pct: Math.round(100 * m.votes / maxV) }; })
+      whys: X.whys || [],
+      results: X.results.filter(function (m) { return m.votes > 0; }).sort(function (a, b) { return b.votes - a.votes; }).map(function (m) { return { name: m.name, icon: m.icon, tint: m.tint, votes: m.votes, pct: Math.round(100 * m.votes / maxV) }; })
     };
   }
 
@@ -81,7 +75,7 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
               <div className="grow">
                 {" "}
                 <div className="muted" style={{ fontSize: "13px" }}>
-                  Class of 2027 · day 9
+                  {v.crewName}
                 </div>
                 {" "}
                 <div className="d" style={{ fontSize: "20px", fontWeight: "800" }}>
@@ -103,7 +97,7 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
               </span>
               {" "}
               <h1 style={{ fontSize: "30px", lineHeight: "1.02", marginTop: "12px" }}>
-                Who here becomes famous first?
+                {v.question}
               </h1>
               {" "}
               <div className="row" style={{ gap: "8px", marginTop: "14px" }}>
@@ -240,10 +234,6 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
                   {" "}
                 </div>
                 {" "}
-                <button className="btn btn-block tap" onClick={v.reveal} style={{ marginTop: "12px" }}>
-                  Preview the 9pm reveal
-                </button>
-                {" "}
               </div>
               {" "}
               </>
@@ -305,17 +295,13 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
                 {" "}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {" "}
-                  <div className="card" style={{ padding: "12px 14px", fontSize: "14.5px" }}>
-                    "Moon’s cooking videos are one algorithm away from blowing."
-                  </div>
-                  {" "}
-                  <div className="card" style={{ padding: "12px 14px", fontSize: "14.5px" }}>
-                    "PixelOwl will be famous for something nobody can explain."
-                  </div>
-                  {" "}
-                  <div className="card" style={{ padding: "12px 14px", fontSize: "14.5px" }}>
-                    "Fox. Podcast. Calling it now."
-                  </div>
+                  {(v.whys || []).map((wy, i0) => (
+                    <Fragment key={i0}>
+                    <div className="card" style={{ padding: "12px 14px", fontSize: "14.5px" }}>
+                      “{wy}”
+                    </div>
+                    </Fragment>
+                  ))}
                   {" "}
                 </div>
                 {" "}
@@ -326,7 +312,7 @@ export default class CrewDaily extends React.Component<Record<string, any>, any>
                   </svg>
                   {" "}
                   <span>
-                    Crew streak: day 9. Moon’s win was pinned to Inside jokes.
+                    Tomorrow brings a new question at the same time.
                   </span>
                   {" "}
                 </div>

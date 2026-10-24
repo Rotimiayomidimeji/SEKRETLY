@@ -149,7 +149,7 @@ export const INBOX_FIXUPS = {
           ${TOAST_OUT}
         };
         var fd = new FormData(); fd.append('file', f); fd.append('chatId', id);
-        fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+        import('@/lib/upload-client').then(function (m) { return m.uploadMedia(fd); }).then(function (r) {
           if (!r || !r.ok) { undo(r && r.error); return; }
           return self.props.sendChat({ chatId: id, mediaUrl: r.url }).then(function (s2) { if (!s2 || !s2.ok) undo(s2 && s2.error); });
         }).catch(function () { undo(); });

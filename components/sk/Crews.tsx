@@ -11,15 +11,11 @@ export default class Crews extends React.Component<Record<string, any>, any> {
   constructor(props) {
     super(props);
     var m = null, pickName = null, fresh = null;
-    try {
-      m = window.localStorage.getItem('sk-mode');
-      pickName = window.localStorage.getItem('sk-crew'); window.localStorage.removeItem('sk-crew');
-      fresh = JSON.parse(window.localStorage.getItem('sk-crew-new') || 'null'); window.localStorage.removeItem('sk-crew-new');
-    } catch (e) {}
-    var names = ['Hostel B gang', 'Class of 2027', 'Sunday brunch crew'];
+    fresh = props.fresh || null;
+    var ids = (props.crews || []).map(function (c) { return c.id; }), pickName = props.pick || null;
     var inv = {};
     ((fresh && fresh.players) || []).forEach(function (p) { inv[p] = true; });
-    this.state = { mode: m || props.mode || 'dark', crew: Math.max(0, names.indexOf(pickName)), tab: 0, rsvp: 0, copied: false, draft: '', extra: [],
+    this.state = { mode: m || props.mode || 'dark', crew: Math.max(0, ids.indexOf(pickName)), tab: 0, rsvp: {}, copied: false, draft: '', extra: [],
       naming: !!fresh, fromGame: fresh && fresh.game ? String(fresh.game).replace('Sekretly · ', '') : 'tonight’s game', players: (fresh && fresh.players) || [], inv: inv, newName: '', made: null, saved: false };
   }
   componentDidMount() {
@@ -32,19 +28,12 @@ export default class Crews extends React.Component<Record<string, any>, any> {
   renderVals() {
     var self = this, s = this.state, dark = s.mode !== 'light';
     var COL = ['#ffd23d', '#7ef0c1', '#7fb2ff', '#ff9ad5', '#ffb35c', '#b78bff', '#5be0a0', '#ff8b98'];
-    var C = [
-      { name: 'Hostel B gang', icon: '/sk/fire.png', bg: 'radial-gradient(130% 110% at 100% 0%,#ffb347 0%,#ff4f6d 45%,#7a1fa2 100%)', who: ['You', 'Fox', 'KolaNut', 'PixelOwl', 'Zobo', 'MangoMoon'], streak: 4, nightTitle: 'Friday · 9:00pm', nightSub: 'Most Likely To · every week' },
-      { name: 'Class of 2027', icon: '/sk/eyes.png', bg: 'radial-gradient(130% 110% at 100% 0%,#22e1ff 0%,#3a6bff 50%,#22337d 100%)', who: ['You', 'Moon', 'PixelOwl', 'ChinChin', 'Suya', 'Zobo', 'Fox', 'KolaNut'], streak: 2, nightTitle: 'Saturday · 8:30pm', nightSub: 'Would You Rather · this week only' },
-      { name: 'Sunday brunch crew', icon: '/sk/shushing_face.png', bg: 'radial-gradient(130% 110% at 100% 0%,#ff9ad5 0%,#d81b72 50%,#5d1785 100%)', who: ['You', 'KolaNut', 'Moon', 'Zobo'], streak: 7, nightTitle: 'Sunday · 2:00pm', nightSub: 'Hot Takes rematch' }
-    ];
-    if (s.made) C.push(s.made);
+    var C = (this.props.crews || []).slice();
+    if (!C.length) C.push({ id: '', name: 'No crews yet', icon: '/sk/sparkles.png', bg: 'radial-gradient(130% 110% at 100% 0%,#5be0a0 0%,#127a80 50%,#0a2b3a 100%)', who: ['You'], streak: 0, nightTitle: 'Save a game table as a crew', nightSub: 'Play a game, then tap “Save this table as a crew”', myRsvp: -1, going: 0, invite: '', board: [{ n: 'You', pts: 0, title: 'New to the crew' }], history: [], jokes: [] });
     var c = C[s.crew] || C[0];
-    var going = Math.max(1, c.who.length - 2) - 1 + (s.rsvp === 0 ? 1 : 0);
-    var J = s.extra.concat([
-      { text: 'Zobo has been “most likely to sleep through an exam” 4 weeks running', from: 'auto · Most Likely To' },
-      { text: 'The jollof incident of Oct 3. We don’t talk about it.', from: 'pinned by KolaNut' },
-      { text: 'Fox picked dare 11 times in a row', from: 'auto · Truth or Dare' },
-      { text: '“I’m just choosing who gets the gist” became the crew motto', from: 'pinned by you' }
+    var myR = s.rsvp[c.id] !== undefined ? s.rsvp[c.id] : c.myRsvp;
+    var going = c.going + (myR === 0 && c.myRsvp !== 0 ? 1 : 0) - (myR !== 0 && c.myRsvp === 0 ? 1 : 0);
+    var J = s.extra.filter(function (j) { return j.crew === c.id; }).concat(c.jokes || [
     ]);
     var BGS = ['#ffe48a', '#ffd0f0', '#bff3dd', '#cfe3ff', '#ffc9b5'];
     var titles = { Fox: 'Dare devil', You: 'Knows everyone’s secrets', KolaNut: 'Hot take queen', PixelOwl: 'Quiet but deadly', Zobo: 'Always late, always there', MangoMoon: 'Wildcard', Moon: 'Poll prophet', ChinChin: 'Chaos agent', Suya: 'Never has, never will' };
@@ -56,32 +45,31 @@ export default class Crews extends React.Component<Record<string, any>, any> {
       justSaved: s.saved,
       c: { name: c.name, icon: c.icon, bg: c.bg, streak: c.streak, nightTitle: c.nightTitle, nightSub: c.nightSub,
         members: c.who.map(function (n, k) { return { n: n, i: n.charAt(0), c: COL[k % COL.length] }; }) },
-      copyInvite: function () { try { navigator.clipboard.writeText('https://sekretly.com/crew/invite'); } catch (e) {} self.setState({ copied: true }); },
+      copyInvite: function () { if (!c.invite) return; try { navigator.clipboard.writeText(c.invite); } catch (e) {} self.setState({ copied: true }); },
       inviteLabel: s.copied ? 'Invite link copied' : 'Invite someone',
       playNow: crewPlay,
-      rsvp: ['Going', 'Maybe', 'Can’t'].map(function (n, i) { return { name: n, on: s.rsvp === i ? 'true' : 'false', pick: function () { self.setState({ rsvp: i }); } }; }),
+      rsvp: ['Going', 'Maybe', 'Can’t'].map(function (n, i) { return { name: n, on: myR === i ? 'true' : 'false', pick: function () { if (!c.id) return; var r = Object.assign({}, s.rsvp); r[c.id] = i; self.setState({ rsvp: r }); self.props.rsvp(c.id, i); } }; }),
       goingText: Math.max(0, going) + ' of ' + c.who.length + ' going · reminder 1 hour before',
       tabs: ['Leaderboard', 'History', 'Inside jokes'].map(function (n, i) { return { name: n, on: s.tab === i ? 'true' : 'false', pick: function () { self.setState({ tab: i }); } }; }),
       tabBoard: s.tab === 0, tabHistory: s.tab === 1, tabJokes: s.tab === 2,
-      board: c.who.map(function (n, k) { return { n: n, pts: 1240 - k * 110 - (n === 'You' ? -60 : 0) }; }).sort(function (a, b) { return b.pts - a.pts; }).map(function (b, k) {
-        return { rank: k + 1, n: b.n, i: b.n.charAt(0), c: COL[c.who.indexOf(b.n) % COL.length], pts: b.pts, title: titles[b.n] || 'New to the crew', bg: b.n === 'You' ? 'rgba(255,59,141,.10)' : 'transparent', rankInk: k === 0 ? '#ffb020' : 'var(--ink)' };
+      board: (c.board || []).map(function (b, k) {
+        return { rank: k + 1, n: b.n, i: b.n.charAt(0), c: COL[c.who.indexOf(b.n) % COL.length], pts: b.pts, title: b.title, bg: b.n === 'You' ? 'rgba(255,59,141,.10)' : 'transparent', rankInk: k === 0 ? '#ffb020' : 'var(--ink)' };
       }),
-      history: [
-        { game: 'Most Likely To', when: 'Last Friday', highlight: 'You got “most likely to cry at a wedding”. 5 of 6 votes. No defence was accepted.', meta: '6 played · 42 rounds · Fox won' },
-        { game: 'Truth or Dare', when: 'Oct 11', highlight: 'Zobo’s dare proof is still the most viewed thing in this crew.', meta: '4 played · 18 rounds' },
-        { game: 'Never Have I Ever', when: 'Oct 4', highlight: 'Turns out 5 of 6 have never cooked rice without burning it.', meta: '6 played · 30 rounds · you won' },
-        { game: 'Crew saved', when: 'Oct 1', highlight: 'Saved from “Friday Night Never” with Fox and KolaNut.', meta: 'Day one' }
+      history: c.history || [], sampleHistory: [
       ],
       draft: s.draft, onDraft: function (e) { self.setState({ draft: e.target.value.slice(0, 120) }); },
-      addJoke: function (e) { if (e && e.preventDefault) e.preventDefault(); if (!s.draft.trim()) return; self.setState({ extra: [{ text: s.draft.trim(), from: 'pinned by you · just now', fresh: true }].concat(s.extra), draft: '' }); },
+      addJoke: function (e) { if (e && e.preventDefault) e.preventDefault(); if (!s.draft.trim()) return; if (!c.id) return; self.props.addJoke(c.id, s.draft.trim()); self.setState({ extra: [{ crew: c.id, text: s.draft.trim(), from: 'pinned by you · just now', fresh: true }].concat(s.extra), draft: '' }); },
       jokes: J.map(function (j, i) { return { text: j.text, from: j.from, bg: BGS[i % BGS.length], rot: (i % 2 ? 1.2 : -1.2) + 'deg', cls: j.fresh ? 'pop' : '' }; }),
       naming: s.naming, fromGame: s.fromGame, closeNaming: function () { self.setState({ naming: false }); },
       newName: s.newName, onNewName: function (e) { self.setState({ newName: e.target.value.slice(0, 30) }); },
       invitees: s.players.map(function (n) { var on = !!s.inv[n]; return { name: n, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { var v = Object.assign({}, s.inv); v[n] = !on; self.setState({ inv: v }); } }; }),
       createCrew: function () {
-        var who = ['You'].concat(s.players.filter(function (k) { return s.inv[k]; }));
-        var made = { name: s.newName.trim() || 'Friday table', icon: '/sk/sparkles.png', bg: 'radial-gradient(130% 110% at 100% 0%,#5be0a0 0%,#127a80 50%,#0a2b3a 100%)', who: who, streak: 0, nightTitle: 'No game night yet', nightSub: 'Tap Change to pick a weekly time' };
-        self.setState({ made: made, crew: 3, naming: false, tab: 0, saved: true });
+        if (s.creating) return;
+        self.setState({ creating: true });
+        self.props.create({ name: s.newName.trim() || 'Friday table', code: (self.props.fresh || {}).code || '', invite: s.players.filter(function (k) { return s.inv[k]; }) }).then(function (r) {
+          if (r && r.ok) window.location.href = '/crews?pick=' + r.id + '&saved=1';
+          else self.setState({ creating: false });
+        });
       }
     };
   }

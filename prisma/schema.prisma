@@ -3,8 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // migrations need a direct (unpooled) connection; locally it is the same address as DATABASE_URL
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // Phase 1: accounts, sessions and the codes for email checks.
@@ -47,68 +49,68 @@ enum LinkStatus {
 }
 
 model User {
-  id              String      @id @default(cuid())
+  id               String             @id @default(cuid())
   /// Always stored lowercase; 3–20 letters, numbers or _.
-  username        String      @unique
-  passwordHash    String
+  username         String             @unique
+  passwordHash     String
   /// Null for accounts made from a link's "get replies" popup, which only confirm they are 16 or older.
-  birthDate       DateTime?   @db.Date
-  ageConfirmedAt  DateTime?
+  birthDate        DateTime?          @db.Date
+  ageConfirmedAt   DateTime?
   /// The key in every link address (sekretlyy.vercel.app/<username>/<linkKey>/…). "Reset all" replaces it.
-  linkKey         String      @unique
+  linkKey          String             @unique
   /// Avatar picked at sign-up: fox, panda, frog, octopus, unicorn or koala.
-  avatar          String      @default("fox")
-  bio             String?
-  role            Role        @default(MEMBER)
-  status          UserStatus  @default(ACTIVE)
+  avatar           String             @default("fox")
+  bio              String?
+  role             Role               @default(MEMBER)
+  status           UserStatus         @default(ACTIVE)
   /// Optional, only used to reset a forgotten password.
-  recoveryEmail   String?
-  emailVerifiedAt DateTime?
-  onboardedAt     DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  lastSeenAt      DateTime?
+  recoveryEmail    String?
+  emailVerifiedAt  DateTime?
+  onboardedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  lastSeenAt       DateTime?
   /// Kind mode: 0 off (only threats held), 1 standard, 2 kind only
-  kindMode        Int         @default(1)
+  kindMode         Int                @default(1)
   /// The member's own hidden words: messages containing them are held
-  hiddenWords     String[]    @default([])
+  hiddenWords      String[]           @default([])
   /// Mystery features the member allows on their links
-  allowHints      Boolean     @default(true)
-  receiptReactions Boolean    @default(true)
-  allowGuess      Boolean     @default(true)
-  streakSaves     Int         @default(2)
+  allowHints       Boolean            @default(true)
+  receiptReactions Boolean            @default(true)
+  allowGuess       Boolean            @default(true)
+  streakSaves      Int                @default(2)
   /// Last Monday a free streak save was added (1 a week, holding at most 2)
-  savesToppedAt   DateTime?
+  savesToppedAt    DateTime?
   /// Up to 3 badge ids shown on the profile
-  pinnedBadges    String[]    @default([])
-  cloudPublic     Boolean     @default(true)
+  pinnedBadges     String[]           @default([])
+  cloudPublic      Boolean            @default(true)
   /// Settings › Privacy: who can start private chats ("everyone" or "nobody"), whether visitors without an
   /// account can message, and whether the public profile (/u/<username>) is visible
-  chatsFrom       String      @default("everyone")
-  allowVisitors   Boolean     @default(true)
-  publicProfile   Boolean     @default(true)
+  chatsFrom        String             @default("everyone")
+  allowVisitors    Boolean            @default(true)
+  publicProfile    Boolean            @default(true)
   /// Settings › Messages: how many days messages and chat bubbles last before they disappear
-  inboxTimerDays  Int         @default(1)
-  chatTimerDays   Int         @default(1)
+  inboxTimerDays   Int                @default(1)
+  chatTimerDays    Int                @default(1)
   /// Settings › Safety: photos and videos stay blurred until tapped
-  blurMedia       Boolean     @default(true)
+  blurMedia        Boolean            @default(true)
   /// Settings › Notifications: which pushes to send ({ msg, reply, join, turn, paused, warn, drop, streak, wrap, quiet })
-  notifPrefs      Json?
+  notifPrefs       Json?
   /// Settings › Games
-  gameInvites     Boolean     @default(true)
-  gameListing     Boolean     @default(true)
-  pushSubs        PushSubscription[]
-  sessions        Session[]
-  codes           EmailCode[]
-  links           Link[]
-  received        Message[]   @relation("received")
-  sent            Message[]   @relation("sent")
-  guessesMade     Guess[]     @relation("guesser")
-  streakSavesUsed StreakSave[]
-  chatsOwned      Chat[]      @relation("chatOwner")
-  chatsJoined     Chat[]      @relation("chatGuest")
-  notifications   Notification[]
-  reportsMade     Report[]
+  gameInvites      Boolean            @default(true)
+  gameListing      Boolean            @default(true)
+  pushSubs         PushSubscription[]
+  sessions         Session[]
+  codes            EmailCode[]
+  links            Link[]
+  received         Message[]          @relation("received")
+  sent             Message[]          @relation("sent")
+  guessesMade      Guess[]            @relation("guesser")
+  streakSavesUsed  StreakSave[]
+  chatsOwned       Chat[]             @relation("chatOwner")
+  chatsJoined      Chat[]             @relation("chatGuest")
+  notifications    Notification[]
+  reportsMade      Report[]
 }
 
 /// One shareable link: a topic in a theme. Address: /<username>/<owner's linkKey>/<theme>/<slug>.
@@ -251,18 +253,18 @@ model Chat {
 
 /// One bubble in a chat. Disappears a day after it is sent, like every message.
 model ChatMessage {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   chatId         String
   fromOwner      Boolean
   text           String?
   mediaUrl       String?
   /// photo or video
   mediaKind      String?
-  deletedByOwner Boolean   @default(false)
-  deletedByGuest Boolean   @default(false)
+  deletedByOwner Boolean  @default(false)
+  deletedByGuest Boolean  @default(false)
   expiresAt      DateTime
-  createdAt      DateTime  @default(now())
-  chat           Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  chat           Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@index([chatId, createdAt])
 }
@@ -270,17 +272,17 @@ model ChatMessage {
 /// "Guess who": the recipient names who they think sent a message. A right guess asks the sender privately;
 /// they choose to reveal or not. Wrong guesses resolve as "not confirmed" after a while, so timing gives nothing away.
 model Guess {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   messageId     String
   guesserId     String
   guessedUserId String
   correct       Boolean
   /// PENDING until the sender decides (right guesses) or until resolveAt passes (wrong ones); then REVEALED or HIDDEN
-  status        String    @default("PENDING")
+  status        String   @default("PENDING")
   resolveAt     DateTime
-  createdAt     DateTime  @default(now())
-  message       Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  guesser       User      @relation("guesser", fields: [guesserId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  message       Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  guesser       User     @relation("guesser", fields: [guesserId], references: [id], onDelete: Cascade)
 
   @@index([messageId])
   @@index([guessedUserId, status])
@@ -298,7 +300,7 @@ model StreakSave {
 
 /// A report a recipient made about something sent to them.
 model Report {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   reporterId    String
   /// "u:<userId>" for account holders, "f:<fingerprint>" for anonymous senders
   senderKey     String
@@ -311,8 +313,8 @@ model Report {
   decision      String?
   decidedAt     DateTime?
   decidedBy     String?
-  createdAt     DateTime @default(now())
-  reporter      User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  reporter      User      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
 
   @@index([reporterId, senderKey])
   @@index([createdAt])
@@ -439,6 +441,8 @@ model Crew {
   id        String       @id @default(cuid())
   name      String
   ownerId   String
+  /// game night, RSVPs, inside jokes and the daily crew question with its votes
+  data      Json         @default("{}")
   createdAt DateTime     @default(now())
   members   CrewMember[]
 }

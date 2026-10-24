@@ -32,7 +32,8 @@ export default class TruthDareLobby extends React.Component<Record<string, any>,
     this.tk = setInterval(function () {
       self.props.load(self.props.code).then(function (v) {
         if (!v) return;
-        if (v.status !== 'LOBBY') { window.location.href = '/g/' + v.code; return; }
+        // go to the table once (a second assignment would cancel the first while it loads)
+        if (v.status !== 'LOBBY') { if (!self.leaving) { self.leaving = true; clearInterval(self.tk); window.location.href = '/g/' + v.code; } return; }
         self.setState({ view: v });
       });
     }, 1500);
@@ -107,7 +108,7 @@ export default class TruthDareLobby extends React.Component<Record<string, any>,
       startLabel: canStart ? (scheduled ? 'Start now instead · ' : 'Start game · ') + s.joined + ' players' : 'Waiting for ' + (gm.min - s.joined) + ' more to start',
       roomHref: roomHref,
       enter: function () { hand(); },
-      startNow: function () { self.props.start(self.props.code).then(function (r) { if (r && r.ok) window.location.href = '/g/' + self.props.code; else self.flash((r && r.error) || 'Couldn’t start', '', gm.icon); }); },
+      startNow: function () { self.props.start(self.props.code).then(function (r) { if (r && r.ok) { self.leaving = true; clearInterval(self.tk); window.location.href = '/g/' + self.props.code; } else self.flash((r && r.error) || 'Couldn’t start', '', gm.icon); }); },
       goNow: function () { hand(); clearTimeout(self.goTimer); self.setState({ inGame: true }); },
       inGame: s.inGame, inLobby: !s.inGame,
       waitingHost: !host && !s.go, waitText: s.joined < max ? 'Waiting for ' + (max - s.joined) + ' more to join…' : 'Everyone’s here. Waiting for the host to start…',

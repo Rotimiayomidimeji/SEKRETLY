@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route } from "@/lib/sk/runtime";
 
 
 export default class HotTakes extends React.Component<Record<string, any>, any> {
@@ -1541,7 +1541,7 @@ export default class HotTakes extends React.Component<Record<string, any>, any> 
                     </span>
                   </div>
                   {" "}
-                  <SkLink href="/crews" onClick={v.saveCrew} className="btn btn-block tap" style={{ marginTop: "12px" }}>
+                  <SkLink href={route(`/crews?from=${v.code}`)} className="btn btn-block tap" style={{ marginTop: "12px" }}>
                     Save as a crew
                   </SkLink>
                   {" "}
