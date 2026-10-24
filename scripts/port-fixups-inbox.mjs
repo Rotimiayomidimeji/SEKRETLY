@@ -83,9 +83,25 @@ export const INBOX_FIXUPS = {
     [`text: 'Their message: “' + b.from + '”'`, `text: (b.fromLabel || 'Their message') + ': “' + b.from + '”'`],
     // the hint is recorded when the message is sent (city · device · time of day)
     [`hintText: open ? hintOf(selRaw.id) : '',`, `hintText: open ? (selRaw.hint || 'Somewhere near you') : '',`],
-    // the photo that came with a message
-    [`<img src="/sk/hero-dark.png" alt="Photo sent anonymously">`, `<img src="{{selMediaSrc}}" alt="Photo sent anonymously">`],
-    [`selHasMedia: open && !!selRaw.media,`, `selHasMedia: open && !!selRaw.media, selMediaSrc: open && selRaw.mediaUrl ? selRaw.mediaUrl : '/sk/hero-dark.png',`],
+    // the photo or video that came with a message (blurred until tapped, if Settings › Safety says so)
+    [
+      `<img src="/sk/hero-dark.png" alt="Photo sent anonymously">`,
+      `<sc-if value="{{selIsVideo}}" hint-placeholder-val="{{ false }}"><video src="{{selMediaSrc}}" controls="controls" preload="metadata"></video></sc-if>
+                  <sc-if value="{{selIsPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{selMediaSrc}}" alt="Photo sent anonymously"></sc-if>`,
+    ],
+    [`selHasMedia: open && !!selRaw.media,`, `selHasMedia: open && !!selRaw.media, selMediaSrc: open && selRaw.mediaUrl ? selRaw.mediaUrl : '', selIsVideo: open && selRaw.media === 'video', selIsPhoto: open && selRaw.media !== 'video',`],
+    [`mediaTag: m.media === 'photo' ? 'Photo' : '',`, `mediaTag: m.media === 'video' ? '▶ Video' : m.media === 'photo' ? 'Photo' : '',`],
+    [
+      `mediaHidden: open && !s.shown[s.openId], mediaCls: open && s.shown[s.openId] ? '' : 'blur',`,
+      `mediaHidden: open && self.props.blurMedia !== false && !s.shown[s.openId], mediaCls: open && (self.props.blurMedia === false || s.shown[s.openId]) ? '' : 'blur',`,
+    ],
+    // chat bubbles: the real file, video or photo; the other person's media blurs until tapped (if the setting is on)
+    [`<img src="{{b.src}}" alt="{{b.alt}}">`, `<sc-if value="{{b.isVideo}}" hint-placeholder-val="{{ false }}"><video src="{{b.src}}" controls="controls" preload="metadata"></video></sc-if><sc-if value="{{b.isPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{b.src}}" alt="{{b.alt}}"></sc-if>`],
+    [`<button class="media-cover" onClick="{{b.reveal}}" style="font-size: 13px">Tap to view video</button>`, `<button class="media-cover" onClick="{{b.reveal}}" style="font-size: 13px">{{b.cover}}</button>`],
+    (src) => src.replace(
+      /src: b\.url && b\.media === 'photo' \? b\.url : '\/sk\/hero-dark\.png', alt: (b\.media === 'video' \? 'Video sent in chat' : 'Photo sent in chat'), tag: b\.media === 'video' \? \(b\.me \? '▶ Your video' : '▶ 0:12'\) : 'Photo', mediaCls: b\.me \|\| s\.shown\[key\] \? '' : 'blur', hidden: !b\.me && !s\.shown\[key\],/,
+      "src: b.url || '', isVideo: b.media === 'video', isPhoto: b.media !== 'video', cover: b.media === 'video' ? 'Tap to view video' : 'Tap to view photo', alt: $1, tag: b.media === 'video' ? (b.me ? '▶ Your video' : '▶ Video') : 'Photo', mediaCls: b.me || s.shown[key] || self.props.blurMedia === false ? '' : 'blur', hidden: !b.me && !s.shown[key] && self.props.blurMedia !== false,",
+    ),
     between(
       `      replyPrivately: function () {`,
       `      chatIntro:`,
@@ -118,14 +134,25 @@ export const INBOX_FIXUPS = {
       },
 `,
     ),
-    // photos and videos in chats arrive with uploads
+    // a photo or video in a chat uploads first (app/api/upload), then goes out as its own bubble
     between(
       `      attachChat: function (e) {`,
       `      // Kind mode: held messages`,
       `      attachChat: function (e) {
+        var f = e && e.target && e.target.files && e.target.files[0]; if (!f || !selRaw) return;
         try { e.target.value = ''; } catch (x) {}
-        self.setState({ toast: { t: 'Photos and videos are coming soon', s: 'For now, chats are text only.', i: GHOST } });
-        ${TOAST_OUT}
+        var id = selRaw.id, kind = f.type && f.type.indexOf('video') === 0 ? 'video' : 'photo', local = '';
+        try { local = URL.createObjectURL(f); } catch (x) {}
+        self.setState({ items: self.state.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: true, media: kind, url: local }]) }) : x; }) });
+        var undo = function (msg) {
+          self.setState({ items: self.state.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.slice(0, -1) }) : x; }), toast: { t: 'Not sent', s: msg || 'Try again.', i: GHOST } });
+          ${TOAST_OUT}
+        };
+        var fd = new FormData(); fd.append('file', f); fd.append('chatId', id);
+        fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+          if (!r || !r.ok) { undo(r && r.error); return; }
+          return self.props.sendChat({ chatId: id, mediaUrl: r.url }).then(function (s2) { if (!s2 || !s2.ok) undo(s2 && s2.error); });
+        }).catch(function () { undo(); });
       },
 `,
     ),
@@ -148,6 +175,12 @@ export const INBOX_FIXUPS = {
     // the menu count drops the moment a message is opened (archived and held ones never count)
     [`      unread: s.items.filter(function (m) { return m.unread; }).length,`, `      unread: s.items.filter(function (m) { return m.unread; }).length,
       navInbox: s.items.filter(function (m) { return m.unread && !s.archived[m.id] && !(m.held && !s.released[m.id]); }).length,`],
+    // report reasons come from Admin › Categories (active ones, shown 5–10 at a time by default)
+    [`  cats() {
+    return [`, `  cats() {
+    if (this.props.reportCats && this.props.reportCats.length) return this.props.reportCats;
+    return [`],
+    [`n = 5 + (seed * 7) % 6`, `n = (this.props.reportMin || 5) + (seed * 7) % ((this.props.reportMax || 10) - (this.props.reportMin || 5) + 1)`],
     [`undoBlock: function () { self.setState(`, `undoBlock: function () { self.props.undoBlock(s.openId); self.setState(`],
     [`undoBlockClose: function () { self.setState(`, `undoBlockClose: function () { self.props.undoBlock(s.openId); self.setState(`],
     // other screens open the inbox on a filter with ?filter=held (not browser storage, so the first render matches)

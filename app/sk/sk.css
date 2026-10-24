@@ -140,6 +140,8 @@ textarea.field{padding:14px;min-height:120px;resize:vertical;line-height:1.45}
 @container (min-width:760px){.ad-banner{width:728px;height:90px}.ad-banner .ad-m{display:none}.ad-banner .ad-d{display:inline}}
 .ad-wrap{display:flex;justify-content:center;margin:18px 0}
 .sk[data-ads="off"] .ad,.sk[data-ads="off"] .ad-wrap{display:none}
+/* the right rail only holds ads: with ads off it goes, and the main column takes the full width */
+.sk[data-ads="off"] .rightrail{display:none!important}
 
 /* overlays */
 .toast{position:fixed;top:14px;left:50%;width:min(92%,420px);display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:var(--card2);border:1px solid var(--line);box-shadow:var(--shadow);z-index:40;animation:toast 4.4s cubic-bezier(.2,.8,.2,1) both;text-decoration:none;color:var(--ink)}
@@ -160,6 +162,8 @@ textarea.field{padding:14px;min-height:120px;resize:vertical;line-height:1.45}
 .media{position:relative;border-radius:18px;overflow:hidden;background:#1b1324}
 .media img{display:block;width:100%;height:100%;object-fit:cover;transition:filter .35s}
 .media.blur img{filter:blur(22px) saturate(.6)}
+.media video{display:block;width:100%;height:100%;object-fit:cover;background:#000;transition:filter .35s}
+.media.blur video{filter:blur(22px) saturate(.6)}
 .media-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#ffffff;background:rgba(10,6,14,.35);border:0;width:100%;font-weight:800;font-size:14px}
 .media-tag{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.55);color:#ffffff;font-size:11px;font-weight:800}
 

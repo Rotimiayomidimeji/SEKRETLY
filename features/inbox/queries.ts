@@ -3,6 +3,7 @@ import "server-only";
 import type { Chat, ChatMessage, Guess, Link, Message, QuizQuestion, User } from "@prisma/client";
 
 import { MESSAGE_TTL_MS, TOPIC_COMPOSER, TOPIC_TITLE } from "@/features/links/topics";
+import { kindOf } from "@/features/media/storage";
 import { senderKeyOf, standingWith, userKey } from "@/features/safety/standing";
 import { db } from "@/lib/db";
 
@@ -13,9 +14,10 @@ const ago = (d: Date) => {
   const m = Math.floor((Date.now() - d.getTime()) / 60_000);
   return m < 1 ? "now" : m < 60 ? m + "m" : m < 1440 ? Math.floor(m / 60) + "h" : Math.floor(m / 1440) + "d";
 };
-const timeLeft = (expires: Date) => {
+/** Time left and the share of its life remaining (for the countdown ring); lifetimes follow each member's timer. */
+const timeLeft = (expires: Date, total = MESSAGE_TTL_MS) => {
   const ms = Math.max(0, expires.getTime() - Date.now());
-  return { left: ms >= 3_600_000 ? Math.floor(ms / 3_600_000) + "h" : Math.max(1, Math.floor(ms / 60_000)) + "m", pct: Math.min(1, ms / MESSAGE_TTL_MS) };
+  return { left: ms >= 3_600_000 ? Math.floor(ms / 3_600_000) + "h" : Math.max(1, Math.floor(ms / 60_000)) + "m", pct: Math.min(1, ms / total) };
 };
 const ALIAS_BG: Record<string, string> = {
   fox: "linear-gradient(135deg,#ffb35c,#ff5f8f)",
@@ -67,7 +69,7 @@ async function messageItem(m: MessageRow, warns: number, names: Map<string, stri
     title: topicTitle(m.link),
     text: m.text,
     ago: ago(m.createdAt),
-    ...timeLeft(m.expiresAt),
+    ...timeLeft(m.expiresAt, m.expiresAt.getTime() - m.createdAt.getTime()),
     unread: !m.readAt,
     warns,
     acct: !!m.senderId,
@@ -75,7 +77,7 @@ async function messageItem(m: MessageRow, warns: number, names: Map<string, stri
     quiz,
     rate: m.topic === "RATE" ? data.score : undefined,
     cat: m.topic === "RATE" ? data.category : undefined,
-    media: m.mediaUrl ? "photo" : undefined,
+    media: m.mediaUrl ? kindOf(m.mediaUrl) : undefined,
     mediaUrl: m.mediaUrl ?? undefined,
     hint: m.hint ?? "",
     chatId: m.chat && !m.chat.ownerDeletedAt ? "c:" + m.chat.id : undefined,
@@ -111,7 +113,7 @@ export async function chatItem(c: ChatRow, viewerId: string, warns?: number) {
     av: "/sk/" + (asOwner ? c.aliasAvatar : c.owner.avatar) + ".png",
     avBg: asOwner ? aliasBg(c.aliasAvatar) : aliasBg(c.owner.avatar),
     ago: ago(c.lastAt),
-    ...timeLeft(new Date(c.lastAt.getTime() + MESSAGE_TTL_MS)),
+    ...timeLeft(new Date(c.lastAt.getTime() + c.owner.chatTimerDays * MESSAGE_TTL_MS), c.owner.chatTimerDays * MESSAGE_TTL_MS),
     unread: !!last && last.fromOwner !== asOwner && (!readAt || readAt < last.createdAt),
     warns: warns ?? (await standingWith(viewerId, [other])).warns,
     acct: true,
@@ -130,7 +132,8 @@ export const CHAT_INCLUDE = { message: { include: { link: true } }, owner: true,
 /** Everything in a member's inbox: messages to them and chats they are in (newest first), plus the unread count. */
 export async function loadInbox(userId: string) {
   const now = new Date();
-  const since = new Date(now.getTime() - MESSAGE_TTL_MS);
+  // chats can last up to 3 weeks (Settings › Messages); each is checked against its owner's timer below
+  const since = new Date(now.getTime() - 21 * MESSAGE_TTL_MS);
   const [messages, chats, standings] = await Promise.all([
     db.message.findMany({
       where: { recipientId: userId, deletedAt: null, expiresAt: { gt: now } },
@@ -151,7 +154,7 @@ export async function loadInbox(userId: string) {
   );
   const warnsOf = (key: string) => standings.find((s) => s.senderKey === key)?.warns ?? 0;
   const items = [
-    ...(await Promise.all(chats.map((c) => chatItem(c, userId, warnsOf(userKey(c.ownerId === userId ? c.guestId : c.ownerId)))))),
+    ...(await Promise.all(chats.filter((c) => c.lastAt.getTime() + c.owner.chatTimerDays * MESSAGE_TTL_MS > now.getTime()).map((c) => chatItem(c, userId, warnsOf(userKey(c.ownerId === userId ? c.guestId : c.ownerId)))))),
     ...(await Promise.all(messages.map((m) => messageItem(m, warnsOf(senderKeyOf(m)), names)))),
   ];
   return { items, unread: items.filter((i) => i.unread && !i.archived).length };
@@ -164,11 +167,12 @@ export async function unreadCount(userId: string) {
     // held messages never ping, so they don't count as new either
     db.message.count({ where: { recipientId: userId, readAt: null, deletedAt: null, archivedAt: null, expiresAt: { gt: now }, OR: [{ held: null }, { releasedAt: { not: null } }] } }),
     db.chat.findMany({
-      where: { lastAt: { gt: new Date(now.getTime() - MESSAGE_TTL_MS) }, OR: [{ ownerId: userId, ownerDeletedAt: null }, { guestId: userId, guestDeletedAt: null }] },
-      select: { ownerId: true, ownerReadAt: true, guestReadAt: true, messages: { orderBy: { createdAt: "desc" }, take: 1, select: { fromOwner: true, createdAt: true } } },
+      where: { lastAt: { gt: new Date(now.getTime() - 21 * MESSAGE_TTL_MS) }, OR: [{ ownerId: userId, ownerDeletedAt: null }, { guestId: userId, guestDeletedAt: null }] },
+      select: { ownerId: true, ownerReadAt: true, guestReadAt: true, lastAt: true, owner: { select: { chatTimerDays: true } }, messages: { orderBy: { createdAt: "desc" }, take: 1, select: { fromOwner: true, createdAt: true } } },
     }),
   ]);
   const unreadChats = chats.filter((c) => {
+    if (c.lastAt.getTime() + c.owner.chatTimerDays * MESSAGE_TTL_MS <= now.getTime()) return false;
     const last = c.messages[0], asOwner = c.ownerId === userId, readAt = asOwner ? c.ownerReadAt : c.guestReadAt;
     return last && last.fromOwner !== asOwner && (!readAt || readAt < last.createdAt);
   }).length;

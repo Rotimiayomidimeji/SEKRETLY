@@ -1,0 +1,16 @@
+/* PollsLobby: from design/mockup/PollsLobby.dc.html */
+body{margin:0;background:#0c0811}
+.lb-wrap{max-width:1180px;margin:0 auto;padding:12px 14px 40px}
+.lb-grid{display:flex;flex-direction:column;gap:12px}
+@container (min-width:900px){.lb-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}.lb-side{position:sticky;top:12px}}
+.lb-code{font-family:var(--font-display),system-ui,sans-serif;font-size:46px;font-weight:800;letter-spacing:.12em;line-height:1}
+.lb-ghost .g3-head,.lb-ghost .g3-body{background:transparent!important;border:2px dashed rgba(255,255,255,.45);box-shadow:none}
+.lb-ghost .g3-name{background:rgba(255,255,255,.12)}
+.lb-new{animation:lbDrop .8s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes lbDrop{from{transform:translateY(-140px) scale(.6);opacity:0}}
+.lb-count{font-family:var(--font-display),system-ui,sans-serif;font-size:96px;font-weight:800;line-height:1;color:#fff;text-shadow:0 0 40px rgba(255,59,141,.8);animation:lbBeat 1s cubic-bezier(.3,1.6,.5,1) infinite}
+@keyframes lbBeat{0%{transform:scale(1.6);opacity:0}30%{transform:scale(1);opacity:1}}
+.lb-nick{display:flex;align-items:center;gap:14px;padding:16px;border-radius:24px}
+.lb-nick .av{width:64px;height:64px;border-radius:50%;font-family:var(--font-display),system-ui,sans-serif;font-size:28px;font-weight:800;color:#1a0b14}
+.lb-rule{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}
+.lb-rule b{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:12.5px;background:var(--card2)}

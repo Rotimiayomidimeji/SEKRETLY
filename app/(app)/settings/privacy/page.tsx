@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function PrivacySettingsPage() { return <FoundationPage title="Privacy controls." description="Visibility and public response settings will be connected here." />; }
+import { redirect } from "next/navigation";
+
+// Old address; Settings opens a section with ?s=.
+export default function SettingsPrivacyPage() {
+  redirect("/settings?s=privacy");
+}

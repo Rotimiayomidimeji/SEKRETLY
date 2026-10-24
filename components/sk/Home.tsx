@@ -342,7 +342,7 @@ export default class Home extends React.Component<Record<string, any>, any> {
                   {" "}
                   <div className="card" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
-                      43
+                      {v.stats.week}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
                       messages this week
@@ -351,16 +351,16 @@ export default class Home extends React.Component<Record<string, any>, any> {
                   {" "}
                   <div className="card" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
-                      218
+                      {v.stats.visits}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
-                      link visits
+                      link visits this week
                     </div>
                   </div>
                   {" "}
                   <div className="card" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
-                      2
+                      {v.stats.chats}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
                       active chats

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { LiveRefresh } from "@/components/layout/LiveRefresh";
 import Home from "@/components/sk/Home";
+import { adsFlag } from "@/features/admin/settings";
 import { currentDrop, myDrop, streakOf } from "@/features/drops/drops";
 import { unreadCount } from "@/features/inbox/queries";
 import { setLinkPaused } from "@/features/links/actions";
@@ -20,12 +21,14 @@ const greeting = () => {
 };
 
 const weekAgo = () => new Date(Date.now() - 7 * 86_400_000);
+const monthAgo = () => new Date(Date.now() - 21 * 86_400_000);
+const nowMs = () => Date.now();
 
 export default async function HomePage() {
   const user = await requireUser("/home");
   const drop = currentDrop();
   const live = { recipientId: user.id, deletedAt: null, expiresAt: { gt: new Date() } };
-  const [mine, unread, notifUnread, streak, today, droppers, hintCount, held, weekCount, badges] = await Promise.all([
+  const [mine, unread, notifUnread, streak, today, droppers, hintCount, held, weekCount, badges, visits, chats] = await Promise.all([
     loadMyLinks(user.id),
     unreadCount(user.id),
     unreadNotifications(user.id),
@@ -36,7 +39,14 @@ export default async function HomePage() {
     db.message.count({ where: { ...live, held: { not: null }, releasedAt: null } }),
     db.message.count({ where: { recipientId: user.id, createdAt: { gte: weekAgo() } } }),
     badgesOf(user.id),
+    db.linkDay.aggregate({ where: { link: { ownerId: user.id }, day: { gte: weekAgo() } }, _sum: { visits: true } }),
+    db.chat.findMany({
+      where: { lastAt: { gte: monthAgo() }, OR: [{ ownerId: user.id, ownerDeletedAt: null }, { guestId: user.id, guestDeletedAt: null }] },
+      select: { lastAt: true, owner: { select: { chatTimerDays: true } } },
+    }),
   ]);
+  // chats still within their owner's timer (Settings › Messages)
+  const activeChats = chats.filter((c) => c.lastAt.getTime() + c.owner.chatTimerDays * 86_400_000 > nowMs()).length;
   // the home strip shows the three newest links, in the shape the board's cards use
   const links = mine.links.slice(0, 3).map((l) => ({
     id: l.id,
@@ -62,7 +72,7 @@ export default async function HomePage() {
       <LiveRefresh seconds={15} />
       <Home
         mode={await getMode()}
-        ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+        ads={await adsFlag("home")}
         username={user.username}
         avatar={user.avatar}
         greeting={greeting()}
@@ -81,6 +91,7 @@ export default async function HomePage() {
             : (others > 0 ? others + (others === 1 ? " person has" : " people have") + " dropped" : "Be the first to drop") + " · tap to drop yours",
         }}
         spots={spots}
+        stats={{ week: weekCount, visits: visits._sum.visits ?? 0, chats: activeChats }}
       />
     </>
   );

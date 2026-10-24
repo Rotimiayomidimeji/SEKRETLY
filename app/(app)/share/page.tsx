@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import ShareStudio from "@/components/sk/ShareStudio";
+import { adsFlag } from "@/features/admin/settings";
 import { currentDrop, myDrop } from "@/features/drops/drops";
 import { TOPIC_TITLE, appOrigin } from "@/features/links/topics";
 import { describeWords } from "@/features/stats/stats";
@@ -64,7 +65,7 @@ export default async function SharePage() {
   return (
     <ShareStudio
       mode={await getMode()}
-      ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+      ads={await adsFlag("studio")}
       pool={pool}
       promos={promos}
       brand={appOrigin().replace(/^https?:\/\//, "") + "/u/" + user.username}

@@ -1,0 +1,5 @@
+/* GamesHub: from design/mockup/GamesHub.dc.html */
+body{margin:0;background:#0c0811}
+.gh-games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:640px){.gh-games{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (min-width:1180px){.gh-games{grid-template-columns:repeat(6,minmax(0,1fr))}}

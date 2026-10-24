@@ -3,6 +3,7 @@ import "server-only";
 import { Prisma } from "@prisma/client";
 
 import { newLinkKey } from "@/features/links/topics";
+import { logVisit } from "@/features/admin/traffic";
 import { notify } from "@/features/notifications/notify";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
@@ -10,7 +11,7 @@ import { hashPassword } from "@/lib/password";
 // Not a "use server" file on purpose: nothing here may be callable from the browser.
 
 // Words that could be mistaken for staff or app pages.
-export const RESERVED = new Set(["admin", "sekretly", "support", "help", "safety", "about", "login", "signup", "settings", "inbox", "home", "games", "staff", "official", "moderator", "root", "system"]);
+export const RESERVED = new Set(["admin", "sekretly", "support", "help", "safety", "about", "login", "signup", "settings", "inbox", "home", "games", "staff", "official", "moderator", "root", "system", "sekretly_hq"]);
 
 /**
  * Creates the account with a fresh link key. Returns ok:false only when the username is taken
@@ -33,6 +34,7 @@ export async function createAccount(data: { username: string; password: string; 
         },
         select: { id: true },
       });
+      await logVisit("signup", "/signup", user.id);
       await notify(user.id, "WELCOME", "Welcome to Sekretly, @" + data.username, "/create", "Make your first link");
       return { ok: true as const, id: user.id };
     } catch (e) {

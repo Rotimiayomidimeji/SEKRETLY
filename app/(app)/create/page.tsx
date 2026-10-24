@@ -21,6 +21,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
       mode={await getMode()}
       topic={typeof topic === "string" && SLUG_TOPIC[topic] ? topic : undefined}
       initial={initial ?? undefined}
+      me={{ username: user.username, avatar: user.avatar }}
       save={saveLink}
     />
   );

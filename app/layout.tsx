@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
+
+import { AdFiller } from "@/components/layout/AdFiller";
+import { Analytics } from "@/components/layout/Analytics";
+import { PushBridge } from "@/components/layout/PushBridge";
+
 import "./globals.css";
 
 // The UI kit refers to these as var(--font-display) and var(--font-body). Loaded the way the mockup loads them:
@@ -11,6 +16,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://sekretlyy.vercel.app"),
   title: "Sekretly · Say it. Stay unknown.",
   description: "Anonymous messages and party games. Share a link, see what your people really think.",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "Sekretly", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {
@@ -22,7 +29,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <PushBridge />
+        <Analytics />
+        <AdFiller />
+      </body>
     </html>
   );
 }

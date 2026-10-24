@@ -7,6 +7,8 @@ import { createAccount } from "@/features/auth/accounts";
 import { passwordSchema, usernameSchema } from "@/features/auth/schemas";
 import { MESSAGE_TTL_MS, RATE_CATEGORIES, TOPIC_TITLE, isNapping } from "@/features/links/topics";
 import { notify } from "@/features/notifications/notify";
+import { ipBlocked, logVisit } from "@/features/admin/traffic";
+import { isOurMedia } from "@/features/media/storage";
 import { classify, cleanHint } from "@/features/safety/kind";
 import { deviceKey, senderHint, standingWith, userKey } from "@/features/safety/standing";
 import { createSession, getCurrentUser } from "@/lib/auth/session";
@@ -34,6 +36,8 @@ const sendSchema = z.object({
       note: z.string().optional(),
       /** the sender's own optional clue */
       hint: z.string().max(80).optional(),
+      /** a photo or video already uploaded through /api/upload */
+      mediaUrl: z.string().max(300).optional(),
     })
     .default({}),
   /** set when the sender adds to a message from its receipt */
@@ -61,7 +65,7 @@ async function buildMessage(topic: LinkTopic, linkId: string, p: z.infer<typeof 
       return { text: note, data: { score, of: questions.length, picks, nickname: nickname() } };
     }
     case "CONFESS":
-      if (text.length < 2) return { error: "Write your confession." };
+      if (text.length < 2 && !p.mediaUrl) return { error: "Write your confession." };
       return { text: text.slice(0, 2000), data: undefined };
     case "RATE": {
       if (!p.score) return { error: "Tap a number from 1 to 10." };
@@ -69,11 +73,11 @@ async function buildMessage(topic: LinkTopic, linkId: string, p: z.infer<typeof 
       return { text: text.slice(0, 140), data: { score: p.score, category } };
     }
     case "AMA":
-      if (text.length < 5) return { error: "Type your question." };
+      if (text.length < 5 && !p.mediaUrl) return { error: "Type your question." };
       return { text: text.slice(0, 300), data: undefined };
     case "CUSTOM":
     case "DROP":
-      if (text.length < 1) return { error: "Write something." };
+      if (text.length < 1 && !p.mediaUrl) return { error: "Write something." };
       return { text: text.slice(0, 1000), data: undefined };
   }
 }
@@ -94,6 +98,10 @@ async function deliver(
   if (!link || link.status === "DELETED") return { ok: false, error: "This link no longer exists." };
   if (isNapping(link)) return { ok: false, error: "This link is taking a nap. Try again later." };
   if (senderId && senderId === link.ownerId) return { ok: false, error: "You can’t send to your own link. Share it with your friends instead." };
+  // Settings › Privacy: this owner only hears from Sekretly members
+  if (!senderId && !link.owner.allowVisitors) return { ok: false, error: "@" + link.owner.username + " only gets messages from Sekretly members. Make a free account to send." };
+  // a network the admin blocked for abuse
+  if (await ipBlocked()) return { ok: false, error: "Sending isn’t available from this network." };
   const fingerprint = await requestFingerprint();
   // reported 4 times by this owner (as this account or from this device): blocked from them only
   const standing = await standingWith(link.ownerId, senderId ? [userKey(senderId), deviceKey(fingerprint)] : [deviceKey(fingerprint)]);
@@ -113,6 +121,9 @@ async function deliver(
   const owner = link.owner;
   const held = classify({ text: built.text, score: input.payload.score }, link.kindOff ? 0 : owner.kindMode, owner.hiddenWords);
   const hint = owner.allowHints && !link.hintsOff ? cleanHint(input.payload.hint) : "";
+  // media only where the topic takes it, and only files this app stored
+  const media = input.payload.mediaUrl;
+  if (media && (!["CONFESS", "AMA", "CUSTOM", "DROP"].includes(link.topic) || !isOurMedia(media))) return { ok: false, error: "That attachment can’t be sent." };
   const code = receiptCode();
   await db.$transaction([
     db.message.create({
@@ -124,13 +135,16 @@ async function deliver(
         data: built.data,
         senderId,
         senderFingerprint: fingerprint,
-        wantsReply: !!senderId && input.wantsReply,
+        // Settings › Privacy › chats "Nobody": no replies are offered
+        wantsReply: !!senderId && input.wantsReply && owner.chatsFrom !== "nobody",
         hint: await senderHint(),
         senderHint: hint || null,
+        mediaUrl: media ?? null,
         receiptCode: code,
         held,
         followUpOfId: input.followUpOf ?? null,
-        expiresAt: new Date(Date.now() + MESSAGE_TTL_MS),
+        // Settings › Messages: the owner's timer (1 day by default)
+        expiresAt: new Date(Date.now() + owner.inboxTimerDays * MESSAGE_TTL_MS),
       },
     }),
     db.link.update({ where: { id: link.id }, data: { messageCount: { increment: 1 } } }),
@@ -141,6 +155,7 @@ async function deliver(
   if (!held) await notify(link.ownerId, "MESSAGE", (input.followUpOf ? "A sender added to their message on " : "Someone sent you a message on ") + title, "/inbox", hint ? "They left a hint" : "Inbox");
   if (link.maxMessages != null && link.messageCount + 1 === link.maxMessages)
     await notify(link.ownerId, "LINK_NAP", "Your link " + title + " is taking a nap", "/links", "Hit its " + link.maxMessages + " message limit · tap to resume");
+  await logVisit("message", "/" + link.owner.username + "/…/" + link.slug, senderId);
   return { ok: true, receipt: code };
 }
 

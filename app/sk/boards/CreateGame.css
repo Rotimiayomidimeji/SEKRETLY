@@ -1,0 +1,22 @@
+/* CreateGame: from design/mockup/CreateGame.dc.html */
+body{margin:0;background:#0c0811}
+.cg-wrap{max-width:1180px;margin:0 auto;padding:12px 14px 8px}
+.cg-grid{display:flex;flex-direction:column-reverse;gap:14px}
+@container (min-width:900px){.cg-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start}.cg-prev{position:sticky;top:12px}}
+.cg-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:560px){.cg-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cg-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cg-row:last-child{border-bottom:0}
+.cg-row > span{flex:1;min-width:0}
+.cg-scene{position:relative;height:84px;border-radius:18px;border:2px solid transparent;overflow:hidden;display:flex;align-items:flex-end;padding:8px 10px;color:#fff;font-weight:800;font-size:13px;text-align:left}
+.cg-scene[aria-pressed="true"]{border-color:#ff3b8d;box-shadow:0 0 0 3px rgba(255,59,141,.25)}
+.cg-scene i{position:absolute;left:50%;top:44%;width:64%;height:34%;transform:translate(-50%,-50%) perspective(200px) rotateX(55deg);border-radius:50%}
+.cg-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.cg-steps button{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;font-size:12px;font-weight:800;color:var(--muted);text-align:left}
+.cg-steps button span{height:6px;border-radius:9px;transition:background .3s}
+.cg-steps button[aria-current="step"]{color:var(--ink)}
+.cg-steps button:disabled{opacity:.55;cursor:default}
+.cg-foot{position:sticky;left:0;right:0;bottom:0;z-index:20;padding:12px 14px 16px;background:var(--nav);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.cg-foot > div{max-width:1180px;margin:0 auto;display:flex;gap:10px}
+.cg-pack{display:inline-flex;align-items:center;gap:6px}
+.cg-poll{display:flex;gap:6px;margin-top:6px}

@@ -254,8 +254,8 @@ export default class Create extends React.Component<Record<string, any>, any> {
                     {" "}
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12.5px", fontWeight: "700" }}>
                       {" "}
-                      <img src="/sk/peach.png" alt="" style={{ width: "24px", height: "24px", borderRadius: "50%", background: "rgba(255,255,255,.3)" }} />
-                      {"@peach "}
+                      <img src={`/sk/${v.me.avatar}.png`} alt="" style={{ width: "24px", height: "24px", borderRadius: "50%", background: "rgba(255,255,255,.3)" }} />
+                      @{v.me.username}{" "}
                       <span style={{ marginLeft: "auto", fontSize: "10.5px", letterSpacing: ".08em", textTransform: "uppercase", opacity: ".8" }}>
                         Live preview
                       </span>

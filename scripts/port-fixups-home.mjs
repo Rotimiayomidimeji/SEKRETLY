@@ -12,6 +12,10 @@ export const HOME_FIXUPS = {
   // props: username, avatar, greeting, unread (inbox), notifUnread, links (from loadMyLinks, newest 3), setPaused(id, paused),
   //        streak, hintCount, drop { question, secondsLeft, sub }, spots[{ title, sub, icon, href, bg, ink, line }]
   Home: [
+    // the three numbers under the top card
+    [`font-weight: 800">43</div><div class="muted" style="font-size: 12.5px">messages this week</div>`, `font-weight: 800">{{stats.week}}</div><div class="muted" style="font-size: 12.5px">messages this week</div>`],
+    [`font-weight: 800">218</div><div class="muted" style="font-size: 12.5px">link visits</div>`, `font-weight: 800">{{stats.visits}}</div><div class="muted" style="font-size: 12.5px">link visits this week</div>`],
+    [`font-weight: 800">2</div><div class="muted" style="font-size: 12.5px">active chats</div>`, `font-weight: 800">{{stats.chats}}</div><div class="muted" style="font-size: 12.5px">active chats</div>`],
     // the install drop-down already offers this; the card only crowded the right rail
     [`        <div class="card" style="padding: 16px">
           <b>Get Sekretly as an app</b>
@@ -102,6 +106,18 @@ export const HOME_FIXUPS = {
 
   // props: items (from loadNotifications), unread, markRead(ids), markAllRead()
   Notifications: [
+    // the banner reflects this phone: hidden once push is on; explains when the browser can't do push yet
+    [`<div class="muted" style="font-size: 13px">Turn it on to hear about messages instantly.</div>`, `<div class="muted" style="font-size: 13px">{{pushSub}}</div>`],
+    [`pushOff: !s.push, pushOn: function () { self.setState({ push: true }); },`, `pushOff: !s.push, pushSub: s.pushSub || 'Turn it on to hear about messages instantly.',
+      pushOn: function () {
+        if (!window.skPush || !window.skPush.supported) { self.setState({ pushSub: 'On iPhone, add Sekretly to your home screen first (Share › Add to Home Screen), then turn this on.' }); return; }
+        window.skPush.enable().then(function (r) { self.setState(r === 'on' ? { push: true } : { pushSub: r === 'denied' ? 'Notifications are blocked for Sekretly. Allow them in your browser settings, then try again.' : 'Couldn’t turn push on. Try again.' }); });
+      },`],
+    [`    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+  }`, `    try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    // PushBridge mounts with the page, so ask once it has had a moment
+    setTimeout(function () { if (window.skPush) window.skPush.isOn().then(function (on) { self.setState({ push: on }); }); }, 300);
+  }`],
     // this is the notifications page: its own menu entry needs no count
     [`unread: unread, hasUnread: unread > 0,`, `unread: unread, hasUnread: false,`],
     between(`    var N = [\n`, `\n    var shown =`, `    var N = this.props.items || [];`),

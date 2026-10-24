@@ -17,6 +17,8 @@ export default class Notifications extends React.Component<Record<string, any>, 
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
+    // PushBridge mounts with the page, so ask once it has had a moment
+    setTimeout(function () { if (window.skPush) window.skPush.isOn().then(function (on) { self.setState({ push: on }); }); }, 300);
   }
   componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
   componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
@@ -38,7 +40,11 @@ export default class Notifications extends React.Component<Record<string, any>, 
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
       ads: this.props.ads === 'off' ? 'off' : 'on',
       unread: unread, hasUnread: false,
-      pushOff: !s.push, pushOn: function () { self.setState({ push: true }); },
+      pushOff: !s.push, pushSub: s.pushSub || 'Turn it on to hear about messages instantly.',
+      pushOn: function () {
+        if (!window.skPush || !window.skPush.supported) { self.setState({ pushSub: 'On iPhone, add Sekretly to your home screen first (Share › Add to Home Screen), then turn this on.' }); return; }
+        window.skPush.enable().then(function (r) { self.setState(r === 'on' ? { push: true } : { pushSub: r === 'denied' ? 'Notifications are blocked for Sekretly. Allow them in your browser settings, then try again.' : 'Couldn’t turn push on. Try again.' }); });
+      },
       filters: [['all', 'All'], ['messages', 'Messages'], ['safety', 'Safety'], ['games', 'Games'], ['account', 'Account']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
       markAll: function () { var r = {}; N.forEach(function (n) { r[n.id] = true; }); self.setState({ read: r }); self.props.markAllRead(); },
       groups: groups, empty: groups.length === 0
@@ -196,7 +202,7 @@ export default class Notifications extends React.Component<Record<string, any>, 
                       Push is off on this phone
                     </b>
                     <div className="muted" style={{ fontSize: "13px" }}>
-                      Turn it on to hear about messages instantly.
+                      {v.pushSub}
                     </div>
                   </div>
                   {" "}

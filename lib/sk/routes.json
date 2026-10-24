@@ -39,7 +39,7 @@
   "CreateGame": "/games/new",
   "CreateGameDesktop": "/games/new",
   "JoinApp": "/games/join",
-  "JoinPublic": "/join/K7Q2",
+  "JoinPublic": "/games/join",
   "Admin": "/admin",
   "AdminTraffic": "/admin/traffic",
   "AdminUsers": "/admin/users",
@@ -54,5 +54,17 @@
   "Badges": "/badges",
   "WeeklyWrap": "/wrap",
   "Crews": "/crews",
-  "CrewDaily": "/crews/daily"
+  "CrewDaily": "/crews/daily",
+  "NHIELobby": "/games",
+  "TruthDareLobby": "/games",
+  "WYRLobby": "/games",
+  "MostLikelyLobby": "/games",
+  "HotTakesLobby": "/games",
+  "PollsLobby": "/games",
+  "NHIE": "/games",
+  "TruthDare": "/games",
+  "WYR": "/games",
+  "MostLikely": "/games",
+  "HotTakes": "/games",
+  "Polls": "/games"
 }

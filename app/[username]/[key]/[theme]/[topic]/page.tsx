@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import Main from "@/components/sk/Main";
+import { adsFlag } from "@/features/admin/settings";
 import { checkUsername } from "@/features/auth/actions";
 import { loadLinkPage } from "@/features/links/queries";
 import { joinAndSend, sendMessage } from "@/features/messages/actions";
@@ -22,7 +23,7 @@ export default async function LinkPage({ params }: PageProps<"/[username]/[key]/
   return (
     <Main
       {...link}
-      ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+      ads={await adsFlag("sent")}
       send={sendMessage}
       joinAndSend={joinAndSend}
       checkUsername={checkUsername}

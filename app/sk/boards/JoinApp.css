@@ -1,0 +1,10 @@
+/* JoinApp: from design/mockup/JoinApp.dc.html */
+body{margin:0;background:#0c0811}
+.ja-code{width:100%;min-height:72px;border-radius:22px;border:2px solid var(--line);background:var(--field);color:var(--ink);font-family:var(--font-display),system-ui,sans-serif;font-size:38px;font-weight:800;letter-spacing:.5em;text-align:center;text-transform:uppercase;padding-left:.5em;transition:border-color .2s,box-shadow .2s}
+.ja-code:focus{outline:0;border-color:#ff3b8d;box-shadow:0 0 0 4px rgba(255,59,141,.18)}
+.ja-prev{display:flex;gap:12px;align-items:center;padding:12px;border-radius:22px;color:#ffffff;margin-top:10px}
+.ja-week{display:flex;gap:6px}
+.ja-week span{flex:1;height:34px;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:800}
+.ja-rank{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ja-rank:last-child{border-bottom:0}
+.ja-rank b.n{width:26px;text-align:center;font-family:var(--font-display),system-ui,sans-serif;font-size:17px}

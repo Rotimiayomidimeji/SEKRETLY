@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { LiveRefresh } from "@/components/layout/LiveRefresh";
 import Inbox from "@/components/sk/Inbox";
+import { activeCategories, adsFlag } from "@/features/admin/settings";
 import { deleteBubbles, deleteItems, markAllRead, markRead, report, sendChat, setArchived, startChat, undoBlock } from "@/features/inbox/actions";
 import { loadInbox } from "@/features/inbox/queries";
 import { guess, react, releaseHeld, searchPeople } from "@/features/mystery/actions";
@@ -18,13 +19,13 @@ export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
   const { open, filter } = await searchParams;
   // the inbox is where message and reply notifications lead, so being here clears them from the bell
   await db.notification.updateMany({ where: { userId: user.id, readAt: null, kind: { in: ["MESSAGE", "REPLY"] } }, data: { readAt: new Date() } });
-  const [{ items }, navNotif] = await Promise.all([loadInbox(user.id), unreadNotifications(user.id)]);
+  const [{ items }, navNotif, cats] = await Promise.all([loadInbox(user.id), unreadNotifications(user.id), activeCategories()]);
   return (
     <>
       <LiveRefresh />
       <Inbox
         mode={await getMode()}
-        ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+        ads={await adsFlag("inbox")}
         username={user.username}
         navNotif={navNotif}
         items={items}
@@ -40,6 +41,10 @@ export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
         undoBlock={undoBlock}
         startFilter={filter === "held" || filter === "unread" || filter === "chats" ? filter : null}
         allowGuess={user.allowGuess}
+        blurMedia={user.blurMedia}
+        reportCats={cats.list}
+        reportMin={cats.min}
+        reportMax={cats.max}
         react={react}
         releaseHeld={releaseHeld}
         searchPeople={searchPeople}

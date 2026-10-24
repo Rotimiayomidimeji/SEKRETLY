@@ -30,6 +30,22 @@ export default class Main extends React.Component<Record<string, any>, any> {
     return out;
   }
   // the owner's quiz: [question, options, index of the right answer]
+  // picks a photo or video and uploads it right away; the message carries its address
+  pickMedia(accept) {
+    var self = this, inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = accept;
+    inp.onchange = function () {
+      var f = inp.files && inp.files[0]; if (!f) return;
+      var fd = new FormData(); fd.append('file', f); fd.append('linkId', self.props.linkId);
+      var preview = ''; try { preview = URL.createObjectURL(f); } catch (x) {}
+      self.setState({ uploading: true, media: f.type.indexOf('video') === 0 ? 'video' : 'photo', mediaUrl: null, mediaInfo: null, mediaPreview: preview, sendErr: null });
+      fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+        if (!r || !r.ok) { self.setState({ uploading: false, media: null, sendErr: (r && r.error) || 'Couldn’t attach that. Try again.' }); return; }
+        self.setState({ uploading: false, media: r.kind, mediaUrl: r.url, mediaInfo: { name: f.name, size: r.size } });
+      }).catch(function () { self.setState({ uploading: false, media: null, sendErr: 'Couldn’t attach that. Try again.' }); });
+    };
+    inp.click();
+  }
   // asks the server whether a popup username is free (debounced) and remembers each answer
   lookUp(v) {
     var self = this;
@@ -153,6 +169,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
     var SH = ['No hint', 'Same school', 'We met this year', 'We talked today', 'We’re close', 'Write my own'];
     var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';
     body.hint = hintTxt || undefined;
+    body.mediaUrl = s.mediaUrl || undefined;
     return {
       // optional sender hint, same on every link type
       hintDisplay: this.props.send && this.props.allowHints === false ? 'none' : 'block',
@@ -197,17 +214,17 @@ export default class Main extends React.Component<Record<string, any>, any> {
       rateShown: rv ? rv : '–', rateEmoji: rateEmoji, rateWord: rateWord, rateColor: rv ? hue(rv) : th.muted,
       // shared
       text: s.text, count: len, maxLen: tp.max,
-      showTools: false, showCount: topic !== 'confess',
+      showTools: (topic === 'confess' || topic === 'ama' || topic === 'custom') && !!this.props.send, showCount: topic !== 'confess',
       showSendArea: topic !== 'quiz' || quizDone,
       onText: function (e) { self.setState({ text: e.target.value.slice(0, tp.max) }); },
-      hasMedia: !!s.media, mediaName: s.media === 'video' ? 'clip.mp4' : 'photo.jpg', mediaMeta: s.media === 'video' ? '0:12 · blurred until @' + OWNER + ' taps' : '1.2 MB · blurred until @' + OWNER + ' taps',
-      attachPhoto: function () { self.setState({ media: 'photo' }); },
-      attachVideo: function () { self.setState({ media: 'video' }); },
-      removeMedia: function () { self.setState({ media: null }); },
+      hasMedia: !!s.media, mediaIsVideo: s.media === 'video', mediaIsPhoto: s.media !== 'video', mediaPreview: s.mediaPreview || s.mediaUrl || '', mediaName: s.uploading ? 'Uploading…' : s.mediaInfo ? s.mediaInfo.name : '', mediaMeta: s.mediaInfo ? (s.mediaInfo.size < 1048576 ? Math.max(1, Math.round(s.mediaInfo.size / 1024)) + ' KB' : (s.mediaInfo.size / 1048576).toFixed(1) + ' MB') + ' · blurred until @' + OWNER + ' taps' : '',
+      attachPhoto: function () { self.pickMedia('image/*'); },
+      attachVideo: function () { self.pickMedia('video/*'); },
+      removeMedia: function () { self.setState({ media: null, mediaUrl: null, mediaInfo: null }); },
       hasWarnings: w > 0,
       warnTitle: w >= 3 ? 'Last warning with @' + OWNER + '' : 'You have ' + w + (w === 1 ? ' warning' : ' warnings') + ' with @' + OWNER + '',
       warnBody: w >= 3 ? 'One more report and you will be blocked from messaging them.' : (3 - w) + ' more and the next report blocks you from messaging them.',
-      cantSend: !can || !!s.sending, sendOpacity: can && !s.sending ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '', needHint: !can, needText: need,
+      cantSend: !can || !!s.sending || !!s.uploading, sendOpacity: can && !s.sending && !s.uploading ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '', needHint: !can, needText: need,
       sendLabel: topic === 'confess' ? 'Send confession' : topic === 'rate' ? (s.rate ? 'Send my ' + rv + '/10' : 'Send rating') : topic === 'quiz' ? 'Send my score to @' + OWNER + '' : topic === 'describe' ? 'Send my 3 words' : 'Send anonymously',
       replyStr: s.wantReply ? 'true' : 'false', toggleReply: function () { self.setState({ wantReply: !s.wantReply }); },
       send: function () {
@@ -740,7 +757,16 @@ export default class Main extends React.Component<Record<string, any>, any> {
                     <div className="pop" style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "10px", padding: "8px", borderRadius: "16px", background: v.th.field }}>
                       {" "}
                       <span className="media" style={{ width: "56px", height: "56px", flex: "none" }}>
-                        <img src="/sk/hero-dark.png" alt="Attached photo preview" />
+                        {v.mediaIsVideo ? (
+                          <>
+                          <video src={v.mediaPreview} preload="metadata" />
+                          </>
+                        ) : null}
+                        {v.mediaIsPhoto ? (
+                          <>
+                          <img src={v.mediaPreview} alt="Attached photo preview" />
+                          </>
+                        ) : null}
                       </span>
                       {" "}
                       <span style={{ flex: "1", fontSize: "13.5px" }}>

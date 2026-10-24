@@ -11,7 +11,7 @@ datasource db {
 // Phase 2: links (with quiz questions), the anonymous messages they receive, and per-day link stats.
 // Phase 3: private chats, reports and the warning ladder, notifications, and inbox state (read/archived/deleted).
 // Phase 3b: mystery features (sender hints, receipts, reactions, guess who), Kind mode, daily drops and streaks.
-// Games and admin data are added by their own migrations as each phase is built.
+// Phase 4–6: report review, app settings, the visit log (admin traffic), game rooms and crews.
 
 enum Role {
   MEMBER
@@ -307,6 +307,10 @@ model Report {
   category      String
   /// What was reported, copied so moderators can still see it after the message disappears.
   excerpt       String
+  /// Admin review of serious reports: keep, reverse (warning undone), suspend (sender suspended), escalate
+  decision      String?
+  decidedAt     DateTime?
+  decidedBy     String?
   createdAt     DateTime @default(now())
   reporter      User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
 
@@ -362,6 +366,90 @@ model PushSubscription {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+}
+
+/// App-wide switches the admin changes (report categories, ad slots, blocked networks), one JSON value per key.
+model AppSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// One request worth showing on Admin › Traffic (link visits, sends, sign-ups). Kept 30 days.
+model VisitLog {
+  id          String   @id @default(cuid())
+  at          DateTime @default(now())
+  kind        String
+  path        String
+  fingerprint String
+  ip          String
+  city        String?
+  region      String?
+  country     String?
+  device      String
+  os          String
+  browser     String
+  userId      String?
+
+  @@index([at])
+  @@index([ip])
+}
+
+/// A game table: made by a host (Create game), joined by code or link, played live by everyone in it.
+model GameRoom {
+  id         String       @id @default(cuid())
+  code       String       @unique
+  game       String
+  name       String
+  hostId     String
+  status     String       @default("LOBBY")
+  isPublic   Boolean      @default(false)
+  maxPlayers Int          @default(6)
+  settings   Json
+  /// the live table, advanced by the host's actions and every player's answers
+  state      Json?
+  version    Int          @default(0)
+  startsAt   DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  players    GamePlayer[]
+
+  @@index([status, isPublic])
+}
+
+model GamePlayer {
+  id         String    @id @default(cuid())
+  roomId     String
+  userId     String?
+  nick       String
+  color      String
+  isHost     Boolean   @default(false)
+  joinedAt   DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  kickedAt   DateTime?
+  room       GameRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, nick])
+  @@index([userId])
+}
+
+/// Friends saved from a game table.
+model Crew {
+  id        String       @id @default(cuid())
+  name      String
+  ownerId   String
+  createdAt DateTime     @default(now())
+  members   CrewMember[]
+}
+
+model CrewMember {
+  crewId   String
+  userId   String
+  joinedAt DateTime @default(now())
+  crew     Crew     @relation(fields: [crewId], references: [id], onDelete: Cascade)
+
+  @@id([crewId, userId])
   @@index([userId])
 }
 

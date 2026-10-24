@@ -1,0 +1,12 @@
+/* Settings: from design/mockup/Settings.dc.html */
+body{margin:0;background:#0c0811}
+.st-wrap{display:flex;gap:24px;align-items:flex-start}
+.st-list{flex:1;min-width:0}
+.st-list.hide{display:none}
+.st-detail{display:none;flex:1;min-width:0}
+.st-detail.open{display:block}
+@container (min-width:900px){.st-list,.st-list.hide{display:block;flex:0 0 300px}.st-detail{display:block}.st-back{display:none!important}}
+.seg{display:flex;padding:4px;border-radius:16px;background:var(--card2);gap:4px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font-weight:800;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.st-range{width:100%;accent-color:#d81b72;height:32px}

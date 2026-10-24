@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { LiveRefresh } from "@/components/layout/LiveRefresh";
 import Notifications from "@/components/sk/Notifications";
+import { adsFlag } from "@/features/admin/settings";
 import { markAllNotificationsRead, markNotificationsRead } from "@/features/notifications/actions";
 import { unreadCount } from "@/features/inbox/queries";
 import { loadNotifications } from "@/features/notifications/queries";
@@ -21,7 +22,7 @@ export default async function NotificationsPage() {
       <LiveRefresh seconds={15} />
       <Notifications
         mode={await getMode()}
-        ads={process.env.NEXT_PUBLIC_ADS === "on" ? "on" : "off"}
+        ads={await adsFlag("notif")}
         items={items}
         navInbox={navInbox}
         markRead={markNotificationsRead}

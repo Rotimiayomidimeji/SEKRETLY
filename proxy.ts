@@ -31,5 +31,6 @@ export const config = {
     "/badges/:path*",
     "/wrap/:path*",
     "/crews/:path*",
+    "/games/:path*",
   ],
 };

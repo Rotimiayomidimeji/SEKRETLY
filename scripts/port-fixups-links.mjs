@@ -82,17 +82,25 @@ export const LINK_FIXUPS = {
       `            <sc-if value="{{hasPopErr}}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin-top: 10px; font-size: 13.5px; font-weight: 700; color: #c4213a">{{popErr}}</p></sc-if>
             <button class="lp-opt tap" onClick="{{popDone}}"`,
     ],
-    [`cantSend: !can, sendOpacity: can ? 1 : 0.55,`, `cantSend: !can || !!s.sending, sendOpacity: can && !s.sending ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '',`],
+    [`cantSend: !can, sendOpacity: can ? 1 : 0.55,`, `cantSend: !can || !!s.sending || !!s.uploading, sendOpacity: can && !s.sending && !s.uploading ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '',`],
     [
       `<sc-if value="{{needHint}}" hint-placeholder-val="{{ false }}"><div style="margin-top: 8px; text-align: center; font-size: 12.5px; font-weight: 700; color: {{th.muted}}">{{needText}}</div></sc-if>`,
       `<sc-if value="{{needHint}}" hint-placeholder-val="{{ false }}"><div style="margin-top: 8px; text-align: center; font-size: 12.5px; font-weight: 700; color: {{th.muted}}">{{needText}}</div></sc-if>
                 <sc-if value="{{hasSendErr}}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin-top: 8px; text-align: center; font-size: 13px; font-weight: 800; color: #ff8b98">{{sendErr}}</div></sc-if>`,
     ],
-    // photo/video attachments arrive with uploads (next phase); until then the buttons stay hidden
-    [`showTools: topic === 'confess' || topic === 'ama' || topic === 'custom',`, `showTools: false,`],
+    // photos and videos upload as soon as they're picked (see app/api/upload); the landing demo has no attach
+    [`showTools: topic === 'confess' || topic === 'ama' || topic === 'custom',`, `showTools: (topic === 'confess' || topic === 'ama' || topic === 'custom') && !!this.props.send,`],
+    [`attachPhoto: function () { self.setState({ media: 'photo' }); },`, `attachPhoto: function () { self.pickMedia('image/*'); },`],
+    [`attachVideo: function () { self.setState({ media: 'video' }); },`, `attachVideo: function () { self.pickMedia('video/*'); },`],
+    // the card shows the picked photo (or the video's first frame) straight away
+    [`<img src="/sk/hero-dark.png" alt="Attached photo preview">`, `<sc-if value="{{mediaIsVideo}}" hint-placeholder-val="{{ false }}"><video src="{{mediaPreview}}" preload="metadata"></video></sc-if><sc-if value="{{mediaIsPhoto}}" hint-placeholder-val="{{ true }}"><img src="{{mediaPreview}}" alt="Attached photo preview"></sc-if>`],
+    [`hasMedia: !!s.media,`, `hasMedia: !!s.media, mediaIsVideo: s.media === 'video', mediaIsPhoto: s.media !== 'video', mediaPreview: s.mediaPreview || s.mediaUrl || '',`],
+    [`removeMedia: function () { self.setState({ media: null }); },`, `removeMedia: function () { self.setState({ media: null, mediaUrl: null, mediaInfo: null }); },`],
+    (src) => src.replace(/mediaName: s\.media === 'video' \? 'clip\.mp4' : 'photo\.jpg', mediaMeta: [^\n]*/, "mediaName: s.uploading ? 'Uploading…' : s.mediaInfo ? s.mediaInfo.name : '', mediaMeta: s.mediaInfo ? (s.mediaInfo.size < 1048576 ? Math.max(1, Math.round(s.mediaInfo.size / 1024)) + ' KB' : (s.mediaInfo.size / 1048576).toFixed(1) + ' MB') + ' · blurred until @' + OWNER + ' taps' : '',"),
     // the sender's optional hint goes with the message (only where the owner allows hints)
     [`    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';`, `    var hintTxt = s.sHint === 5 ? s.sHintCustom.trim() : s.sHint > 0 ? SH[s.sHint].toLowerCase() : '';
-    body.hint = hintTxt || undefined;`],
+    body.hint = hintTxt || undefined;
+    body.mediaUrl = s.mediaUrl || undefined;`],
     [
       `<div style="margin-top: 14px; padding: 10px 12px; border-radius: 16px; background: {{th.chipBg}}">
                   <button class="tap" onClick="{{toggleHintBox}}"`,
@@ -111,7 +119,23 @@ export const LINK_FIXUPS = {
     ],
     [
       `  quiz() {`,
-      `  // asks the server whether a popup username is free (debounced) and remembers each answer
+      `  // picks a photo or video and uploads it right away; the message carries its address
+  pickMedia(accept) {
+    var self = this, inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = accept;
+    inp.onchange = function () {
+      var f = inp.files && inp.files[0]; if (!f) return;
+      var fd = new FormData(); fd.append('file', f); fd.append('linkId', self.props.linkId);
+      var preview = ''; try { preview = URL.createObjectURL(f); } catch (x) {}
+      self.setState({ uploading: true, media: f.type.indexOf('video') === 0 ? 'video' : 'photo', mediaUrl: null, mediaInfo: null, mediaPreview: preview, sendErr: null });
+      fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+        if (!r || !r.ok) { self.setState({ uploading: false, media: null, sendErr: (r && r.error) || 'Couldn’t attach that. Try again.' }); return; }
+        self.setState({ uploading: false, media: r.kind, mediaUrl: r.url, mediaInfo: { name: f.name, size: r.size } });
+      }).catch(function () { self.setState({ uploading: false, media: null, sendErr: 'Couldn’t attach that. Try again.' }); });
+    };
+    inp.click();
+  }
+  // asks the server whether a popup username is free (debounced) and remembers each answer
   lookUp(v) {
     var self = this;
     clearTimeout(this.lt);
@@ -126,6 +150,8 @@ export const LINK_FIXUPS = {
 
   // props: username, initial (edit mode: the link's current settings), save(input) -> { ok, url, path } | { ok:false, error }
   Create: [
+    // the live preview shows the member, not the mockup's @peach
+    [`<img src="/sk/peach.png" alt="" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.3)">@peach`, `<img src="/sk/{{me.avatar}}.png" alt="" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.3)">@{{me.username}}`],
     [`      quiz: this.starter(), openQ: 0, swapN: 0, toast: null };`, `      quiz: this.starter(), openQ: 0, swapN: 0, toast: null };\n    if (props.initial) Object.assign(this.state, props.initial, { quiz: props.initial.quiz || this.starter() });`],
     [
       `    this.setState(this.editArrive());\n    this.nt = setInterval(function () { var nv = ''; try { nv = window.localStorage.getItem('sk-nav') || ''; } catch (x) {} if (nv !== self.nav) self.setState(self.editArrive()); }, 700);\n`,

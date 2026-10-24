@@ -25,10 +25,11 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
   static reactsOf(items) { var o = {}; items.forEach(function (x) { if (x.reaction !== undefined && x.reaction !== null) o[x.id] = x.reaction; }); return o; }
   static guessesOf(items) { var o = {}; items.forEach(function (x) { if (x.guess && x.guess.used) o[x.id] = { used: x.guess.used, res: x.guess.res, who: x.guess.who }; }); return o; }
   cats() {
+    if (this.props.reportCats && this.props.reportCats.length) return this.props.reportCats;
     return ['Abusive', 'Harassment', 'Bullying', 'Insults', 'Threats', 'Intimidation', 'Hate speech', 'Racism', 'Tribalism', 'Religious hate', 'Sexism', 'Body shaming', 'Disability mockery', 'Sexual content', 'Unwanted nudity', 'Explicit photo', 'Explicit video', 'Non-consensual image', 'Unwanted advances', 'Creepy or inappropriate', 'Grooming concern', 'Underage concern', 'Stalking', 'Doxxing / private info', 'Exposing secrets', 'Blackmail', 'Extortion', 'Impersonation', 'Scam', 'Fraud', 'Phishing link', 'Malware link', 'Spam', 'Flooding', 'Advertising', 'Selling things', 'Gambling promo', 'Drugs', 'Weapons', 'Violence', 'Graphic gore', 'Self-harm', 'Suicide talk', 'Misinformation', 'False rumour', 'Defamation', 'Trolling', 'Mocking', 'Profanity', 'Other harmful'];
   }
   pickRandom(seed) {
-    var all = this.cats().slice(), out = [], n = 5 + (seed * 7) % 6, x = seed * 9301 + 49297;
+    var all = this.cats().slice(), out = [], n = (this.props.reportMin || 5) + (seed * 7) % ((this.props.reportMax || 10) - (this.props.reportMin || 5) + 1), x = seed * 9301 + 49297;
     while (out.length < n && all.length) { x = (x * 9301 + 49297) % 233280; out.push(all.splice(Math.floor(x / 233280 * all.length), 1)[0]); }
     return out;
   }
@@ -136,7 +137,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
           self.setState({ openId: m.id, items: items, share: false, draft: '', page: 0, chatSel: false, chatChosen: {} }); if (m.unread) self.props.markRead([m.id]);
         },
         topic: link.title, th: link.th, textQuoted: '“' + m.text + '”',
-        mediaTag: m.media === 'photo' ? 'Photo' : '',
+        mediaTag: m.media === 'video' ? '▶ Video' : m.media === 'photo' ? 'Photo' : '',
         sub: m.kind === 'chat' ? 'Anonymous chat · from ' + link.title : 'On ' + link.title,
         canShare: m.kind === 'one',
         stash: stashOf([{ id: m.id, topic: link.title, th: link.th.replace('th-', ''), text: shareText(m) }])
@@ -150,7 +151,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
     var sel = selRaw ? decorate(selRaw) : { stash: function () {}, who: '', sub: '', av: GHOST, avBg: '', avCls: '', th: '', topic: '', textQuoted: '', ago: '', left: '', mediaTag: '' };
     var thread = selRaw && selRaw.kind === 'chat' ? selRaw.thread.map(function (b, i) {
       var key = selRaw.id + ':' + i;
-      if (b.media) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: true, isText: false, align: b.me ? 'flex-end' : 'flex-start', src: b.url && b.media === 'photo' ? b.url : '/sk/hero-dark.png', alt: b.media === 'video' ? 'Video sent in chat' : 'Photo sent in chat', tag: b.media === 'video' ? (b.me ? '▶ Your video' : '▶ 0:12') : 'Photo', mediaCls: b.me || s.shown[key] ? '' : 'blur', hidden: !b.me && !s.shown[key], reveal: function () { var o = Object.assign({}, s.shown); o[key] = true; self.setState({ shown: o }); } };
+      if (b.media) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: true, isText: false, align: b.me ? 'flex-end' : 'flex-start', src: b.url || '', isVideo: b.media === 'video', isPhoto: b.media !== 'video', cover: b.media === 'video' ? 'Tap to view video' : 'Tap to view photo', alt: b.media === 'video' ? 'Video sent in chat' : 'Photo sent in chat', tag: b.media === 'video' ? (b.me ? '▶ Your video' : '▶ Video') : 'Photo', mediaCls: b.me || s.shown[key] || self.props.blurMedia === false ? '' : 'blur', hidden: !b.me && !s.shown[key] && self.props.blurMedia !== false, reveal: function () { var o = Object.assign({}, s.shown); o[key] = true; self.setState({ shown: o }); } };
       if (b.from) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: false, isText: true, text: (b.fromLabel || 'Their message') + ': “' + b.from + '”', align: 'stretch', bg: 'transparent', ink: dark ? '#e9dff0' : '#3a3046', border: 'dashed ' + line, radius: '18px', style: 'italic' };
       if (b.gone) return { selCls: '', showChk: false, chkCls: '', press: function () {}, release: function () {}, ctx: function () {}, tap: function () {}, canShare: false, inApp: false, isMedia: false, isText: true, text: 'Message disappeared', align: 'center', bg: 'transparent', ink: dark ? '#bcaec2' : '#665e74', border: 'dashed ' + line, radius: '99px', style: 'italic' };
       var bsel = s.chatChosen[key], pickB = function () { var c = Object.assign({}, self.state.chatChosen); if (c[key]) delete c[key]; else c[key] = true; self.setState({ chatChosen: c }); };
@@ -311,9 +312,20 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       },
       chatIntro: open && selRaw.started ? 'You started this chat from their message. You two are anonymous to each other, forever.' : 'You two are anonymous to each other, forever. Messages disappear 1 day after they are sent.',
       attachChat: function (e) {
+        var f = e && e.target && e.target.files && e.target.files[0]; if (!f || !selRaw) return;
         try { e.target.value = ''; } catch (x) {}
-        self.setState({ toast: { t: 'Photos and videos are coming soon', s: 'For now, chats are text only.', i: GHOST } });
-        clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3600);
+        var id = selRaw.id, kind = f.type && f.type.indexOf('video') === 0 ? 'video' : 'photo', local = '';
+        try { local = URL.createObjectURL(f); } catch (x) {}
+        self.setState({ items: self.state.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.concat([{ me: true, media: kind, url: local }]) }) : x; }) });
+        var undo = function (msg) {
+          self.setState({ items: self.state.items.map(function (x) { return x.id === id ? Object.assign({}, x, { thread: x.thread.slice(0, -1) }) : x; }), toast: { t: 'Not sent', s: msg || 'Try again.', i: GHOST } });
+          clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3600);
+        };
+        var fd = new FormData(); fd.append('file', f); fd.append('chatId', id);
+        fetch('/api/upload', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(function (r) {
+          if (!r || !r.ok) { undo(r && r.error); return; }
+          return self.props.sendChat({ chatId: id, mediaUrl: r.url }).then(function (s2) { if (!s2 || !s2.ok) undo(s2 && s2.error); });
+        }).catch(function () { undo(); });
       },
       // Kind mode: held messages
       selHeld: open && isHeld(selRaw), heldReason: open && selRaw.held ? selRaw.held : '',
@@ -362,8 +374,8 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       },
       closeHint: function () { clearInterval(self.ht); self.setState({ hint: null, hintT: 0 }); },
       selBlocked: open && w >= 4,
-      selHasMedia: open && !!selRaw.media, selMediaSrc: open && selRaw.mediaUrl ? selRaw.mediaUrl : '/sk/hero-dark.png',
-      mediaHidden: open && !s.shown[s.openId], mediaCls: open && s.shown[s.openId] ? '' : 'blur',
+      selHasMedia: open && !!selRaw.media, selMediaSrc: open && selRaw.mediaUrl ? selRaw.mediaUrl : '', selIsVideo: open && selRaw.media === 'video', selIsPhoto: open && selRaw.media !== 'video',
+      mediaHidden: open && self.props.blurMedia !== false && !s.shown[s.openId], mediaCls: open && (self.props.blurMedia === false || s.shown[s.openId]) ? '' : 'blur',
       revealMedia: function () { var o = Object.assign({}, s.shown); o[s.openId] = true; self.setState({ shown: o }); },
       undoBlock: function () { self.props.undoBlock(s.openId); self.setState({ items: s.items.map(function (x) { return x.id === s.openId ? Object.assign({}, x, { warns: 3 }) : x; }) }); self.flash('undo'); },
       thread: thread, typing: s.typing, draft: s.draft,
@@ -995,7 +1007,17 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                         {" "}
                         <div className={`media ${v.mediaCls}`} style={{ marginTop: "14px", height: "230px" }}>
                           {" "}
-                          <img src={v.selMediaSrc} alt="Photo sent anonymously" />
+                          {v.selIsVideo ? (
+                            <>
+                            <video src={v.selMediaSrc} controls={true} preload="metadata" />
+                            </>
+                          ) : null}
+                          {" "}
+                          {v.selIsPhoto ? (
+                            <>
+                            <img src={v.selMediaSrc} alt="Photo sent anonymously" />
+                            </>
+                          ) : null}
                           {" "}
                           <span className="media-tag">
                             {v.sel.mediaTag}
@@ -1443,7 +1465,16 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                             {" "}
                             <div className={`media ${b.mediaCls}`} style={{ width: "220px", height: "150px", borderRadius: "20px" }}>
                               {" "}
-                              <img src={b.src} alt={b.alt} />
+                              {b.isVideo ? (
+                                <>
+                                <video src={b.src} controls={true} preload="metadata" />
+                                </>
+                              ) : null}
+                              {b.isPhoto ? (
+                                <>
+                                <img src={b.src} alt={b.alt} />
+                                </>
+                              ) : null}
                               {" "}
                               <span className="media-tag">
                                 {b.tag}
@@ -1452,7 +1483,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                               {b.hidden ? (
                                 <>
                                 <button className="media-cover" onClick={b.reveal} style={{ fontSize: "13px" }}>
-                                  Tap to view video
+                                  {b.cover}
                                 </button>
                                 </>
                               ) : null}

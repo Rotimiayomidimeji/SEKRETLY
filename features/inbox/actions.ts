@@ -5,6 +5,8 @@ import { z } from "zod";
 
 import { CHAT_INCLUDE, chatItem } from "@/features/inbox/queries";
 import { MESSAGE_TTL_MS } from "@/features/links/topics";
+import { isOurMedia, kindOf } from "@/features/media/storage";
+import { warningText } from "@/features/admin/settings";
 import { notify } from "@/features/notifications/notify";
 import { SUPPORT_CATEGORIES, addWarning, senderKeyOf, standingWith, undoBlock as clearBlock, userKey } from "@/features/safety/standing";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -93,13 +95,17 @@ export async function startChat(id: string) {
   return { ok: true as const, item: await chatItem(full, user.id) };
 }
 
-const sendSchema = z.object({ chatId: z.string().max(40), text: z.string().trim().min(1).max(1000) });
+const sendSchema = z
+  .object({ chatId: z.string().max(40), text: z.string().trim().max(1000).optional().default(""), mediaUrl: z.string().max(300).optional() })
+  .refine((v) => v.text.length > 0 || !!v.mediaUrl);
 
 /** One reply in a chat, from either side. */
 export async function sendChat(input: z.input<typeof sendSchema>) {
   const user = await me();
   const parsed = sendSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Type something first." };
+  const media = parsed.data.mediaUrl;
+  if (media && !isOurMedia(media)) return { ok: false as const, error: "That attachment can’t be sent." };
   const chatId = parsed.data.chatId.replace(/^c:/, "");
   const chat = await db.chat.findFirst({ where: { id: chatId, OR: [{ ownerId: user.id }, { guestId: user.id }] }, include: { owner: true } });
   if (!chat) return { ok: false as const, error: "This chat is gone." };
@@ -111,7 +117,8 @@ export async function sendChat(input: z.input<typeof sendSchema>) {
   if (!limit.allowed) return { ok: false as const, error: "Slow down a little. Try again soon." };
   const now = new Date();
   await db.$transaction([
-    db.chatMessage.create({ data: { chatId, fromOwner: asOwner, text: parsed.data.text, expiresAt: new Date(now.getTime() + MESSAGE_TTL_MS) } }),
+    // bubbles last as long as the chat owner's chat timer (Settings › Messages)
+    db.chatMessage.create({ data: { chatId, fromOwner: asOwner, text: parsed.data.text || null, mediaUrl: media ?? null, mediaKind: media ? kindOf(media) : null, expiresAt: new Date(now.getTime() + chat.owner.chatTimerDays * MESSAGE_TTL_MS) } }),
     db.chat.update({
       where: { id: chatId },
       // a new message brings the chat back for the other side if they had deleted it
@@ -173,7 +180,7 @@ export async function report(id: string, category: string) {
       await notify(
         sender.accountId,
         "WARNING",
-        "Your message to @" + user.username + " was reported as “" + cat + "”. This is warning " + n + " of 3.",
+        await warningText(cat, user.username, n),
         "/help",
         n >= 3 ? "Last warning · one more report blocks you from @" + user.username : "Warning · " + (3 - n) + " more and the next report blocks you from @" + user.username,
       );

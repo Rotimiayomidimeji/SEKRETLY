@@ -1,2 +1,6 @@
-import { FoundationPage } from "@/components/layout/FoundationPage";
-export default function SafetySettingsPage() { return <FoundationPage title="Safety controls." description="Filtering, blocking, and reporting preferences will be connected here." />; }
+import { redirect } from "next/navigation";
+
+// Old address; Settings opens a section with ?s=.
+export default function SettingsSafetyPage() {
+  redirect("/settings?s=safety");
+}

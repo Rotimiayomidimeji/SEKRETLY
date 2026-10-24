@@ -3,6 +3,7 @@ import "server-only";
 import { headers } from "next/headers";
 
 import { CLOSE_AFTER_MS, TOPIC_COMPOSER, TOPIC_TITLE, isNapping, linkPath, appOrigin } from "@/features/links/topics";
+import { logVisit } from "@/features/admin/traffic";
 import { deviceKey, standingWith, userKey } from "@/features/safety/standing";
 import { db } from "@/lib/db";
 import { requestFingerprint } from "@/lib/rate-limit";
@@ -33,6 +34,7 @@ export async function loadLinkPage(params: { username: string; key: string; them
   if (!link || link.status === "DELETED") return null;
 
   if (viewer?.id !== owner.id) {
+    await logVisit("visit", "/" + owner.username + "/" + params.key + "/" + params.theme + "/" + params.slug, viewer?.id ?? null);
     const day = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00Z");
     const source = await visitSource();
     await db.$transaction([

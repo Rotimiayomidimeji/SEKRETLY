@@ -46,8 +46,9 @@ export default class Onboarding extends React.Component<Record<string, any>, any
       pushOn: s.push === true, pushOff: s.push !== true,
       pushNext: s.push === true ? 'Next' : 'Not now',
       askPush: function () {
-        if (typeof Notification === 'undefined') { self.setState({ push: false }); return; }
-        Notification.requestPermission().then(function (p) { self.setState({ push: p === 'granted' }); });
+        // subscribes this phone for push (see components/layout/PushBridge); iPhone needs the app installed first
+        if (!window.skPush || !window.skPush.supported) { self.setState({ push: false }); return; }
+        window.skPush.enable().then(function (r) { self.setState({ push: r === 'on' }); });
       },
       pushPrompt: s.pushPrompt,
       allowPush: function () { self.setState({ pushPrompt: false, push: true }); },

@@ -53,7 +53,8 @@ export async function login(input: { username: string; password: string; next?: 
   await clearRateLimit(`login:${name}`);
   await createSession(user.id);
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
-  redirect(safeNext(input.next) ?? (user.onboardedAt ? "/home" : "/onboarding"));
+  // the admin account lands on the admin overview
+  redirect(safeNext(input.next) ?? (user.role === "ADMIN" ? "/admin" : user.onboardedAt ? "/home" : "/onboarding"));
 }
 
 export async function logout() {
