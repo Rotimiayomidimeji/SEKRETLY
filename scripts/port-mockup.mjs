@@ -21,8 +21,13 @@ import { PROFILE_FIXUPS } from "./port-fixups-profile.mjs";
 import { ADMIN_FIXUPS } from "./port-fixups-admin.mjs";
 import { GAME_FIXUPS } from "./port-fixups-games.mjs";
 import { CREW_FIXUPS } from "./port-fixups-crews.mjs";
+import { POLISH_FIXUPS } from "./port-fixups-polish.mjs";
+import { BUILDER_FIXUPS } from "./port-fixups-builders.mjs";
 
-const FIXUPS = { ...BASE_FIXUPS, ...LINK_FIXUPS, ...INBOX_FIXUPS, ...HOME_FIXUPS, ...MYSTERY_FIXUPS, ...SHARE_FIXUPS, ...PROFILE_FIXUPS, ...ADMIN_FIXUPS, ...GAME_FIXUPS, ...CREW_FIXUPS };
+// a board can be fixed by several files; they apply in this order
+const FIXUPS = {};
+for (const set of [BASE_FIXUPS, LINK_FIXUPS, INBOX_FIXUPS, HOME_FIXUPS, MYSTERY_FIXUPS, SHARE_FIXUPS, PROFILE_FIXUPS, ADMIN_FIXUPS, GAME_FIXUPS, CREW_FIXUPS, POLISH_FIXUPS, BUILDER_FIXUPS])
+  for (const [board, fixes] of Object.entries(set)) FIXUPS[board] = (FIXUPS[board] || []).concat(fixes);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MOCK = path.join(ROOT, "design/mockup");
@@ -277,7 +282,7 @@ function port(board) {
   const root = parse(tpl);
   const body = root.children.map((c) => gen(c, [], imports, "#root", 3)).join("");
   const comps = [...imports].filter((x) => !x.startsWith("#"));
-  const helpers = ["saveMode", imports.has("#SkLink") && "SkLink", imports.has("#route") && "route"].filter(Boolean);
+  const helpers = ["saveMode", imports.has("#SkLink") && "SkLink", imports.has("#route") && "route", logic.includes("skStack(") && "skStack"].filter(Boolean);
   const cls = logic.slice(head.length, logic.lastIndexOf("}"));
   const tsx = `// @ts-nocheck -- ported 1:1 from design/mockup/${board}.dc.html by scripts/port-mockup.mjs; typed as it gets wired to real data
 "use client";

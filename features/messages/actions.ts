@@ -13,6 +13,7 @@ import { classify, cleanHint } from "@/features/safety/kind";
 import { deviceKey, senderHint, standingWith, userKey } from "@/features/safety/standing";
 import { createSession, getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
+import { emit } from "@/lib/realtime";
 import { verifyPassword } from "@/lib/password";
 import { clearRateLimit, hitRateLimit, requestFingerprint } from "@/lib/rate-limit";
 
@@ -31,6 +32,8 @@ const sendSchema = z.object({
       words: z.array(z.string().trim().min(1).max(20)).optional(),
       picks: z.array(z.number().int().min(0).max(3)).optional(),
       score: z.number().int().min(1).max(10).optional(),
+      /** Rate me: one score per question, in order */
+      scores: z.array(z.number().int().min(1).max(10)).max(12).optional(),
       category: z.string().optional(),
       text: z.string().optional(),
       note: z.string().optional(),
@@ -68,6 +71,15 @@ async function buildMessage(topic: LinkTopic, linkId: string, p: z.infer<typeof 
       if (text.length < 2 && !p.mediaUrl) return { error: "Write your confession." };
       return { text: text.slice(0, 2000), data: undefined };
     case "RATE": {
+      // the owner's own questions: one score each; the message keeps the average as its score
+      const qs = await db.quizQuestion.findMany({ where: { linkId }, orderBy: { position: "asc" } });
+      if (p.scores) {
+        const labels = qs.length ? qs.map((q) => q.text) : ["Rate me overall"];
+        if (p.scores.length !== labels.length) return { error: "Rate every question first." };
+        const avg = p.scores.reduce((a, b) => a + b, 0) / labels.length;
+        const scores = labels.map((q, i) => ({ q, score: p.scores![i] }));
+        return { text: text.slice(0, 140), data: { score: Math.round(avg), avg: Math.round(avg * 10) / 10, scores, category: labels.length === 1 ? labels[0] : "Average of " + labels.length } };
+      }
       if (!p.score) return { error: "Tap a number from 1 to 10." };
       const category = RATE_CATEGORIES.includes(p.category as (typeof RATE_CATEGORIES)[number]) ? p.category! : "Overall";
       return { text: text.slice(0, 140), data: { score: p.score, category } };
@@ -152,6 +164,8 @@ async function deliver(
     db.visitor.upsert({ where: { fingerprint }, create: { fingerprint }, update: {} }),
   ]);
   const title = link.topic === "CUSTOM" || link.topic === "DROP" ? link.customQuestion ?? TOPIC_TITLE[link.topic] : TOPIC_TITLE[link.topic];
+  // held messages don't notify, but the owner's inbox (Held) and counts still update live
+  if (held) emit(link.ownerId, "message");
   if (!held) await notify(link.ownerId, "MESSAGE", (input.followUpOf ? "A sender added to their message on " : "Someone sent you a message on ") + title, "/inbox", hint ? "They left a hint" : "Inbox");
   if (link.maxMessages != null && link.messageCount + 1 === link.maxMessages)
     await notify(link.ownerId, "LINK_NAP", "Your link " + title + " is taking a nap", "/links", "Hit its " + link.maxMessages + " message limit · tap to resume");

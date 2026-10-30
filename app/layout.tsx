@@ -3,7 +3,9 @@ import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 
 import { AdFiller } from "@/components/layout/AdFiller";
 import { Analytics } from "@/components/layout/Analytics";
+import { PageLoader } from "@/components/layout/PageLoader";
 import { PushBridge } from "@/components/layout/PushBridge";
+import { ShareKit } from "@/components/layout/ShareKit";
 
 import "./globals.css";
 
@@ -28,10 +30,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`} suppressHydrationWarning>
+      <head>
+        {/* light/dark (the sk-mode cookie) on <html> before the first paint, so loading screens match the page */}
+        <script dangerouslySetInnerHTML={{ __html: "try{var m=/(?:^|; )sk-mode=(light|dark)/.exec(document.cookie);document.documentElement.dataset.mode=m?m[1]:'dark'}catch(e){}" }} />
+      </head>
       <body>
         {children}
+        <PageLoader />
         <PushBridge />
+        <ShareKit />
         <Analytics />
         <AdFiller />
       </body>

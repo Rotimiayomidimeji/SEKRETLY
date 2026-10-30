@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, skStack } from "@/lib/sk/runtime";
 
 
 export default class ShareStudio extends React.Component<Record<string, any>, any> {
@@ -31,6 +31,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     }, this.extra || {});
   }
   componentDidMount() {
+    skStack(this, ["done"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -86,16 +87,24 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
   // hands the images over: the share sheet where the phone has one (WhatsApp Status, Instagram, Snapchat…), else downloads
   finish(files, dest) {
     var self = this;
-    var canShare = dest !== 'save' && navigator.canShare && navigator.canShare({ files: files });
-    if (!canShare) {
+    var one = files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
+    if (dest === 'save' || !one) {
       files.forEach(function (f, i) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 400); });
-      self.setState({ posting: null, done: true, files: files });
+      self.setState({ posting: null, done: true, files: files, sentN: files.length, needTap: false });
       return;
     }
-    self.setState({ posting: null, files: files });
-    navigator.share({ files: files, title: 'Sekretly' }).then(function () { self.setState({ done: true }); }).catch(function (e) {
-      // the tap that started posting expired while the images were drawn: ask for one more tap
-      self.setState({ done: true, needTap: !(e && e.name === 'AbortError') });
+    var all = navigator.canShare({ files: files });
+    self.setState({ posting: null, files: files, batch: all ? files.length : 1, sentN: 0 }, function () { self.shareBatch(0); });
+  }
+  // shares the next batch of images; when some are left (or the tap expired) the done sheet offers the next tap
+  shareBatch(from) {
+    var self = this, files = this.state.files || [], size = this.state.batch || files.length, part = files.slice(from, from + size);
+    if (!part.length) return;
+    navigator.share({ files: part, title: 'Sekretly' }).then(function () {
+      var n = from + part.length;
+      self.setState({ done: true, sentN: n, needTap: n < files.length });
+    }).catch(function (e) {
+      self.setState({ done: true, sentN: from, needTap: !(e && e.name === 'AbortError') || from > 0 });
     });
   }
   renderVals() {
@@ -144,11 +153,11 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
       g.thumbs.push({ num: c.on ? c.num : '–', cls: 'th-' + c.th + (i === focus ? ' focus' : '') + (c.on ? '' : ' off'), posted: !!s.posted[c.key],
         aria: (c.on ? 'Card ' + c.num : 'Skipped card') + ', ' + c.m.topic, go: function () { go(i); } });
     });
-    var DEST = [['wa', 'WhatsApp', 'WhatsApp Status', '#25d366', '#0b2a1c', 'W'], ['ig', 'Instagram', 'your Instagram story', 'linear-gradient(135deg,#7a2ff7,#d81b72 55%,#f29b38)', '#ffffff', 'IG'], ['sc', 'Snapchat', 'your Snapchat story', '#fffc00', '#111111', 'S'], ['save', 'Save', 'your photos', 'var(--card2)', 'var(--ink)', '↓']];
+    var DEST = [['wa', 'WhatsApp', 'WhatsApp Status', 'whatsapp'], ['ig', 'Instagram', 'your Instagram story', 'instagram'], ['sc', 'Snapchat', 'your Snapchat story', 'snapchat'], ['tt', 'TikTok', 'TikTok', 'tiktok'], ['save', 'Save to photos', 'your photos', 'save']];
     var dest = DEST.filter(function (x) { return x[0] === s.dest; })[0] || DEST[0];
     var pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });
-    var allOn = anySel === total && total > 0;
     var pool = Object.keys(M).filter(function (id) { return s.tray.indexOf(id) < 0 && !M[id].promo; });
+    var allOn = anySel === total && total > 0 && !pool.length;
     var promos = Object.keys(M).filter(function (id) { return !!M[id].promo; });
     var FR = [['Fox', '#ffb35c', 'chatting now'], ['Moon', '#9db8ff', 'active 2h ago'], ['KolaNut', '#ff9ad5', 'from Friday Night Never'], ['PixelOwl', '#7ef0c1', 'from Hostel B confessions']];
     var postedList = flat.filter(function (c) { return !!s.posted[c.key]; });
@@ -156,6 +165,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     return {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
+      noCards: total === 0,
       summary: total + ' card' + (total === 1 ? '' : 's') + ' from ' + s.tray.length + ' message' + (s.tray.length === 1 ? '' : 's') + ' · swipe to check each one',
       cards: cards, focusTh: fc ? 'th-' + fc.th : '',
       down: function (e) { self.px = e ? e.clientX : null; self.swiped = false; },
@@ -172,15 +182,19 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
       groups: groups,
       orderHint: anySel + ' of ' + total + ' cards will post, in this order. Tap a number to jump to that card.',
       allStr: allOn ? 'true' : 'false', allCls: allOn ? 'on' : '', allLabel: allOn ? '✓ All selected' : 'Select all',
-      toggleAll: function () { var o = {}; if (allOn) flat.forEach(function (c) { o[c.key] = true; }); self.setState({ off: o }); },
-      dests: DEST.map(function (x) { var on = s.dest === x[0]; return { name: x[1], bg: x[3], ink: x[4], mark: x[5], on: on ? 'true' : 'false', pick: function () { self.setState({ dest: x[0] }); } }; }),
+      toggleAll: function () {
+        if (allOn && !pool.length) { var o = {}; flat.forEach(function (c) { o[c.key] = true; }); self.setState({ off: o }); return; }
+        self.setState({ off: {}, tray: s.tray.concat(pool) });
+      },
+      dests: DEST.map(function (x) { var on = s.dest === x[0]; return { name: x[1], icon: '/brand/' + x[3] + '.svg', on: on ? 'true' : 'false', pick: function () { self.setState({ dest: x[0] }); } }; }),
       cantPost: pubSel === 0 || !!s.posting, postOp: pubSel === 0 || s.posting ? 0.55 : 1,
       postLabel: s.posting ? 'Posting…' : pubSel === 0 ? 'Select a card to post' : s.dest === 'save' ? 'Save ' + pubSel + ' image' + (pubSel === 1 ? '' : 's') + ' in order' : 'Post ' + pubSel + ' card' + (pubSel === 1 ? '' : 's') + ' to ' + dest[2],
       post: function () { if (pubSel && !s.posting) self.runPost(pubKeys, s.dest); },
       doneOpen: s.done, doneTitle: postedList.length + ' card' + (postedList.length === 1 ? '' : 's') + (s.dest === 'save' ? ' saved to ' : ' posted to ') + dest[2],
       steps: postedList.map(function (c) { return { num: c.num, label: (c.parts.length > 1 ? 'Part ' + (c.pi + 1) + ' · ' : '') + c.text }; }),
       needTap: s.needTap, drawErr: !!s.drawErr,
-      shareNow: function () { if (s.files) navigator.share({ files: s.files, title: 'Sekretly' }).then(function () { self.setState({ needTap: false }); }).catch(function () {}); },
+      shareNow: function () { if (s.files) self.shareBatch(s.sentN || 0); },
+      tapLabel: s.files && s.sentN > 0 && s.sentN < s.files.length ? 'Post card ' + (s.sentN + 1) + ' of ' + s.files.length : 'Open share sheet',
       brand: this.props.brand || '', ads: this.props.ads === 'on' ? 'on' : 'off',
       again: function () { self.setState({ done: false, posted: {}, sent: null }); },
       noAny: anySel === 0, hasOwn: flat.some(function (c) { return !!c.m.own; }),
@@ -249,6 +263,23 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
             <section className="ss-stage" aria-label="Cards to share" aria-roledescription="carousel" onPointerDown={v.down} onPointerUp={v.up}>
               {" "}
               <div className={`ss-glow ${v.focusTh}`} aria-hidden="true" />
+              {" "}
+              {v.noCards ? (
+                <>
+                <div className="ss-empty">
+                  <img src="/sk/sparkles.png" alt="" style={{ width: "56px", height: "56px" }} />
+                  <b>
+                    Nothing to share yet
+                  </b>
+                  <span>
+                    When people message you, pick their messages here and post them as story cards. Or add a promo card below.
+                  </span>
+                  <SkLink href="/create" className="btn btn-sm btn-cta tap">
+                    Make a link
+                  </SkLink>
+                </div>
+                </>
+              ) : null}
               {" "}
               {v.isPosting ? (
                 <>
@@ -510,11 +541,8 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
               {(v.dests || []).map((d, i0) => (
                 <Fragment key={i0}>
                 {" "}
-                <button className="ss-d tap" onClick={d.pick} role="radio" aria-checked={d.on} aria-pressed={d.on}>
-                  <span style={{ background: d.bg, color: d.ink }}>
-                    {d.mark}
-                  </span>
-                  {d.name}
+                <button className="ss-d ss-d-ic tap" onClick={d.pick} role="radio" aria-checked={d.on} aria-pressed={d.on} aria-label={d.name} title={d.name}>
+                  <img src={d.icon} alt="" />
                 </button>
                 {" "}
                 </Fragment>
@@ -691,7 +719,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
                 {v.needTap ? (
                   <>
                   <button className="btn btn-cta btn-lg tap" onClick={v.shareNow} style={{ flex: "1" }}>
-                    Open share sheet
+                    {v.tapLabel}
                   </button>
                   </>
                 ) : null}

@@ -5,13 +5,13 @@ import { useEffect } from "react";
 
 /**
  * Keeps a server-rendered screen fresh: re-fetches it every `seconds` while the tab is visible, and as soon as
- * the person comes back to it. Stands in for live push (Pusher) until that is switched on.
+ * the person comes back to it. While live updates are connected (components/layout/Realtime) it stays quiet.
  */
 export function LiveRefresh({ seconds = 8 }: { seconds?: number }) {
   const router = useRouter();
   useEffect(() => {
     const tick = () => {
-      if (document.visibilityState === "visible") router.refresh();
+      if (document.visibilityState === "visible" && !window.__skLive) router.refresh();
     };
     const timer = setInterval(tick, seconds * 1000);
     document.addEventListener("visibilitychange", tick);

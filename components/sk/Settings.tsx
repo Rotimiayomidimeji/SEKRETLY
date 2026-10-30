@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, skStack } from "@/lib/sk/runtime";
 
 
 export default class Settings extends React.Component<Record<string, any>, any> {
@@ -15,6 +15,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
     this.state = Object.assign({ mode: m || props.mode || 'dark', look: props.mode || 'system', sec: props.startSection || null, newWord: '', delOpen: false, installPrompt: false, installed: false, edit: null }, props.settings, { notif: Object.assign({ push: false }, (props.settings || {}).notif) });
   }
   componentDidMount() {
+    skStack(this, ["sec","delOpen","edit"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -1117,7 +1118,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
                     Sekretly
                   </div>
                   <div style={{ fontSize: "13px", color: "#5f6368" }}>
-                    sekretly.com
+                    sekretlyy.vercel.app
                   </div>
                 </div>
               </div>

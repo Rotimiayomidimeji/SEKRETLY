@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, skStack } from "@/lib/sk/runtime";
 
 
 export default class CreateGame extends React.Component<Record<string, any>, any> {
@@ -25,6 +25,7 @@ export default class CreateGame extends React.Component<Record<string, any>, any
   }
   defaults(game) { return { nhie: {}, tod: { proof: true, pass: true }, wyr: { bonus: true }, mlt: { full: true, titles: true }, hot: { avg: true }, poll: { bonus: true, anyone: true } }[game] || {}; }
   componentDidMount() {
+    skStack(this, ["step"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}

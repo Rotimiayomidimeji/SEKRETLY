@@ -6,12 +6,19 @@ import { CLOSE_AFTER_MS, TOPIC_COMPOSER, TOPIC_TITLE, isNapping, linkPath, appOr
 import { logVisit } from "@/features/admin/traffic";
 import { deviceKey, standingWith, userKey } from "@/features/safety/standing";
 import { db } from "@/lib/db";
+import { emit } from "@/lib/realtime";
 import { requestFingerprint } from "@/lib/rate-limit";
 
 type Viewer = { id: string } | null;
 
-/** Where a visit came from, by referrer or in-app browser. Counts only; nothing about the visitor is kept. */
-async function visitSource(): Promise<"fromWhatsapp" | "fromInstagram" | "fromSnapchat" | "fromOther"> {
+/**
+ * Where a visit came from: the ?s= tag our share buttons add (wa, ig, sc), else the referrer or in-app browser.
+ * Counts only; nothing about the visitor is kept.
+ */
+async function visitSource(tag?: string): Promise<"fromWhatsapp" | "fromInstagram" | "fromSnapchat" | "fromOther"> {
+  if (tag === "wa") return "fromWhatsapp";
+  if (tag === "ig") return "fromInstagram";
+  if (tag === "sc") return "fromSnapchat";
   const h = await headers();
   const hint = `${h.get("referer") ?? ""} ${h.get("user-agent") ?? ""}`.toLowerCase();
   if (/whatsapp|wa\.me/.test(hint)) return "fromWhatsapp";
@@ -24,7 +31,7 @@ async function visitSource(): Promise<"fromWhatsapp" | "fromInstagram" | "fromSn
  * Everything the link page needs for /<username>/<key>/<theme>/<slug>, and counts the visit.
  * Returns null when the address doesn't match a link (old key, deleted link, typo).
  */
-export async function loadLinkPage(params: { username: string; key: string; theme: string; slug: string }, viewer: Viewer) {
+export async function loadLinkPage(params: { username: string; key: string; theme: string; slug: string; source?: string }, viewer: Viewer) {
   const owner = await db.user.findUnique({ where: { username: params.username.toLowerCase() } });
   if (!owner || owner.status !== "ACTIVE" || owner.linkKey !== params.key) return null;
   const link = await db.link.findUnique({
@@ -36,7 +43,8 @@ export async function loadLinkPage(params: { username: string; key: string; them
   if (viewer?.id !== owner.id) {
     await logVisit("visit", "/" + owner.username + "/" + params.key + "/" + params.theme + "/" + params.slug, viewer?.id ?? null);
     const day = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00Z");
-    const source = await visitSource();
+    const source = await visitSource(params.source);
+    emit(owner.id, "stats");
     await db.$transaction([
       db.link.update({ where: { id: link.id }, data: { visitCount: { increment: 1 } } }),
       db.linkDay.upsert({
@@ -68,7 +76,10 @@ export async function loadLinkPage(params: { username: string; key: string; them
     theme: link.theme,
     topic: TOPIC_COMPOSER[link.topic],
     customQuestion: link.customQuestion,
-    quiz: link.questions.map((q) => [q.text, q.options, q.correctIndex] as [string, string[], number]),
+    quiz: link.topic === "QUIZ" ? link.questions.map((q) => [q.text, q.options, q.correctIndex] as [string, string[], number]) : [],
+    rateQs: link.topic === "RATE" ? link.questions.map((q) => q.text) : [],
+    title: link.title,
+    intro: link.intro,
     board,
     linkState: standing.blocked ? "blocked" : isNapping(link) ? "paused" : "live",
     senderWarnings: String(Math.min(3, standing.warns)),
@@ -129,9 +140,12 @@ export async function loadLinkForEdit(userId: string, id: string) {
     msgN: link.maxMessages ?? 50,
     limTime: !!link.closesAt,
     time,
-    quiz: link.questions.length
+    quiz: link.topic === "QUIZ" && link.questions.length
       ? link.questions.map((q) => ({ text: q.text, opts: [...q.options, "", "", ""].slice(0, 4), right: q.correctIndex }))
       : undefined,
+    ...(link.topic === "RATE" && link.questions.length ? { rateQs: link.questions.map((q) => q.text) } : {}),
+    // Create keeps the owner's words per topic
+    copy: link.title || link.intro ? { [slugFor[link.topic]]: { ...(link.title ? { title: link.title } : {}), ...(link.intro ? { intro: link.intro } : {}) } } : {},
   };
 }
 

@@ -10,14 +10,14 @@ const CODE_TTL_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 const hash = (code: string) => createHash("sha256").update(code).digest("hex");
 
-/** Creates a fresh 6-digit code (older unused ones stop working) and emails it. */
+/** Creates a fresh 6-digit code (older unused ones stop working) and emails it. False when the email couldn't go out. */
 export async function issueCode(userId: string, email: string, purpose: CodePurpose) {
   const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
   await db.$transaction([
     db.emailCode.updateMany({ where: { userId, purpose, usedAt: null }, data: { usedAt: new Date() } }),
     db.emailCode.create({ data: { userId, purpose, email, codeHash: hash(code), expiresAt: new Date(Date.now() + CODE_TTL_MS) } }),
   ]);
-  await sendCodeEmail(email, code, purpose === "VERIFY_EMAIL" ? "verify" : "reset");
+  return sendCodeEmail(email, code, purpose === "VERIFY_EMAIL" ? "verify" : "reset");
 }
 
 /** Checks a code without using it up (unless `consume`). Wrong guesses count towards MAX_ATTEMPTS. */

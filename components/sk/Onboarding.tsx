@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink, route } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route, skStack } from "@/lib/sk/runtime";
 
 
 export default class Onboarding extends React.Component<Record<string, any>, any> {
@@ -20,6 +20,7 @@ export default class Onboarding extends React.Component<Record<string, any>, any
     return { onb: o, step: o && o.from === 'link' ? 1 : 0, push: null, pushPrompt: false, os: 'android', installPrompt: false, installed: false };
   }
   componentDidMount() {
+    skStack(this, ["step"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}

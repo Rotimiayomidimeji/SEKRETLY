@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink, route } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route, skStack } from "@/lib/sk/runtime";
 
 
 export default class Create extends React.Component<Record<string, any>, any> {
@@ -12,7 +12,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
     super(props);
     var m = null; // light/dark arrives as props.mode from the sk-mode cookie
     this.state = { mode: m || props.mode || 'dark', step: 0, theme: 'sunset', topic: props.topic || 'describe-3', custom: '', limMsg: false, msgN: 50, limTime: true, time: '24 hours', copied: false,
-      quiz: this.starter(), openQ: 0, swapN: 0, toast: null };
+      quiz: this.starter(), openQ: 0, swapN: 0, toast: null, copy: {}, rateQs: ['Rate my looks', 'Rate my vibe', 'Rate my style', 'Rate me as a friend'], rateOwn: '' };
     if (props.initial) Object.assign(this.state, props.initial, { quiz: props.initial.quiz || this.starter() });
   }
   // My links › Edit leaves { id, topic, theme } in sk-linkedit and stamps sk-nav
@@ -22,6 +22,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
     return e ? { editing: e.id, topic: e.topic, theme: e.theme, step: 0, copied: false } : { editing: null };
   }
   componentDidMount() {
+    skStack(this, ["step"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -39,9 +40,9 @@ export default class Create extends React.Component<Record<string, any>, any> {
     return [
       { text: 'What’s my go-to food?', opts: ['Jollof rice', 'Suya', 'Amala', 'Indomie'], right: 1 },
       { text: 'Where am I on a Friday night?', opts: ['At an owambe', 'In bed by 10', 'At the club', 'Church vigil'], right: 1 },
-      { text: 'What’s my love language?', opts: ['Words', 'Gifts', 'Quality time', 'Acts of service'], right: -1 },
-      { text: 'Who’s my celebrity crush?', opts: ['Tems', 'Burna Boy', 'Ayra Starr', 'Rema'], right: -1 },
-      { text: 'What annoys me the most?', opts: ['Late replies', 'Loud chewing', 'Liars', ''], right: -1 }
+      { text: 'What’s my love language?', opts: ['Words', 'Gifts', 'Quality time', 'Acts of service'], right: 0 },
+      { text: 'Who’s my celebrity crush?', opts: ['Tems', 'Burna Boy', 'Ayra Starr', 'Rema'], right: 0 },
+      { text: 'What annoys me the most?', opts: ['Late replies', 'Loud chewing', 'Liars', ''], right: 0 }
     ];
   }
   // saves through the server; the share step then shows the real address
@@ -50,18 +51,30 @@ export default class Create extends React.Component<Record<string, any>, any> {
     if (this.state.saving) return;
     this.setState({ saving: true });
     this.props.save(input).then(function (r) {
-      if (r && r.ok) self.setState({ saving: false, step: nextStep, url: r.url, path: r.path, copied: false });
+      if (r && r.ok) { self.card = null; self.setState({ saving: false, step: nextStep, url: r.url, path: r.path, copied: false }); setTimeout(function () { self.drawCard(); }, 700); }
       else { self.setState({ saving: false }); self.flash((r && r.error) || 'Couldn’t save. Try again.'); }
     });
   }
-  // WhatsApp gets the link as a message; elsewhere the phone's share sheet (or the clipboard) does it.
-  // Posting the story card as an image arrives with the Share studio.
-  share(kind) {
-    var url = 'https://' + this.state.url;
-    if (kind === 'wa') { window.open('https://wa.me/?text=' + encodeURIComponent('Send me an anonymous message 👀 ' + url), '_blank', 'noopener'); return; }
-    if (navigator.share) { navigator.share({ title: 'Sekretly', text: 'Send me an anonymous message 👀', url: url }).catch(function () {}); return; }
-    try { navigator.clipboard.writeText(url); } catch (e) {}
-    this.flash('Link copied. Paste it in your story.');
+  // draws the story card (9:16) once, for the apps that take an image
+  drawCard() {
+    var self = this, node = document.querySelector('.cr-story');
+    if (!node || this.card) return Promise.resolve(this.card);
+    return import('html-to-image').then(function (h) {
+      return h.toBlob(node, { canvasWidth: 1080, canvasHeight: 1920, pixelRatio: 1, style: { borderRadius: '0', boxShadow: 'none', animation: 'none', transform: 'none' } });
+    }).then(function (b) { self.card = b ? new File([b], 'sekretly-story.png', { type: 'image/png' }) : null; return self.card; }).catch(function () { return null; });
+  }
+  // each app opens on its own "send to" screen with the link filled in; story apps also get the card image
+  share(dest) {
+    var self = this, url = (/^https?:/.test(this.state.url) ? '' : 'https://') + this.state.url;
+    if (!window.skShare) return;
+    var withCard = dest === 'ig' || dest === 'sc' || dest === 'tt' || dest === 'save';
+    var run = function (card) {
+      window.skShare.open(dest, { url: url, text: 'Send me an anonymous message 👀', files: withCard && card ? [card] : undefined }).then(function (r) {
+        if (r === 'copied') self.flash(dest === 'ig' || dest === 'tt' ? 'Link copied. Paste it on your story.' : 'Link copied');
+        else if (r === 'saved') self.flash('Story card saved');
+      });
+    };
+    if (withCard && !this.card) this.drawCard().then(run); else run(this.card);
   }
   flash(t) { var self = this; clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(function () { self.setState({ toast: null }); }, 1800); }
   renderVals() {
@@ -81,21 +94,38 @@ export default class Create extends React.Component<Record<string, any>, any> {
     var isCustom = tp.id === 'custom', isQuiz = tp.id === 'know-me';
     var line = dark ? 'rgba(255,255,255,.12)' : 'rgba(48,34,72,.14)';
     // steps depend on the topic: the quiz adds "Write your quiz"
-    var STEPS = isQuiz ? ['topic', 'quiz', 'theme', 'limits', 'share'] : ['topic', 'theme', 'limits', 'share'];
-    var TITLES = { theme: 'Pick a theme', topic: 'Pick a topic', quiz: 'Write your quiz', limits: 'Set limits', share: 'Share it' };
+    var isRate = tp.id === 'rate-me';
+    var STEPS = isQuiz ? ['topic', 'quiz', 'theme', 'limits', 'share'] : isRate ? ['topic', 'rate', 'theme', 'limits', 'share'] : ['topic', 'theme', 'limits', 'share'];
+    // what visitors read at the top of the link page: the topic's words until the owner writes their own
+    var INTRO = { 'describe-3': 'Tap three words that sum me up. That’s it.', 'know-me': 'Questions about me. Get your score, see the leaderboard.', confess: 'Say the whole thing. Nobody will know it was you.', 'rate-me': 'Rate me on each one, 1 to 10. Add why if you’re brave.', ama: 'Any question. I answer, you stay unknown.', custom: 'No rules. Just write.' };
+    var cp = s.copy[tp.id] || {};
+    var titleVal = cp.title !== undefined ? cp.title : tp.title, introVal = cp.intro !== undefined ? cp.intro : INTRO[tp.id];
+    var setCopy = function (k, v) { var c = Object.assign({}, s.copy), o = Object.assign({}, c[tp.id] || {}); o[k] = v; c[tp.id] = o; self.setState({ copy: c }); };
+    // rating builder: grouped ready-made questions plus the owner's own, in the order picked
+    var RS = [
+      ['Looks & style', ['Rate my looks', 'Rate my smile', 'Rate my style', 'Rate my hair', 'Rate my pictures', 'Rate my Sunday fit']],
+      ['Personality', ['Rate my vibe', 'Rate my sense of humour', 'Rate my energy', 'How kind am I?', 'How honest am I?', 'Rate my confidence']],
+      ['As a friend', ['Rate me as a friend', 'How loyal am I?', 'Can I keep a secret?', 'Rate my advice', 'How fast do I reply?']],
+      ['Love & dating', ['Rate me as a partner', 'Rate my rizz', 'Rate my texting game', 'How romantic am I?', 'Would you date me?']],
+      ['Skills & taste', ['Rate my cooking', 'Rate my dance moves', 'Rate my singing', 'Rate my music taste', 'Rate my fashion sense']],
+      ['Life', ['Rate my hustle', 'How organised am I?', 'Am I ever on time?', 'Rate my social media', 'Rate my glow-up']]
+    ];
+    var preset = [].concat.apply([], RS.map(function (g) { return g[1]; }));
+    var ownQs = s.rateQs.filter(function (t) { return preset.indexOf(t) < 0; });
+    var TITLES = { rate: 'What they rate', theme: 'Pick a theme', topic: 'Pick a topic', quiz: 'Write your quiz', limits: 'Set limits', share: 'Share it' };
     var step = Math.min(s.step, STEPS.length - 1), cur = STEPS[step];
     // quiz validity: question text, at least 2 options, a marked answer that has text
     var Q = s.quiz;
     var qOk = function (q) { var filled = q.opts.filter(function (o) { return o.trim(); }).length; return q.text.trim().length > 3 && filled >= 2 && q.right >= 0 && !!q.opts[q.right].trim(); };
     var ready = Q.filter(qOk).length;
-    var quizValid = ready === Q.length && Q.length >= 3;
+    var quizValid = ready === Q.length && Q.length >= 1;
     var setQ = function (i, patch) { var nq = Q.map(function (q, k) { return k === i ? Object.assign({}, q, patch) : q; }); self.setState({ quiz: nq }); };
-    var cantNext = (cur === 'topic' && isCustom && !s.custom.trim()) || (cur === 'quiz' && !quizValid);
+    var cantNext = (cur === 'topic' && isCustom && !s.custom.trim()) || (cur === 'quiz' && !quizValid) || (cur === 'rate' && !s.rateQs.length);
     var firstBad = Q.map(qOk).indexOf(false);
     var save = function () {
       try { if (isQuiz) window.localStorage.setItem('sk-quiz', JSON.stringify(Q.map(function (q) { return [q.text.trim(), q.opts.filter(function (o) { return o.trim(); }), q.opts.filter(function (o, k) { return k < q.right && o.trim(); }).length]; }))); } catch (e) {}
     };
-    var pvQ = Q[0] || { text: '', opts: [], right: -1 };
+    var pvQ = Q[0] || { text: '', opts: [], right: 0 };
     function opt(label, active, fn) { return { label: label, on: active ? 'true' : 'false', cls: active ? 'on' : '', pick: fn }; }
     return {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
@@ -104,7 +134,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
       liveTitle: s.editing ? 'Changes saved' : 'Your link is live',
       bars: STEPS.map(function (x, i) { return { c: i <= step ? '#d81b72' : line }; }),
       thCls: 'th-' + th[0], thEmoji: th[2],
-      topicTitle: isCustom ? (s.custom.trim() || 'Your question here') : tp.title, topicHint: tp.hint, storyLine: tp.story,
+      topicTitle: isCustom ? (s.custom.trim() || 'Your question here') : (titleVal.trim() || tp.title), topicHint: introVal.trim() || INTRO[tp.id], storyLine: tp.story,
       pvDescribe: tp.pv === 'describe', pvQuiz: tp.pv === 'quiz', pvConfess: tp.pv === 'confess', pvRate: tp.pv === 'rate', pvAsk: tp.pv === 'ask',
       pvAskText: isCustom ? 'Type your answer…' : 'Ask me anything…', pvSend: tp.send,
       pvDots: Q.map(function (q, k) { return k === 0 ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.25)'; }),
@@ -115,6 +145,29 @@ export default class Create extends React.Component<Record<string, any>, any> {
       notShare: cur !== 'share', isShare: cur === 'share',
       themes: T.map(function (t) { var a = t[0] === s.theme; return { name: t[1], cls: 'th-' + t[0], emoji: t[2], on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ theme: t[0] }); } }; }),
       topics: TP.map(function (t) { var a = t.id === tp.id; return { title: t.title, sub: t.sub, emoji: t.emoji, isNew: !!t.isNew, on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : line, dot: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ topic: t.id }); } }; }),
+      notCustom: !isCustom, titleVal: titleVal, introVal: introVal, titleDefault: tp.title, introDefault: INTRO[tp.id],
+      onTitle: function (e) { setCopy('title', e.target.value.slice(0, 60)); }, onIntro: function (e) { setCopy('intro', e.target.value.slice(0, 120)); },
+      resetCopy: function () { var c = Object.assign({}, s.copy); delete c[tp.id]; self.setState({ copy: c }); }, copyEdited: !!s.copy[tp.id],
+      sRate: cur === 'rate', pvRateQ: s.rateQs[0] || 'They’re rating you',
+      rateGroups: RS.concat(ownQs.length ? [['Your own', ownQs]] : []).map(function (g) {
+        return { name: g[0], items: g[1].map(function (t) {
+          var idx = s.rateQs.indexOf(t), on = idx >= 0;
+          return { label: (on ? (idx + 1) + ' · ' : '') + t, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () {
+            var n = s.rateQs.slice();
+            if (on) n.splice(idx, 1); else if (n.length < 12) n.push(t); else { self.flash('Up to 12 questions'); return; }
+            self.setState({ rateQs: n });
+          } };
+        }) };
+      }),
+      rateOwn: s.rateOwn, onRateOwn: function (e) { self.setState({ rateOwn: e.target.value.slice(0, 60) }); },
+      addRateOwn: function () {
+        var t = s.rateOwn.trim();
+        if (t.length < 3) { self.flash('Write your question first'); return; }
+        if (s.rateQs.indexOf(t) >= 0) { self.setState({ rateOwn: '' }); return; }
+        if (s.rateQs.length >= 12) { self.flash('Up to 12 questions'); return; }
+        self.setState({ rateQs: s.rateQs.concat([t]), rateOwn: '' });
+      },
+      rateNote: s.rateQs.length ? s.rateQs.length + (s.rateQs.length === 1 ? ' question' : ' questions') + ' picked. Friends rate each one from 1 to 10, in this order, and you see the average.' : 'Pick at least one question.',
       isCustom: isCustom, custom: s.custom, onCustom: function (e) { self.setState({ custom: e.target.value.slice(0, 60) }); }, customLeft: 60 - s.custom.length,
       // quiz builder
       qs: Q.map(function (q, i) {
@@ -131,14 +184,14 @@ export default class Create extends React.Component<Record<string, any>, any> {
               onText: function (e) { var no = q.opts.slice(); no[k] = e.target.value.slice(0, 28); setQ(i, { opts: no }); },
               mark: function () { if (!q.opts[k].trim()) { self.flash('Write option ' + (k + 1) + ' first'); return; } setQ(i, { right: k }); } };
           }),
-          swap: function () { var I = self.ideas(), used = Q.map(function (x) { return x.text; }), n = s.swapN, pick = I[n % I.length], g = 0; while (used.indexOf(pick) >= 0 && g++ < I.length) { n++; pick = I[n % I.length]; } setQ(i, { text: pick, opts: ['', '', '', ''], right: -1 }); self.setState({ swapN: n + 1 }); },
-          canRemove: Q.length > 3,
+          swap: function () { var I = self.ideas(), used = Q.map(function (x) { return x.text; }), n = s.swapN, pick = I[n % I.length], g = 0; while (used.indexOf(pick) >= 0 && g++ < I.length) { n++; pick = I[n % I.length]; } setQ(i, { text: pick, opts: ['', '', '', ''], right: 0 }); self.setState({ swapN: n + 1 }); },
+          canRemove: Q.length > 1,
           remove: function () { self.setState({ quiz: Q.filter(function (x, k) { return k !== i; }), openQ: -1 }); }
         };
       }),
-      canAddQ: Q.length < 10, addLabel: '+ Add a question (' + Q.length + '/10)',
-      addQ: function () { self.setState({ quiz: Q.concat([{ text: '', opts: ['', '', '', ''], right: -1 }]), openQ: Q.length }); },
-      quizNote: quizValid ? 'All ' + Q.length + ' questions are ready. Friends see them one at a time, in this order.' : ready + ' of ' + Q.length + ' ready. Every question needs at least 2 options and a ✓ answer (3 to 10 questions).',
+      canAddQ: Q.length < 25, addLabel: '+ Add a question (' + Q.length + '/25)',
+      addQ: function () { self.setState({ quiz: Q.concat([{ text: '', opts: ['', '', '', ''], right: 0 }]), openQ: Q.length }); },
+      quizNote: quizValid ? 'All ' + Q.length + ' questions are ready. Friends see them one at a time, in this order.' : ready + ' of ' + Q.length + ' ready. Every question needs at least 2 options and a ✓ answer (1 to 25 questions).',
       // limits
       limMsg: s.limMsg, limTime: s.limTime, limMsgStr: s.limMsg ? 'true' : 'false', limTimeStr: s.limTime ? 'true' : 'false',
       toggleMsg: function () { self.setState({ limMsg: !s.limMsg }); },
@@ -151,10 +204,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
       url: s.url || '',
       copyLabel: s.copied ? 'Copied' : 'Copy', copyBg: s.copied ? '#0d7f4b' : '#d81b72',
       copy: function () { try { navigator.clipboard.writeText('https://' + s.url); } catch (e) {} self.setState({ copied: true }); self.flash('Link copied'); },
-      shareWa: function () { self.share('wa'); },
-      shareIg: function () { self.share(); },
-      shareSc: function () { self.share(); },
-      saveCard: function () { self.share(); },
+      shareIcons: ['wa', 'ig', 'sc', 'tt', 'x', 'fb', 'tg', 'save', 'more'].map(function (id) { var d = { wa: ['wa', 'WhatsApp', 'whatsapp'], ig: ['ig', 'Instagram', 'instagram'], sc: ['sc', 'Snapchat', 'snapchat'], tt: ['tt', 'TikTok', 'tiktok'], x: ['x', 'X', 'x'], fb: ['fb', 'Facebook', 'facebook'], tg: ['tg', 'Telegram', 'telegram'], sms: ['sms', 'Messages', 'sms'], copy: ['copy', 'Copy link', 'copy'], save: ['save', 'Save', 'save'], more: ['more', 'More', 'more'] }[id]; return { name: d[1], label: (id === 'copy' || id === 'save' || id === 'more' ? d[1] : 'Share on ' + d[1]), icon: '/brand/' + d[2] + '.svg', go: function () { self.share(d[0]); } }; }),
       previewHref: s.path || '/',
       toast: !!s.toast, toastText: s.toast || '',
       canBack: step > 0 && cur !== 'share',
@@ -165,7 +215,10 @@ export default class Create extends React.Component<Record<string, any>, any> {
           self.submit({
             id: s.editing || null, topic: tp.id, theme: s.theme, custom: s.custom,
             maxMessages: s.limMsg ? s.msgN : null, closesIn: s.limTime ? s.time : null,
-            quiz: isQuiz ? Q.map(function (q) { return { text: q.text.trim(), options: q.opts.filter(function (o) { return o.trim(); }).map(function (o) { return o.trim(); }), right: q.opts.filter(function (o, k) { return k < q.right && o.trim(); }).length }; }) : null
+            quiz: isQuiz ? Q.map(function (q) { return { text: q.text.trim(), options: q.opts.filter(function (o) { return o.trim(); }).map(function (o) { return o.trim(); }), right: q.opts.filter(function (o, k) { return k < q.right && o.trim(); }).length }; }) : null,
+            rate: isRate ? s.rateQs : null,
+            title: isCustom || titleVal.trim() === tp.title ? '' : titleVal.trim(),
+            intro: introVal.trim() === INTRO[tp.id] ? '' : introVal.trim()
           }, step + 1);
           return;
         }
@@ -368,7 +421,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
                         <div>
                           {" "}
                           <div style={{ fontSize: "11px", fontWeight: "800", opacity: ".85", marginBottom: "6px" }}>
-                            They’re rating you
+                            {v.pvRateQ}
                           </div>
                           {" "}
                           <div className="cr-row" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
@@ -616,6 +669,47 @@ export default class Create extends React.Component<Record<string, any>, any> {
                     </>
                   ) : null}
                   {" "}
+                  <div className="card" style={{ padding: "14px", marginTop: "12px" }}>
+                    {" "}
+                    <div className="row">
+                      <b style={{ flex: "1", fontSize: "15px" }}>
+                        Make it yours
+                      </b>
+                      {v.copyEdited ? (
+                        <>
+                        <button className="btn btn-sm btn-ghost tap" onClick={v.resetCopy}>
+                          Use suggestion
+                        </button>
+                        </>
+                      ) : null}
+                    </div>
+                    {" "}
+                    <p className="muted" style={{ fontSize: "13px", marginTop: "2px" }}>
+                      What friends read at the top of your link. Change any word.
+                    </p>
+                    {" "}
+                    {v.notCustom ? (
+                      <>
+                      {" "}
+                      <div>
+                        <label htmlFor="cr-title" className="label" style={{ marginTop: "10px" }}>
+                          Title
+                        </label>
+                        {" "}
+                        <input id="cr-title" className="field" value={v.titleVal ?? ""} onChange={v.onTitle} maxLength="60" placeholder={v.titleDefault} />
+                      </div>
+                      {" "}
+                      </>
+                    ) : null}
+                    {" "}
+                    <label htmlFor="cr-intro" className="label" style={{ marginTop: "10px" }}>
+                      Intro line
+                    </label>
+                    {" "}
+                    <input id="cr-intro" className="field" value={v.introVal ?? ""} onChange={v.onIntro} maxLength="120" placeholder={v.introDefault} />
+                    {" "}
+                  </div>
+                  {" "}
                 </div>
                 {" "}
                 </>
@@ -627,7 +721,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
                 <div>
                   {" "}
                   <p className="muted" style={{ marginBottom: "12px", fontSize: "15px" }}>
-                    Write questions about you, add options, then tap ✓ on the right answer. Friends guess and get a score.
+                    Write questions about you and their options. Option 1 is the right answer until you tap ✓ on another. Friends get a score out of how many you ask.
                   </p>
                   {" "}
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -729,6 +823,64 @@ export default class Create extends React.Component<Record<string, any>, any> {
                   {" "}
                   <p className="hint" style={{ marginTop: "8px" }}>
                     {v.quizNote}
+                  </p>
+                  {" "}
+                </div>
+                {" "}
+                </>
+              ) : null}
+              {" "}
+              {v.sRate ? (
+                <>
+                {" "}
+                <div>
+                  {" "}
+                  <p className="muted" style={{ marginBottom: "4px", fontSize: "15px" }}>
+                    Pick what friends rate you on. They see one question at a time and tap 1 to 10.
+                  </p>
+                  {" "}
+                  {(v.rateGroups || []).map((g, i0) => (
+                    <Fragment key={i0}>
+                    {" "}
+                    <div style={{ marginTop: "14px" }}>
+                      {" "}
+                      <b style={{ fontSize: "14px" }}>
+                        {g.name}
+                      </b>
+                      {" "}
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
+                        {" "}
+                        {(g.items || []).map((it, i2) => (
+                          <Fragment key={i2}>
+                          <button className={`chip tap ${it.cls}`} onClick={it.pick} aria-pressed={it.on}>
+                            {it.label}
+                          </button>
+                          </Fragment>
+                        ))}
+                        {" "}
+                      </div>
+                      {" "}
+                    </div>
+                    {" "}
+                    </Fragment>
+                  ))}
+                  {" "}
+                  <label htmlFor="cr-rate-own" className="label" style={{ marginTop: "16px" }}>
+                    Write your own
+                  </label>
+                  {" "}
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    {" "}
+                    <input id="cr-rate-own" className="field" value={v.rateOwn ?? ""} onChange={v.onRateOwn} maxLength="60" placeholder="e.g. Rate my jollof" style={{ flex: "1", minWidth: "0" }} />
+                    {" "}
+                    <button className="btn tap" onClick={v.addRateOwn}>
+                      Add
+                    </button>
+                    {" "}
+                  </div>
+                  {" "}
+                  <p className="hint" style={{ marginTop: "8px" }}>
+                    {v.rateNote}
                   </p>
                   {" "}
                 </div>
@@ -860,24 +1012,14 @@ export default class Create extends React.Component<Record<string, any>, any> {
                     {" "}
                   </div>
                   {" "}
-                  <button className="btn btn-lg btn-block tap" onClick={v.shareWa} style={{ marginTop: "14px", background: "#128c4a", color: "#ffffff", border: "0" }}>
-                    Share to WhatsApp Status
-                  </button>
-                  {" "}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px", marginTop: "8px" }}>
-                    {" "}
-                    <button className="btn tap" onClick={v.shareIg} style={{ background: "linear-gradient(135deg,#7a2ff7,#d81b72 55%,#c2410c)", color: "#ffffff", border: "0" }}>
-                      Instagram
-                    </button>
-                    {" "}
-                    <button className="btn tap" onClick={v.shareSc} style={{ background: "#fffc00", color: "#111111", border: "0" }}>
-                      Snapchat
-                    </button>
-                    {" "}
-                    <button className="btn tap" onClick={v.saveCard}>
-                      Save card
-                    </button>
-                    {" "}
+                  <div className="sk-share" style={{ marginTop: "16px" }}>
+                    {(v.shareIcons || []).map((d, i0) => (
+                      <Fragment key={i0}>
+                      <button className="sk-share-ic tap" onClick={d.go} aria-label={d.label} title={d.name}>
+                        <img src={d.icon} alt="" />
+                      </button>
+                      </Fragment>
+                    ))}
                   </div>
                   {" "}
                   <SkLink href={route(v.previewHref)} className="btn btn-block btn-ghost tap" style={{ marginTop: "10px" }}>

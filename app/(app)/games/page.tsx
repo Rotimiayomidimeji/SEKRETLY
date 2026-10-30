@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import GamesHub from "@/components/sk/GamesHub";
 import { adsFlag } from "@/features/admin/settings";
+import { loadCrews } from "@/features/crews/crews";
 import { navCounts } from "@/features/notifications/queries";
 import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
@@ -14,12 +15,13 @@ const dayAgo = () => new Date(Date.now() - 86_400_000);
 // Open public rooms waiting for players (newest first), plus ways to start or join one.
 export default async function GamesPage() {
   const user = await requireUser("/games");
-  const [rooms, nav] = await Promise.all([
+  const [rooms, nav, crews] = await Promise.all([
     db.gameRoom.findMany({ where: { status: "LOBBY", isPublic: true, createdAt: { gte: dayAgo() } }, orderBy: { createdAt: "desc" }, take: 30, include: { _count: { select: { players: { where: { kickedAt: null } } } } } }),
     navCounts(user.id),
+    loadCrews(user.id),
   ]);
   const open = rooms
     .filter((r) => r._count.players < r.maxPlayers)
     .map((r) => ({ g: r.game, name: r.name, joined: r._count.players, max: r.maxPlayers, left: "waiting", code: r.code }));
-  return <GamesHub mode={await getMode()} ads={await adsFlag("list")} rooms={open} {...nav} />;
+  return <GamesHub mode={await getMode()} ads={await adsFlag("list")} rooms={open} crews={crews} {...nav} />;
 }

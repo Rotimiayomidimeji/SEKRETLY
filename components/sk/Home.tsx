@@ -67,12 +67,13 @@ export default class Home extends React.Component<Record<string, any>, any> {
       notifUnread: this.props.notifUnread || 0, hasNotif: (this.props.notifUnread || 0) > 0,
       links: base.map(function (l) {
         var p = !!s.paused[l.id];
-        return Object.assign({}, l, { status: p ? 'Paused' : 'Live', action: p ? 'Resume link' : 'Pause', toggle: function () { var n = Object.assign({}, s.paused); n[l.id] = !p; self.setState({ paused: n }); self.props.setPaused(l.id, !p); } });
+        return Object.assign({}, l, { unit: l.count === 1 ? 'message' : 'messages', status: p ? 'Paused' : 'Live', action: p ? 'Resume link' : 'Pause', toggle: function () { var n = Object.assign({}, s.paused); n[l.id] = !p; self.setState({ paused: n }); self.props.setPaused(l.id, !p); } });
       }),
-      games: [
-        { name: 'Friday Night Never', type: 'Never Have I Ever', joined: 3, max: 6, left: '1h 20m', icon: E.shush, tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)', href: 'NHIELobbyJoin.dc.html', join: J('nhie', 'Friday Night Never') },
-        { name: 'Hostel B confessions', type: 'Never Have I Ever', joined: 7, max: 10, left: '42m', icon: E.fire, tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)', href: 'NHIELobbyJoin.dc.html', join: J('nhie', 'Hostel B confessions') },
-        { name: 'Class of 2027 chaos', type: 'Would You Rather', joined: 2, max: 8, left: '1h 55m', icon: E.eyes, tint: 'linear-gradient(135deg,#22e1ff,#3a6bff)', href: 'WYRLobbyJoin.dc.html', join: J('wyr', 'Class of 2027 chaos') }
+      games: (this.props.rooms || []).slice(0, 3).map(function (r, i) {
+        var T = { nhie: ['Never Have I Ever', E.shush], tod: ['Truth or Dare', E.fire], wyr: ['Would You Rather', E.eyes], mlt: ['Most Likely To', E.sparkles], hot: ['Hot Takes', E.fire], poll: ['Anonymous Polls', E.eyes] }[r.g] || ['Game', E.sparkles];
+        var tint = ['linear-gradient(135deg,#ff5fa2,#7a3cff)', 'linear-gradient(135deg,#ffb35c,#ff4f6d)', 'linear-gradient(135deg,#22e1ff,#3a6bff)'][i % 3];
+        return { name: r.name, type: T[0], joined: r.joined, max: r.max, icon: T[1], tint: tint, href: '/join/' + r.code, join: function () {} };
+      }), hasGames: (this.props.rooms || []).length > 0, noGames: !(this.props.rooms || []).length, sampleGames: [
       ],
       showDrop: s.drop && !s.installed,
       hideDrop: function () { self.setState({ drop: false }); },
@@ -207,9 +208,9 @@ export default class Home extends React.Component<Record<string, any>, any> {
                 {" "}
                 <header className="topbar">
                   {" "}
-                  <span className="av" style={{ background: "linear-gradient(135deg,#d6ff6b,#22c4a0)" }}>
+                  <SkLink href="/profile" className="av tap" aria-label="Your profile" style={{ background: "linear-gradient(135deg,#d6ff6b,#22c4a0)" }}>
                     <img src={`/sk/${v.avatar}.png`} alt="" />
-                  </span>
+                  </SkLink>
                   {" "}
                   <div className="grow">
                     {" "}
@@ -340,32 +341,32 @@ export default class Home extends React.Component<Record<string, any>, any> {
                 {" "}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px", marginTop: "12px" }}>
                   {" "}
-                  <div className="card" style={{ padding: "14px" }}>
+                  <SkLink href="/inbox" className="card tap sk-stat" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
                       {v.stats.week}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
                       messages this week
                     </div>
-                  </div>
+                  </SkLink>
                   {" "}
-                  <div className="card" style={{ padding: "14px" }}>
+                  <SkLink href="/links" className="card tap sk-stat" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
                       {v.stats.visits}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
                       link visits this week
                     </div>
-                  </div>
+                  </SkLink>
                   {" "}
-                  <div className="card" style={{ padding: "14px" }}>
+                  <SkLink href="/inbox?filter=chats" className="card tap sk-stat" style={{ padding: "14px" }}>
                     <div className="d" style={{ fontSize: "26px", fontWeight: "800" }}>
                       {v.stats.chats}
                     </div>
                     <div className="muted" style={{ fontSize: "12.5px" }}>
                       active chats
                     </div>
-                  </div>
+                  </SkLink>
                   {" "}
                 </div>
                 {" "}
@@ -406,7 +407,9 @@ export default class Home extends React.Component<Record<string, any>, any> {
                   {(v.links || []).map((l, i0) => (
                     <Fragment key={i0}>
                     {" "}
-                    <article className={l.th} style={{ flex: "none", width: "216px", minHeight: "230px", borderRadius: "24px", padding: "16px", display: "flex", flexDirection: "column", scrollSnapAlign: "start" }}>
+                    <article className={l.th} style={{ position: "relative", flex: "none", width: "216px", minHeight: "230px", borderRadius: "24px", padding: "16px", display: "flex", flexDirection: "column", scrollSnapAlign: "start" }}>
+                      {" "}
+                      <SkLink href={route(l.href)} className="sk-stretch" aria-label={`Insights for ${l.topic}`} />
                       {" "}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         {" "}
@@ -428,11 +431,11 @@ export default class Home extends React.Component<Record<string, any>, any> {
                         </span>
                         {" "}
                         <span style={{ fontSize: "13px", opacity: ".85" }}>
-                          {"messages · "}{l.limit}
+                          {l.unit}{" · "}{l.limit}
                         </span>
                       </div>
                       {" "}
-                      <button className="tap" onClick={l.toggle} style={{ marginTop: "10px", minHeight: "44px", borderRadius: "14px", border: "0", background: "rgba(255,255,255,.95)", color: "#2a0a1c", fontWeight: "800", fontSize: "14px" }}>
+                      <button className="tap" onClick={l.toggle} style={{ position: "relative", zIndex: "2", marginTop: "10px", minHeight: "44px", borderRadius: "14px", border: "0", background: "rgba(255,255,255,.95)", color: "#2a0a1c", fontWeight: "800", fontSize: "14px" }}>
                         {l.action}
                       </button>
                       {" "}
@@ -506,9 +509,32 @@ export default class Home extends React.Component<Record<string, any>, any> {
                   {" "}
                 </div>
                 {" "}
-                <h3 style={{ fontSize: "15px", margin: "18px 0 10px" }}>
-                  Open games near you
-                </h3>
+                {v.noGames ? (
+                  <>
+                  <SkLink href="/games/new" className="card tap" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px", marginTop: "18px" }}>
+                    <img src="/sk/sparkles.png" alt="" style={{ width: "32px", height: "32px" }} />
+                    <span style={{ flex: "1" }}>
+                      <b style={{ display: "block", fontSize: "15px" }}>
+                        No open games right now
+                      </b>
+                      <span className="muted" style={{ fontSize: "13px" }}>
+                        Start one and invite your people
+                      </span>
+                    </span>
+                    <span className="btn btn-sm btn-cta">
+                      Start
+                    </span>
+                  </SkLink>
+                  </>
+                ) : null}
+                {" "}
+                {v.hasGames ? (
+                  <>
+                  <h3 style={{ fontSize: "15px", margin: "18px 0 10px" }}>
+                    Open games near you
+                  </h3>
+                  </>
+                ) : null}
                 {" "}
                 <ul style={{ listStyle: "none", margin: "0", padding: "0", display: "flex", flexDirection: "column", gap: "10px" }}>
                   {" "}
@@ -528,7 +554,7 @@ export default class Home extends React.Component<Record<string, any>, any> {
                         </div>
                         {" "}
                         <div className="muted" style={{ fontSize: "13px" }}>
-                          {g.type}{" · "}{g.joined}/{g.max}{" · "}{g.left}{" left"}
+                          {g.type}{" · "}{g.joined}/{g.max}{" joined"}
                         </div>
                         {" "}
                       </div>
@@ -676,7 +702,7 @@ export default class Home extends React.Component<Record<string, any>, any> {
                     Sekretly
                   </div>
                   <div style={{ fontSize: "13px", color: "#5f6368" }}>
-                    sekretly.com
+                    sekretlyy.vercel.app
                   </div>
                 </div>
                 {" "}

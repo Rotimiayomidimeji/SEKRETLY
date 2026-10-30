@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink, route } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route, skStack } from "@/lib/sk/runtime";
 
 
 export default class MyLinks extends React.Component<Record<string, any>, any> {
@@ -14,6 +14,7 @@ export default class MyLinks extends React.Component<Record<string, any>, any> {
     this.state = { mode: m || props.mode || 'dark', paused: (props.links || []).reduce(function (p, l) { if (l.paused) p[l.id] = true; return p; }, {}), deleted: {}, copied: null, key: props.linkKey || '', resetOpen: false, resetText: '', toast: '' };
   }
   componentDidMount() {
+    skStack(this, ["resetOpen"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}

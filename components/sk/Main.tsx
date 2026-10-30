@@ -18,7 +18,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
   }
   componentWillUnmount() { clearTimeout(this.qt); }
   blank() {
-    return { words: [], deckSeed: 0, ownWord: '', rate: null, rateCat: 'Overall', qi: 0, picks: [], qLocked: false,
+    return { words: [], deckSeed: 0, ownWord: '', rate: null, rates: [], ri: 0, slide: 'a', rateCat: 'Overall', qi: 0, picks: [], qLocked: false,
       text: '', media: null, sent: false, popup: false, popStep: 'ask', popUser: '', popPass: '', popAgree: false, popShow: false, popLogin: false, wantReply: false, report: false, reported: false, picked: null, other: false, otherText: '', seed: 1, sHint: 0, sHintBox: false, sHintCustom: '', rcCopied: false };
   }
   cats() {
@@ -87,12 +87,16 @@ export default class Main extends React.Component<Record<string, any>, any> {
       describe: { title: 'Describe me in 3 words', sub: 'Tap three words that sum me up. That’s it.', who: 'wants 3 words from you', emoji: E.sparkles, max: 60 },
       quiz: { title: 'How well do you know me?', sub: 'Questions about me. Get your score, see the leaderboard.', who: 'made a quiz about themselves', emoji: E.crown, max: 140 },
       confess: { title: 'Confess something', sub: 'Say the whole thing. Nobody will know it was you.', who: 'is listening', emoji: E.shush, max: 2000 },
-      rate: { title: 'Rate me 1–10', sub: 'You’re rating @' + OWNER + '. Pick a number, add why if you’re brave.', who: 'wants your honest rating', emoji: E.fire, max: 140 },
+      rate: { title: 'Rate me 1–10', sub: 'Rate me on each one, 1 to 10. Add why if you’re brave.', who: 'wants your honest rating', emoji: E.fire, max: 140 },
       ama: { title: 'Ask me anything', sub: 'Any question. They answer, you stay unknown.', who: 'is taking questions', emoji: E.ghost, max: 300 },
       custom: { title: this.props.customQuestion || 'Tell me something you’ve never said', sub: 'No rules. Just write.', who: 'wants to hear from you', emoji: E.letter, max: 1000 }
     };
     var topic = TP[this.props.topic] ? this.props.topic : (this.props.topic === 'opinion' ? 'quiz' : 'describe');
-    var tp = TP[topic];
+    var tp = Object.assign({}, TP[topic]);
+    if (this.props.title) tp.title = this.props.title;
+    if (this.props.intro) tp.sub = this.props.intro;
+    // Rate me: one question at a time (older links without their own questions get one overall question)
+    var RQ = this.props.rateQs && this.props.rateQs.length ? this.props.rateQs : ['Rate me overall'];
     var self = this, s = this.state, embed = this.props.embed === 'yes';
     var len = s.text.length, trimmed = s.text.trim().length;
     var on = function (v) { return { bg: v ? th.chipOn : th.chipBg, ink: v ? th.chipOnInk : th.ink, line: v ? th.chipOn : th.cardLine }; };
@@ -126,18 +130,21 @@ export default class Main extends React.Component<Record<string, any>, any> {
     board.sort(function (a, b) { return b.score - a.score; });
 
     // rate
-    var rv = s.rate || 0;
+    var rates = s.rates || [], ri = Math.min(s.ri || 0, RQ.length - 1);
+    var rateDone = RQ.every(function (q, k) { return !!rates[k]; }) && s.ri >= RQ.length;
+    var avg = rates.length ? rates.reduce(function (a, b) { return a + (b || 0); }, 0) / RQ.length : 0;
+    var rv = rateDone ? Math.round(avg) : (rates[ri] || 0);
     var rateEmoji = !rv ? E.thinking : rv <= 3 ? E.frog : rv <= 5 ? E.thinking : rv <= 7 ? E.eyes : rv <= 9 ? E.fire : E.star;
     var rateWord = !rv ? 'Tap a number' : ['', 'Ouch.', 'Not your day.', 'Room to grow.', 'Meh, honestly.', 'Right in the middle.', 'Solid.', 'Pretty great.', 'Seriously good.', 'Nearly perfect.', 'No notes. 10/10.'][rv];
     var hue = function (n) { return 'hsl(' + (220 - n * 19) + ',90%,66%)'; };
 
-    var can = topic === 'describe' ? full : topic === 'quiz' ? quizDone : topic === 'confess' ? trimmed >= 2 : topic === 'rate' ? !!s.rate : topic === 'ama' ? trimmed >= 5 : (trimmed >= 1 || !!s.media);
-    var need = topic === 'describe' ? (3 - s.words.length) + ' more word' + (3 - s.words.length === 1 ? '' : 's') + ' to go' : topic === 'quiz' ? 'Answer all ' + QN + ' first' : topic === 'confess' ? 'Write your confession' : topic === 'rate' ? 'Tap a number from 1 to 10' : topic === 'ama' ? 'Type your question' : 'Write something';
+    var can = topic === 'describe' ? full : topic === 'quiz' ? quizDone : topic === 'confess' ? trimmed >= 2 : topic === 'rate' ? rateDone : topic === 'ama' ? trimmed >= 5 : (trimmed >= 1 || !!s.media);
+    var need = topic === 'describe' ? (3 - s.words.length) + ' more word' + (3 - s.words.length === 1 ? '' : 's') + ' to go' : topic === 'quiz' ? 'Answer all ' + QN + ' first' : topic === 'confess' ? 'Write your confession' : topic === 'rate' ? 'Rate every question first' : topic === 'ama' ? 'Type your question' : 'Write something';
     var visitor = this.props.visitor || 'first';
     var member = visitor === 'member';
-    var payload = topic === 'describe' ? s.words.join(' · ') : topic === 'rate' ? rv + '/10' + (trimmed ? ' · ' + s.text.trim() : '') : topic === 'quiz' ? 'I scored ' + score + '/' + QN + ' on your quiz' : s.text.trim();
+    var payload = topic === 'describe' ? s.words.join(' · ') : topic === 'rate' ? (Math.round(avg * 10) / 10) + '/10' + (trimmed ? ' · ' + s.text.trim() : '') : topic === 'quiz' ? 'I scored ' + score + '/' + QN + ' on your quiz' : s.text.trim();
     // what goes to the server for each topic (it re-checks everything, and scores the quiz itself)
-    var body = topic === 'describe' ? { words: s.words } : topic === 'quiz' ? { picks: s.picks, note: s.text } : topic === 'rate' ? { score: s.rate || undefined, category: s.rateCat, text: s.text } : { text: s.text };
+    var body = topic === 'describe' ? { words: s.words } : topic === 'quiz' ? { picks: s.picks, note: s.text } : topic === 'rate' ? { scores: RQ.map(function (q, k) { return rates[k] || 0; }), text: s.text } : { text: s.text };
     var doSend = function (replies) {
       if (!self.props.send) { self.setState({ sent: true, popup: false, wantReply: replies }); return; }
       if (s.sending) return;
@@ -207,15 +214,27 @@ export default class Main extends React.Component<Record<string, any>, any> {
       retake: function () { clearTimeout(self.qt); self.setState({ qi: 0, picks: [], qLocked: false }); },
       showQuizAd: topic === 'quiz' && quizDone && !embed,
       // confess
-      cfHint: cards > 1 ? 'Long one: @' + OWNER + ' reads it as ' + cards + ' cards' : 'Write as much as you want',
+      cfHint: 'Write as much as you want',
       // rate
       rateCats: ['Overall', 'Vibe', 'Style', 'Friendship', 'Humour'].map(function (r) { var o = on(s.rateCat === r); return { label: r, on: s.rateCat === r ? 'true' : 'false', bg: o.bg, ink: o.ink, line: o.line, pick: function () { self.setState({ rateCat: r }); } }; }),
-      tiles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { var a = s.rate === n; return { n: n, on: a ? 'true' : 'false', bg: a ? hue(n) : th.chipBg, ink: a ? '#120a16' : th.ink, line: a ? hue(n) : th.cardLine, pick: function () { self.setState({ rate: n }); } }; }),
-      rateShown: rv ? rv : '–', rateEmoji: rateEmoji, rateWord: rateWord, rateColor: rv ? hue(rv) : th.muted,
+      tiles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { var a = rates[ri] === n; return { n: n, on: a ? 'true' : 'false', bg: a ? hue(n) : th.chipBg, ink: a ? '#120a16' : th.ink, line: a ? hue(n) : th.cardLine, pick: function () {
+        var r = rates.slice(); r[ri] = n;
+        self.setState({ rates: r, rate: n });
+        clearTimeout(self.rt);
+        self.rt = setTimeout(function () { self.setState({ ri: ri + 1, slide: self.state.slide === 'a' ? 'b' : 'a' }); }, 380);
+      } }; }),
+      rateQ: RQ[ri], rateStep: 'Question ' + (ri + 1) + ' of ' + RQ.length, rateSlide: 'lp-slide-' + (s.slide || 'a'),
+      rateMany: RQ.length > 1, rateDone: rateDone, rating: !rateDone,
+      rateDots: RQ.map(function (q, k) { return k < ri || rateDone ? hue(rates[k] || 5) : k === ri ? th.ink : th.cardLine; }),
+      rateBack: ri > 0 && !rateDone, rateBackGo: function () { clearTimeout(self.rt); self.setState({ ri: Math.max(0, ri - 1), slide: self.state.slide === 'a' ? 'b' : 'a' }); },
+      rateAvg: Math.round(avg * 10) / 10,
+      rateSum: RQ.map(function (q, k) { return { q: q, n: rates[k] || '–', c: hue(rates[k] || 5) }; }),
+      rateAgain: function () { self.setState({ ri: 0, slide: self.state.slide === 'a' ? 'b' : 'a' }); },
+      rateShown: rateDone ? Math.round(avg * 10) / 10 : (rv ? rv : '–'), rateEmoji: rateEmoji, rateWord: rateWord, rateColor: rv ? hue(rv) : th.muted,
       // shared
       text: s.text, count: len, maxLen: tp.max,
       showTools: (topic === 'confess' || topic === 'ama' || topic === 'custom') && !!this.props.send, showCount: topic !== 'confess',
-      showSendArea: topic !== 'quiz' || quizDone,
+      showSendArea: (topic !== 'quiz' || quizDone) && (topic !== 'rate' || rateDone),
       onText: function (e) { self.setState({ text: e.target.value.slice(0, tp.max) }); },
       hasMedia: !!s.media, mediaIsVideo: s.media === 'video', mediaIsPhoto: s.media !== 'video', mediaPreview: s.mediaPreview || s.mediaUrl || '', mediaName: s.uploading ? 'Uploading…' : s.mediaInfo ? s.mediaInfo.name : '', mediaMeta: s.mediaInfo ? (s.mediaInfo.size < 1048576 ? Math.max(1, Math.round(s.mediaInfo.size / 1024)) + ' KB' : (s.mediaInfo.size / 1048576).toFixed(1) + ' MB') + ' · blurred until @' + OWNER + ' taps' : '',
       attachPhoto: function () { self.pickMedia('image/*'); },
@@ -225,7 +244,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
       warnTitle: w >= 3 ? 'Last warning with @' + OWNER + '' : 'You have ' + w + (w === 1 ? ' warning' : ' warnings') + ' with @' + OWNER + '',
       warnBody: w >= 3 ? 'One more report and you will be blocked from messaging them.' : (3 - w) + ' more and the next report blocks you from messaging them.',
       cantSend: !can || !!s.sending || !!s.uploading, sendOpacity: can && !s.sending && !s.uploading ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '', needHint: !can, needText: need,
-      sendLabel: topic === 'confess' ? 'Send confession' : topic === 'rate' ? (s.rate ? 'Send my ' + rv + '/10' : 'Send rating') : topic === 'quiz' ? 'Send my score to @' + OWNER + '' : topic === 'describe' ? 'Send my 3 words' : 'Send anonymously',
+      sendLabel: topic === 'confess' ? 'Send confession' : topic === 'rate' ? (rateDone ? 'Send my ' + (Math.round(avg * 10) / 10) + '/10' : 'Send rating') : topic === 'quiz' ? 'Send my score to @' + OWNER + '' : topic === 'describe' ? 'Send my 3 words' : 'Send anonymously',
       replyStr: s.wantReply ? 'true' : 'false', toggleReply: function () { self.setState({ wantReply: !s.wantReply }); },
       send: function () {
         if (!can) return;
@@ -656,35 +675,94 @@ export default class Main extends React.Component<Record<string, any>, any> {
                         </span>
                       </div>
                       {" "}
-                      <div className="lp-k" style={{ color: v.th.muted, padding: "14px 2px 8px" }}>
-                        Rate their…
-                      </div>
-                      {" "}
-                      <div className="lp-chips" style={{ display: "flex", gap: "7px", overflowX: "auto", margin: "0 -18px", padding: "2px 18px 8px" }}>
+                      {v.rating ? (
+                        <>
                         {" "}
-                        {(v.rateCats || []).map((rc, i0) => (
-                          <Fragment key={i0}>
+                        <div className={v.rateSlide}>
                           {" "}
-                          <button className="lp-chip" onClick={rc.pick} aria-pressed={rc.on} style={{ flex: "none", minHeight: "40px", padding: "0 15px", borderRadius: "999px", border: `1px solid ${rc.line}`, background: rc.bg, color: rc.ink, fontWeight: "800", fontSize: "14px" }}>
-                            {rc.label}
+                          {v.rateMany ? (
+                            <>
+                            <div style={{ display: "flex", gap: "4px", marginTop: "14px" }}>
+                              {(v.rateDots || []).map((rd, i0) => (
+                                <Fragment key={i0}>
+                                <span style={{ flex: "1", height: "5px", borderRadius: "5px", background: rd, transition: "background .3s" }} />
+                                </Fragment>
+                              ))}
+                            </div>
+                            </>
+                          ) : null}
+                          {" "}
+                          <div className="lp-k" style={{ color: v.th.muted, padding: "12px 2px 4px" }}>
+                            {v.rateStep}
+                          </div>
+                          {" "}
+                          <div style={{ fontSize: "24px", fontWeight: "800", lineHeight: "1.15", letterSpacing: "-.02em", padding: "0 2px 10px" }}>
+                            {v.rateQ}
+                          </div>
+                          {" "}
+                        </div>
+                        {" "}
+                        </>
+                      ) : null}
+                      {" "}
+                      {v.rateDone ? (
+                        <>
+                        {" "}
+                        <div className="lp-slide-a" style={{ marginTop: "14px" }}>
+                          {" "}
+                          <div className="lp-k" style={{ color: v.th.muted, padding: "0 2px 8px" }}>
+                            Your ratings
+                          </div>
+                          {" "}
+                          {(v.rateSum || []).map((rs, i0) => (
+                            <Fragment key={i0}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 2px", borderBottom: `1px solid ${v.th.cardLine}` }}>
+                              <span style={{ flex: "1", fontWeight: "700", fontSize: "15px" }}>
+                                {rs.q}
+                              </span>
+                              <b style={{ fontSize: "18px", color: rs.c }}>
+                                {rs.n}
+                              </b>
+                            </div>
+                            </Fragment>
+                          ))}
+                          {" "}
+                          <button className="lp-chip" onClick={v.rateAgain} style={{ marginTop: "10px", minHeight: "36px", padding: "0 14px", borderRadius: "999px", border: `1px solid ${v.th.cardLine}`, background: v.th.chipBg, color: v.th.ink, fontWeight: "800", fontSize: "13px" }}>
+                            Change my ratings
                           </button>
                           {" "}
-                          </Fragment>
-                        ))}
+                        </div>
                         {" "}
-                      </div>
+                        </>
+                      ) : null}
                       {" "}
-                      <div className="lp-tiles" role="radiogroup" aria-label="Score from 1 to 10" style={{ marginTop: "6px" }}>
-                        {" "}
-                        {(v.tiles || []).map((tl, i0) => (
-                          <Fragment key={i0}>
-                          <button className="lp-tile" role="radio" aria-checked={tl.on} aria-pressed={tl.on} onClick={tl.pick} style={{ background: tl.bg, color: tl.ink, borderColor: tl.line }}>
-                            {tl.n}
-                          </button>
-                          </Fragment>
-                        ))}
-                        {" "}
-                      </div>
+                      {v.rating ? (
+                        <>
+                        <div>
+                          {" "}
+                          <div className="lp-tiles" role="radiogroup" aria-label="Score from 1 to 10" style={{ marginTop: "6px" }}>
+                            {" "}
+                            {(v.tiles || []).map((tl, i0) => (
+                              <Fragment key={i0}>
+                              <button className="lp-tile" role="radio" aria-checked={tl.on} aria-pressed={tl.on} onClick={tl.pick} style={{ background: tl.bg, color: tl.ink, borderColor: tl.line }}>
+                                {tl.n}
+                              </button>
+                              </Fragment>
+                            ))}
+                            {" "}
+                          </div>
+                          {" "}
+                          {v.rateBack ? (
+                            <>
+                            <button className="lp-chip" onClick={v.rateBackGo} style={{ marginTop: "10px", minHeight: "36px", padding: "0 14px", borderRadius: "999px", border: `1px solid ${v.th.cardLine}`, background: "transparent", color: v.th.ink, fontWeight: "800", fontSize: "13px" }}>
+                              ← Previous question
+                            </button>
+                            </>
+                          ) : null}
+                          {" "}
+                        </div>
+                        </>
+                      ) : null}
                       {" "}
                       <div style={{ display: "flex", alignItems: "center", gap: "14px", marginTop: "14px" }}>
                         {" "}

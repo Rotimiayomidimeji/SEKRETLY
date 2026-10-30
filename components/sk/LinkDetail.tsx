@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, skStack } from "@/lib/sk/runtime";
 
 
 export default class LinkDetail extends React.Component<Record<string, any>, any> {
@@ -20,6 +20,7 @@ export default class LinkDetail extends React.Component<Record<string, any>, any
     return { id: null, paused: !!(this.props.data && this.props.data.paused), copied: false, delOpen: false, toast: '' };
   }
   componentDidMount() {
+    skStack(this, ["delOpen"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -52,7 +53,7 @@ export default class LinkDetail extends React.Component<Record<string, any>, any
       l: l, url: url, status: s.paused ? 'Paused' : 'Live', pauseLabel: s.paused ? 'Resume' : 'Pause',
       togglePause: function () { self.setState({ paused: !s.paused }); self.flash(s.paused ? 'Link resumed' : 'Link paused'); self.props.setPaused(D.linkId, !s.paused); },
       copyLabel: s.copied ? 'Copied' : 'Copy link', copy: function () { try { navigator.clipboard.writeText('https://' + url); } catch (e) {} self.setState({ copied: true }); self.flash('Link copied'); },
-      share: function () { if (navigator.share) { navigator.share({ title: 'Sekretly', text: 'Send me an anonymous message 👀', url: 'https://' + url }).catch(function () {}); return; } try { navigator.clipboard.writeText('https://' + url); } catch (e) {} self.flash('Link copied. Paste it in your story.'); },
+      shareIcons: ['wa', 'ig', 'sc', 'tt', 'x', 'fb', 'tg', 'more'].map(function (id) { var d = { wa: ['wa', 'WhatsApp', 'whatsapp'], ig: ['ig', 'Instagram', 'instagram'], sc: ['sc', 'Snapchat', 'snapchat'], tt: ['tt', 'TikTok', 'tiktok'], x: ['x', 'X', 'x'], fb: ['fb', 'Facebook', 'facebook'], tg: ['tg', 'Telegram', 'telegram'], sms: ['sms', 'Messages', 'sms'], copy: ['copy', 'Copy link', 'copy'], save: ['save', 'Save', 'save'], more: ['more', 'More', 'more'] }[id]; return { name: d[1], label: (id === 'copy' || id === 'save' || id === 'more' ? d[1] : 'Share on ' + d[1]), icon: '/brand/' + d[2] + '.svg', go: function () { if (window.skShare) window.skShare.open(d[0], { url: 'https://' + url, text: 'Send me an anonymous message 👀' }).then(function (r) { if (r === 'copied') self.flash(d[0] === 'ig' || d[0] === 'tt' ? 'Link copied. Paste it on your story.' : 'Link copied'); }); } }; }),
       stats: stats.map(function (x) { return { v: x[0], k: x[1] }; }),
       weekTotal: l.week.reduce(function (a, b) { return a + b; }, 0) + ' this week',
       week: l.week.map(function (v, i) { return { h: Math.max(4, Math.round(v / max * 100)) + '%', day: DAYS[i], d: (i * 0.05).toFixed(2) + 's' }; }),
@@ -136,20 +137,26 @@ export default class LinkDetail extends React.Component<Record<string, any>, any
             {" "}
           </div>
           {" "}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px", marginTop: "10px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px", marginTop: "10px" }}>
             {" "}
             <button className="btn tap" onClick={v.copy}>
               {v.copyLabel}
-            </button>
-            {" "}
-            <button className="btn tap" onClick={v.share}>
-              Share card
             </button>
             {" "}
             <button className="btn tap" onClick={v.togglePause}>
               {v.pauseLabel}
             </button>
             {" "}
+          </div>
+          {" "}
+          <div className="sk-share" style={{ marginTop: "12px" }}>
+            {(v.shareIcons || []).map((d, i0) => (
+              <Fragment key={i0}>
+              <button className="sk-share-ic tap" onClick={d.go} aria-label={d.label} title={d.name}>
+                <img src={d.icon} alt="" />
+              </button>
+              </Fragment>
+            ))}
           </div>
           {" "}
           <div className="ld-stats rise" style={{ marginTop: "16px", animationDelay: ".05s" }}>

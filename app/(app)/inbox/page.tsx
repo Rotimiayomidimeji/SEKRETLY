@@ -41,6 +41,9 @@ export default async function InboxPage({ searchParams }: PageProps<"/inbox">) {
         undoBlock={undoBlock}
         startFilter={filter === "held" || filter === "unread" || filter === "chats" ? filter : null}
         allowGuess={user.allowGuess}
+        inboxTimerDays={user.inboxTimerDays}
+        chatTimerDays={user.chatTimerDays}
+        timerSet={!!user.timerSetAt}
         blurMedia={user.blurMedia}
         reportCats={cats.list}
         reportMin={cats.min}

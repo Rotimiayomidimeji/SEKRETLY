@@ -15,10 +15,11 @@ export async function generateMetadata({ params }: PageProps<"/[username]/[key]/
   return { title: `Send @${username.toLowerCase()} an anonymous message · Sekretly` };
 }
 
-export default async function LinkPage({ params }: PageProps<"/[username]/[key]/[theme]/[topic]">) {
+export default async function LinkPage({ params, searchParams }: PageProps<"/[username]/[key]/[theme]/[topic]">) {
   const { username, key, theme, topic } = await params;
+  const { s } = await searchParams;
   const viewer = await getCurrentUser();
-  const link = await loadLinkPage({ username, key, theme, slug: topic }, viewer);
+  const link = await loadLinkPage({ username, key, theme, slug: topic, source: typeof s === "string" ? s : undefined }, viewer);
   if (!link) notFound();
   return (
     <Main

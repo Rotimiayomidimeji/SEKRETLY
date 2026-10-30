@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, skStack } from "@/lib/sk/runtime";
 
 
 export default class Inbox extends React.Component<Record<string, any>, any> {
@@ -39,6 +39,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
     return T[(n + cat.length) % T.length] + S[cat.length % S.length];
   }
   componentDidMount() {
+    skStack(this, ["openId","share","report","guessOpen","del","selMode"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -201,6 +202,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       unread: s.items.filter(function (m) { return m.unread; }).length,
       navInbox: s.items.filter(function (m) { return m.unread && !s.archived[m.id] && !(m.held && !s.released[m.id]); }).length,
       // bulk selection
+      showTimer: !this.props.timerSet, timerLabel: 'Messages disappear after ' + (function (d) { d = d || 1; return d % 7 === 0 ? (d / 7) + (d === 7 ? ' week' : ' weeks') : d + (d === 1 ? ' day' : ' days'); })(this.props.inboxTimerDays) + ' · change',
       inArchive: inArchive, notArchive: !inArchive, listTitle: inArchive ? 'Archived' : 'Inbox',
       archiveNote: 'Archived messages stay here until they disappear. Hold one to bring it back.',
       leaveArchive: function () { self.setState({ filter: 'all', selMode: false, chosen: {} }); },
@@ -310,7 +312,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
           clearTimeout(self.t4); self.t4 = setTimeout(function () { self.setState({ toast: null }); }, 3600);
         });
       },
-      chatIntro: open && selRaw.started ? 'You started this chat from their message. You two are anonymous to each other, forever.' : 'You two are anonymous to each other, forever. Messages disappear 1 day after they are sent.',
+      chatIntro: open && selRaw.started ? 'You started this chat from their message. You two are anonymous to each other, forever.' : 'You two are anonymous to each other, forever. Messages disappear ' + (function (d) { d = d || 1; return d % 7 === 0 ? (d / 7) + (d === 7 ? ' week' : ' weeks') : d + (d === 1 ? ' day' : ' days'); })(self.props.chatTimerDays) + ' after they are sent.',
       attachChat: function (e) {
         var f = e && e.target && e.target.files && e.target.files[0]; if (!f || !selRaw) return;
         try { e.target.value = ''; } catch (x) {}
@@ -601,10 +603,14 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                 <>
                 <div>
                   {" "}
-                  <SkLink href="/settings" className="pill" style={{ marginTop: "10px", textDecoration: "none" }}>
-                    <img src="/sk/hourglass_not_done.png" alt="" style={{ width: "16px", height: "16px" }} />
-                    Messages disappear after 1 day · change
-                  </SkLink>
+                  {v.showTimer ? (
+                    <>
+                    <SkLink href="/settings?s=messages" className="pill" style={{ marginTop: "10px", textDecoration: "none" }}>
+                      <img src="/sk/hourglass_not_done.png" alt="" style={{ width: "16px", height: "16px" }} />
+                      {v.timerLabel}
+                    </SkLink>
+                    </>
+                  ) : null}
                   {" "}
                   <div className="rail" role="tablist" aria-label="Filter" style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
                     {" "}

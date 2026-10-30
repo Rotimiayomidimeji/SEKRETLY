@@ -91,6 +91,8 @@ model User {
   publicProfile    Boolean            @default(true)
   /// Settings › Messages: how many days messages and chat bubbles last before they disappear
   inboxTimerDays   Int                @default(1)
+  /// When the member last chose their message timer (the inbox stops suggesting it after that)
+  timerSetAt       DateTime?
   chatTimerDays    Int                @default(1)
   /// Settings › Safety: photos and videos stay blurred until tapped
   blurMedia        Boolean            @default(true)
@@ -122,6 +124,9 @@ model Link {
   slug           String
   theme          String
   customQuestion String?
+  /// The owner's own heading and intro line for the link page (the topic's defaults when empty)
+  title          String?
+  intro          String?
   /// For DROP links: the drop number (one question per day for everyone) and the owner's own answer, if shared
   dropNumber     Int?
   dropSelf       String?

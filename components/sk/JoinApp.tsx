@@ -32,8 +32,14 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
     return {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var x = dark ? 'light' : 'dark'; saveMode(x); self.setState({ mode: x }); },
-      code: code, onCode: function (e) { self.setState({ code: e.target.value.replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 5) }); },
-      joinCode: joinAs('nhie', 'Friday Night Never'), codeOk: code.length === 5, codeHref: '/join/' + code, codeBad: code.length === 4 && code !== 'K7Q2', codeHint: code.length < 4,
+      code: code, onCode: function (e) { var c = e.target.value.replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 5); self.setState({ code: c }); if (c.length === 5 && self.props.peek) self.props.peek(c).then(function (v) { self.setState({ peek: { code: c, room: v } }); }); },
+      codeHref: '/join/' + code, codeHint: code.length < 5,
+      codeOk: (function () { var p = s.peek; return code.length === 5 && !!p && p.code === code && !!p.room && p.room.status === 'LOBBY'; })(),
+      codeBad: (function () { var p = s.peek; return code.length === 5 && !!p && p.code === code && (!p.room || p.room.status !== 'LOBBY'); })(),
+      peekName: s.peek && s.peek.room ? s.peek.room.name : '',
+      peekMeta: s.peek && s.peek.room ? ({ nhie: 'Never Have I Ever', tod: 'Truth or Dare', wyr: 'Would You Rather', mlt: 'Most Likely To', hot: 'Hot Takes', poll: 'Anonymous Polls' }[s.peek.room.game] || 'Game') + ' · ' + s.peek.room.players.length + ' of ' + s.peek.room.max + ' seated' : '',
+      rooms: (this.props.rooms || []).map(function (r) { return { name: r.name, type: { nhie: 'Never Have I Ever', tod: 'Truth or Dare', wyr: 'Would You Rather', mlt: 'Most Likely To', hot: 'Hot Takes', poll: 'Anonymous Polls' }[r.g] || 'Game', joined: r.joined, max: r.max, href: '/join/' + r.code }; }),
+      noRooms: !(this.props.rooms || []).length,
       invites: IV.map(function (x) { return Object.assign({}, x, { join: joinAs(x.gid, x.room), decline: function () { var o = Object.assign({}, s.declined); o[x.id] = true; self.setState({ declined: o }); } }); }),
       inviteCount: IV.length, noInvites: IV.length === 0,
       live: [['Fox', '#ffb35c', 'Truth or Dare · Dare Club 300L · turn 3 of 6', 'Jump in', 'tod', 'Dare Club 300L', 'TruthDare.dc.html', true], ['Ada', '#7ef0c1', 'Hot Takes · Sunday vibes only · in the lobby', 'Join', 'hot', 'Sunday vibes only', 'HotTakesLobbyJoin.dc.html', false], ['Tolu', '#ff9ad5', 'Would You Rather · Class of 2027 chaos · turn 4 of 8', 'Jump in', 'wyr', 'Class of 2027 chaos', 'WYR.dc.html', true]].map(function (x) { return { name: x[0], initial: x[0].charAt(0), bg: x[1], what: x[2], cta: x[3], href: x[6], join: joinAs(x[4], x[5], x[7]) }; }),
@@ -147,7 +153,7 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
                   Room code
                 </label>
                 {" "}
-                <input id="ja-code" className="ja-code" value={v.code ?? ""} onChange={v.onCode} maxLength="4" placeholder="····" autoComplete="off" style={{ marginTop: "10px" }} />
+                <input id="ja-code" className="ja-code" value={v.code ?? ""} onChange={v.onCode} maxLength="5" placeholder="·····" autoComplete="off" style={{ marginTop: "10px" }} />
                 {" "}
                 {v.codeBad ? (
                   <>
@@ -166,10 +172,10 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
                     {" "}
                     <span style={{ flex: "1" }}>
                       <b className="d" style={{ fontSize: "18px" }}>
-                        Friday Night Never
+                        {v.peekName}
                       </b>
                       <div style={{ fontSize: "13px", opacity: ".85" }}>
-                        Never Have I Ever · 3 of 6 seated · Mild → Unhinged
+                        {v.peekMeta}
                       </div>
                     </span>
                     {" "}
@@ -185,7 +191,7 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
                 {v.codeHint ? (
                   <>
                   <p className="muted" style={{ marginTop: "8px", fontSize: "13px" }}>
-                    Try K7Q2
+                    Ask the host for the 5-letter room code
                   </p>
                   </>
                 ) : null}
@@ -194,39 +200,31 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
               {" "}
               <div className="sec-h">
                 <h2>
-                  Invites for you
+                  Open rooms
                 </h2>
-                <span className="muted" style={{ fontSize: "13px" }}>
-                  {v.inviteCount}{" waiting"}
-                </span>
+                <SkLink href="/games" className="pink" style={{ fontWeight: "700", fontSize: "14px" }}>
+                  All games
+                </SkLink>
               </div>
               {" "}
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {" "}
-                {(v.invites || []).map((iv, i0) => (
+                {(v.rooms || []).map((r, i0) => (
                   <Fragment key={i0}>
                   {" "}
-                  <div className="card rise" style={{ padding: "12px", display: "flex", gap: "12px", alignItems: "center" }}>
-                    {" "}
-                    <span className="av" style={{ background: iv.tint }}>
-                      <img src={iv.icon} alt="" />
-                    </span>
+                  <div className="card" style={{ padding: "12px", display: "flex", gap: "12px", alignItems: "center" }}>
                     {" "}
                     <span style={{ flex: "1", minWidth: "0" }}>
                       <b>
-                        {iv.room}
+                        {r.name}
                       </b>
                       <div className="muted" style={{ fontSize: "12.5px" }}>
-                        {iv.from}{" · "}{iv.game}{" · "}{iv.seats}
+                        {r.type}{" · "}{r.joined}/{r.max}{" joined"}
                       </div>
                     </span>
                     {" "}
-                    <button className="btn btn-sm btn-ghost tap" onClick={iv.decline} style={{ border: "0" }}>
-                      Decline
-                    </button>
-                    {" "}
-                    <SkLink href={route(iv.href)} onClick={iv.join} className="btn btn-sm btn-cta tap">
-                      Accept
+                    <SkLink href={route(r.href)} className="btn btn-sm btn-cta tap">
+                      Join
                     </SkLink>
                     {" "}
                   </div>
@@ -234,142 +232,19 @@ export default class JoinApp extends React.Component<Record<string, any>, any> {
                   </Fragment>
                 ))}
                 {" "}
-                {v.noInvites ? (
+                {v.noRooms ? (
                   <>
                   <p className="muted" style={{ fontSize: "14px" }}>
-                    No invites right now. Start a game and invite your people.
+                    {"No open rooms right now. "}
+                    <SkLink href="/games/new" className="pink">
+                      Start one
+                    </SkLink>
+                    {" and invite your people."}
                   </p>
                   </>
                 ) : null}
                 {" "}
               </div>
-              {" "}
-              <div className="sec-h">
-                <h2>
-                  Friends playing now
-                </h2>
-              </div>
-              {" "}
-              <div className="card" style={{ overflow: "hidden" }}>
-                {" "}
-                {(v.live || []).map((lv, i0) => (
-                  <Fragment key={i0}>
-                  {" "}
-                  <div className="list-row">
-                    {" "}
-                    <span className="av" style={{ background: lv.bg, width: "42px", height: "42px", borderRadius: "50%", color: "#1a0b14", fontWeight: "800" }}>
-                      {lv.initial}
-                    </span>
-                    {" "}
-                    <span style={{ flex: "1", minWidth: "0" }}>
-                      <b>
-                        {lv.name}
-                      </b>
-                      <div className="muted" style={{ fontSize: "12.5px" }}>
-                        {lv.what}
-                      </div>
-                    </span>
-                    {" "}
-                    <span className="live" style={{ width: "9px", height: "9px", borderRadius: "50%", background: "#5be0a0", flex: "none" }} />
-                    {" "}
-                    <SkLink href={route(lv.href)} onClick={lv.join} className="btn btn-sm tap">
-                      {lv.cta}
-                    </SkLink>
-                    {" "}
-                  </div>
-                  {" "}
-                  </Fragment>
-                ))}
-                {" "}
-              </div>
-              {" "}
-              <div className="sec-h">
-                <h2>
-                  Your game week
-                </h2>
-              </div>
-              {" "}
-              <section className="card" style={{ padding: "16px" }}>
-                {" "}
-                <div className="row">
-                  <img src="/sk/fire.png" alt="" style={{ width: "40px", height: "40px" }} />
-                  <span style={{ flex: "1" }}>
-                    <b className="d" style={{ fontSize: "20px" }}>
-                      4-day streak
-                    </b>
-                    <div className="muted" style={{ fontSize: "13px" }}>
-                      Play one round today to make it 5
-                    </div>
-                  </span>
-                  <span className="pill" style={{ background: "#ff3b8d", color: "#ffffff" }}>
-                    Lv 7
-                  </span>
-                </div>
-                {" "}
-                <div className="ja-week" style={{ marginTop: "12px" }}>
-                  {(v.week || []).map((d, i0) => (
-                    <Fragment key={i0}>
-                    <span style={{ background: d.bg, color: d.ink }}>
-                      {d.label}
-                    </span>
-                    </Fragment>
-                  ))}
-                </div>
-                {" "}
-              </section>
-              {" "}
-              <section className="card" style={{ padding: "14px", marginTop: "10px", display: "flex", gap: "12px", alignItems: "center" }}>
-                {" "}
-                <img className={v.giftCls} src="/sk/wrapped_gift_3d.png" alt="" style={{ width: "52px", height: "52px", flex: "none" }} />
-                {" "}
-                <span style={{ flex: "1" }}>
-                  <b>
-                    {v.giftTitle}
-                  </b>
-                  <div className="muted" style={{ fontSize: "13px" }}>
-                    {v.giftSub}
-                  </div>
-                </span>
-                {" "}
-                <button className="btn btn-sm btn-cta tap" onClick={v.openGift} disabled={!!(v.giftDone)}>
-                  {v.giftCta}
-                </button>
-                {" "}
-              </section>
-              {" "}
-              <section className="card" style={{ padding: "8px 16px", marginTop: "10px" }}>
-                {" "}
-                <div className="row" style={{ padding: "8px 0" }}>
-                  <b style={{ flex: "1" }}>
-                    Crew leaderboard · this week
-                  </b>
-                  <span className="muted" style={{ fontSize: "12.5px" }}>
-                    resets Monday
-                  </span>
-                </div>
-                {" "}
-                {(v.ranks || []).map((rk, i0) => (
-                  <Fragment key={i0}>
-                  {" "}
-                  <div className="ja-rank">
-                    <b className="n">
-                      {rk.n}
-                    </b>
-                    <span className="av" style={{ background: rk.bg, width: "32px", height: "32px", borderRadius: "50%", color: "#1a0b14", fontWeight: "800", fontSize: "13px" }}>
-                      {rk.initial}
-                    </span>
-                    <span style={{ flex: "1", fontWeight: rk.w }}>
-                      {rk.name}
-                    </span>
-                    <span className="muted" style={{ fontWeight: "700" }}>
-                      {rk.xp}{" XP"}
-                    </span>
-                  </div>
-                  {" "}
-                  </Fragment>
-                ))}
-                {" "}
-              </section>
               {" "}
             </div>
             {" "}

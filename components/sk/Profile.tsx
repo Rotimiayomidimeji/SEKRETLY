@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink, route } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route, skStack } from "@/lib/sk/runtime";
 
 
 export default class Profile extends React.Component<Record<string, any>, any> {
@@ -14,6 +14,7 @@ export default class Profile extends React.Component<Record<string, any>, any> {
     this.state = { mode: m || props.mode || 'dark', av: Math.max(0, ['fox', 'panda', 'frog', 'octopus', 'unicorn', 'koala'].indexOf(props.avatar)), bio: props.bio || '', editing: false, pub: props.pub !== false, picker: false, reported: false, range: 0, word: '', cloudPub: props.cloudPub !== false };
   }
   componentDidMount() {
+    skStack(this, ["editing","picker"]);
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
@@ -43,7 +44,7 @@ export default class Profile extends React.Component<Record<string, any>, any> {
     var BD = this.props.badges || [];
     return {
       cloudTitle: own ? 'How people describe you' : 'How people describe @' + U, cloudDisplay: own || s.cloudPub ? 'block' : 'none',
-      answerCount: (this.props.answerCounts || [0, 0, 0])[s.range],
+      answerCount: (this.props.answerCounts || [0, 0, 0])[s.range], noWords: !(this.props.answerCounts || [0, 0, 0])[s.range], hasWords: !!(this.props.answerCounts || [0, 0, 0])[s.range],
       ranges: ['All time', 'This month', 'This week'].map(function (n, i) { return { name: n, on: s.range === i ? 'true' : 'false', pick: function () { self.setState({ range: i }); } }; }),
       words: W.map(function (a, i) { var t = a.n / mx, on = cw && cw.word === a.word; return { word: a.word, n: a.n, on: on ? 'true' : 'false', size: Math.round(15 + t * 27) + 'px', color: on ? '#ffffff' : PAL[i % PAL.length], bg: on ? 'var(--pink)' : 'transparent', pick: function () { self.setState({ word: a.word }); } }; }),
       pickWord: cw ? cw.word : '', pickN: cw ? cw.n : 0, pickTrend: cw ? cw.trend : '',
@@ -441,6 +442,14 @@ export default class Profile extends React.Component<Record<string, any>, any> {
                     {" "}
                     <div style={{ marginTop: "12px", padding: "14px 8px", borderRadius: "20px", background: "radial-gradient(120% 100% at 50% 0%,rgba(216,27,114,.20),rgba(122,60,255,.08) 60%,transparent)", display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "4px 12px", minHeight: "190px" }}>
                       {" "}
+                      {v.noWords ? (
+                        <>
+                        <p className="muted" style={{ textAlign: "center", maxWidth: "30ch", fontSize: "14px", lineHeight: "1.45" }}>
+                          No words yet. Share a “Describe me in 3 words” link and the words people pick show up here.
+                        </p>
+                        </>
+                      ) : null}
+                      {" "}
                       {(v.words || []).map((w, i0) => (
                         <Fragment key={i0}>
                         {" "}
@@ -453,14 +462,18 @@ export default class Profile extends React.Component<Record<string, any>, any> {
                       {" "}
                     </div>
                     {" "}
-                    <div className="row" style={{ marginTop: "10px", padding: "10px 12px", borderRadius: "14px", background: "var(--card2)", fontSize: "13.5px" }}>
-                      <b className="d" style={{ fontSize: "16px", flex: "1" }}>
-                        {v.pickWord}
-                      </b>
-                      <span className="muted">
-                        {"said "}{v.pickN}{" times · "}{v.pickTrend}
-                      </span>
-                    </div>
+                    {v.hasWords ? (
+                      <>
+                      <div className="row" style={{ marginTop: "10px", padding: "10px 12px", borderRadius: "14px", background: "var(--card2)", fontSize: "13.5px" }}>
+                        <b className="d" style={{ fontSize: "16px", flex: "1" }}>
+                          {v.pickWord}
+                        </b>
+                        <span className="muted">
+                          {"said "}{v.pickN}{" times · "}{v.pickTrend}
+                        </span>
+                      </div>
+                      </>
+                    ) : null}
                     {" "}
                     {v.isOwn ? (
                       <>
@@ -469,11 +482,15 @@ export default class Profile extends React.Component<Record<string, any>, any> {
                         {" "}
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px", marginTop: "10px" }}>
                           {" "}
-                          <SkLink href="/share" onClick={v.shareCloud} className="btn btn-cta tap">
-                            Share my cloud
-                          </SkLink>
+                          {v.hasWords ? (
+                            <>
+                            <SkLink href="/share" onClick={v.shareCloud} className="btn btn-cta tap">
+                              Share my cloud
+                            </SkLink>
+                            </>
+                          ) : null}
                           {" "}
-                          <SkLink href="/links" className="btn tap">
+                          <SkLink href="/create?topic=describe-3" className="btn tap">
                             Get more words
                           </SkLink>
                           {" "}

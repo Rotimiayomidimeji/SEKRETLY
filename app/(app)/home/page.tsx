@@ -28,7 +28,7 @@ export default async function HomePage() {
   const user = await requireUser("/home");
   const drop = currentDrop();
   const live = { recipientId: user.id, deletedAt: null, expiresAt: { gt: new Date() } };
-  const [mine, unread, notifUnread, streak, today, droppers, hintCount, held, weekCount, badges, visits, chats] = await Promise.all([
+  const [mine, unread, notifUnread, streak, today, droppers, hintCount, held, weekCount, badges, visits, chats, rooms] = await Promise.all([
     loadMyLinks(user.id),
     unreadCount(user.id),
     unreadNotifications(user.id),
@@ -44,6 +44,13 @@ export default async function HomePage() {
       where: { lastAt: { gte: monthAgo() }, OR: [{ ownerId: user.id, ownerDeletedAt: null }, { guestId: user.id, guestDeletedAt: null }] },
       select: { lastAt: true, owner: { select: { chatTimerDays: true } } },
     }),
+    // open public rooms still waiting for players (the Games hub shows the full list)
+    db.gameRoom.findMany({
+      where: { status: "LOBBY", isPublic: true, createdAt: { gte: new Date(nowMs() - 86_400_000) } },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+      include: { _count: { select: { players: { where: { kickedAt: null } } } } },
+    }),
   ]);
   // chats still within their owner's timer (Settings › Messages)
   const activeChats = chats.filter((c) => c.lastAt.getTime() + c.owner.chatTimerDays * 86_400_000 > nowMs()).length;
@@ -56,7 +63,9 @@ export default async function HomePage() {
     th: l.th,
     emoji: l.emoji,
     paused: l.paused,
+    href: "/links/" + l.id,
   }));
+  const openRooms = rooms.filter((r) => r._count.players < r.maxPlayers).map((r) => ({ g: r.game, name: r.name, joined: r._count.players, max: r.maxPlayers, code: r.code }));
   // the spotlight takes turns between what's worth a look right now
   const card = { bg: "var(--card)", ink: "var(--ink)", line: "var(--line)" };
   const nextBadge = badges.filter((b) => b.have < b.need && b.cat === "Inbox").sort((a, b) => b.have / b.need - a.have / a.need)[0];
@@ -92,6 +101,7 @@ export default async function HomePage() {
         }}
         spots={spots}
         stats={{ week: weekCount, visits: visits._sum.visits ?? 0, chats: activeChats }}
+        rooms={openRooms}
       />
     </>
   );

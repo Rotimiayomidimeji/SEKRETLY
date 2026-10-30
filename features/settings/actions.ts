@@ -49,6 +49,8 @@ export async function updateSettings(input: z.input<typeof settingsSchema>) {
       inboxTimerDays: inboxTimer === undefined ? undefined : TIMER_DAYS[inboxTimer],
       chatTimerDays: chatTimer === undefined ? undefined : TIMER_DAYS[chatTimer],
       hiddenWords: hiddenWords === undefined ? undefined : [...new Set(hiddenWords)],
+      // the inbox stops suggesting a timer once one has been chosen
+      timerSetAt: inboxTimer === undefined && chatTimer === undefined ? undefined : new Date(),
     },
   });
   return { ok: true };
@@ -91,7 +93,7 @@ export async function setRecoveryEmail(email: string) {
   const limit = await hitRateLimit("code:" + user.id, 5, 3_600_000);
   if (!limit.allowed) return { ok: false as const, error: "Too many codes. Try again in an hour." };
   await db.user.update({ where: { id: user.id }, data: { recoveryEmail: v.data, emailVerifiedAt: null } });
-  await issueCode(user.id, v.data, "VERIFY_EMAIL");
+  if (!(await issueCode(user.id, v.data, "VERIFY_EMAIL"))) return { ok: false as const, error: "We couldn’t send the code right now. Check the address and try again." };
   return { ok: true as const };
 }
 

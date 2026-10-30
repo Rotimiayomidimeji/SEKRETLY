@@ -84,7 +84,7 @@ export async function startReset(username: string): Promise<{ ok: true; masked: 
   if (!limit.allowed) return { ok: false, error: "Too many reset requests. Try again in an hour." };
   const user = await db.user.findUnique({ where: { username: name } });
   if (!user || user.status === "DELETED" || !user.recoveryEmail) return { ok: false, noEmail: true };
-  await issueCode(user.id, user.recoveryEmail, "RESET_PASSWORD");
+  if (!(await issueCode(user.id, user.recoveryEmail, "RESET_PASSWORD"))) return { ok: false, error: "We couldn’t send the email right now. Try again in a few minutes." };
   return { ok: true, masked: maskEmail(user.recoveryEmail) };
 }
 

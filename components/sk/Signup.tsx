@@ -95,7 +95,7 @@ export default class Signup extends React.Component<Record<string, any>, any> {
       toggleEmail: function () { self.setState({ emailOpen: !s.emailOpen }); },
       email: s.email, onEmail: function (e) { self.setState({ email: e.target.value }); },
       nextHref: s.emailOpen && /.+@.+..+/.test(s.email.trim()) ? 'Verify.dc.html' : 'Onboarding.dc.html',
-      submit: function () { self.submit(); }, busy: !!s.busy, ctaLabel: s.busy ? 'Creating your account…' : 'Create my account',
+      submit: function () { self.submit(); }, busy: !!s.busy, busyCls: s.busy ? 'sk-busy' : '', busyStr: s.busy ? 'true' : 'false', ctaLabel: s.busy ? 'Creating your account…' : 'Create my account',
       hasError: !!s.error, error: s.error || '',
       terms: s.terms, onTerms: function (e) { self.setState({ terms: e.target.checked }); },
       canGo: valid, cantGo: !valid
@@ -254,7 +254,7 @@ export default class Signup extends React.Component<Record<string, any>, any> {
                 <div style={{ display: "flex", alignItems: "center", minHeight: "54px", borderRadius: "16px", border: `1px solid ${v.userLine}`, background: "var(--field)", padding: "0 14px" }}>
                   {" "}
                   <span className="muted" style={{ fontSize: "15px" }}>
-                    sekretly.com/
+                    sekretlyy.vercel.app/
                   </span>
                   {" "}
                   <input id="su-user" value={v.user ?? ""} onChange={v.onUser} autoComplete="username" placeholder="yourname" maxLength="20" style={{ flex: "1", minWidth: "0", border: "0", background: "transparent", color: "var(--ink)", fontSize: "16px", fontWeight: "700", outline: "none", padding: "14px 0" }} />
@@ -385,7 +385,7 @@ export default class Signup extends React.Component<Record<string, any>, any> {
               {v.canGo ? (
                 <>
                 {" "}
-                <button onClick={v.submit} disabled={!!(v.busy)} className="btn btn-cta btn-lg btn-block tap" style={{ marginTop: "18px" }}>
+                <button onClick={v.submit} disabled={!!(v.busy)} className={`btn btn-cta btn-lg btn-block tap ${v.busyCls}`} aria-busy={v.busyStr} style={{ marginTop: "18px" }}>
                   {v.ctaLabel}
                 </button>
                 {" "}

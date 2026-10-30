@@ -65,7 +65,12 @@ Project → **Settings → Environment Variables**. For each variable, type the 
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | push public key | copy from your `.env.local` |
 | `VAPID_PRIVATE_KEY` | push private key | copy from your `.env.local`. **Mark it Sensitive** |
 | `VAPID_SUBJECT` | `mailto:` + your email | copy from your `.env.local` |
-| `RESEND_API_KEY` | optional, see Step 7 | resend.com |
+| `SMTP_USER` | your Gmail address | Step 7 (codes for password resets) |
+| `SMTP_PASS` | a Gmail **app password** (16 letters). **Mark it Sensitive** | Step 7 |
+| `PUSHER_APP_ID` | Pusher app id | Step 7b (live updates) |
+| `NEXT_PUBLIC_PUSHER_KEY` | Pusher key | Step 7b |
+| `PUSHER_SECRET` | Pusher secret. **Mark it Sensitive** | Step 7b |
+| `NEXT_PUBLIC_PUSHER_CLUSTER` | e.g. `eu` | Step 7b |
 | `NEXT_PUBLIC_POSTHOG_KEY` | optional, product analytics | posthog.com → Project settings |
 | `NEXT_PUBLIC_POSTHOG_HOST` | `https://eu.i.posthog.com` | only if you use PostHog |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | `ca-pub-…` | later, once AdSense approves the site |
@@ -118,15 +123,33 @@ You can change the password at **/admin/account**.
 To make another existing live account an admin, set the same `$env:DATABASE_URL` and run
 `node scripts/make-admin.mjs <username>`.
 
-## Step 7 (optional): Emails for password resets
+## Step 7: Emails with codes (password reset, recovery email)
 
-Without `RESEND_API_KEY`, live password-reset codes go nowhere. On your computer they're printed in the terminal.
+Without this, members never receive their 6-digit codes. Gmail is the easiest: it delivers to **any** address
+(about 500 emails a day) without owning a domain.
 
-1. Sign up at **resend.com** with the same email you gave the admin account.
-2. **API Keys** → **Create API Key** (Sending access) → copy → add it as `RESEND_API_KEY` in Vercel (Step 4) → redeploy.
-3. Until you own a domain and verify it in Resend, Resend only delivers to **your own** signup email. That's enough
-   to reset the admin password. Members' reset codes start arriving once you add a custom domain (e.g.
-   `sekretly.ng`) in Resend → **Domains** and set `EMAIL_FROM` to `Sekretly <no-reply@sekretly.ng>`.
+1. Use a Gmail account for Sekretly (a new one like `sekretly.app@gmail.com` is best).
+2. Turn on **2-Step Verification** for it: myaccount.google.com → **Security** → 2-Step Verification.
+3. Make an **app password**: myaccount.google.com/apppasswords → name it `Sekretly` → **Create** → copy the 16 letters (no spaces).
+4. In Vercel → Environment Variables add `SMTP_USER` = that Gmail address and `SMTP_PASS` = the 16 letters
+   (all three environments, mark `SMTP_PASS` Sensitive). Redeploy.
+5. Test: log out → **Forgot password** → your username → the code arrives in a few seconds (check Spam the first time).
+
+If a code ever doesn't go out, the screen now says so, and Vercel → **Logs** shows why (search for `email to`).
+(Resend still works instead, but only once you own a domain and verify it there.)
+
+## Step 7b: Live updates (Pusher, free)
+
+Messages, notifications and counts then appear on open screens instantly, without refreshing.
+Without it the app still works and checks for news every few seconds.
+
+1. Sign up at **pusher.com** → **Channels** → **Create app**. Name `sekretly`, cluster **eu (Ireland)** (closest
+   to Nigeria with the London setup), frontend **React**, backend **Node.js**.
+2. Open the app → **App Keys**. Copy `app_id`, `key`, `secret` and `cluster` into Vercel as
+   `PUSHER_APP_ID`, `NEXT_PUBLIC_PUSHER_KEY`, `PUSHER_SECRET` (Sensitive) and `NEXT_PUBLIC_PUSHER_CLUSTER`.
+3. Leave the Pusher **App Settings** as they are (client events off). Redeploy Vercel.
+
+The free plan covers 200,000 updates a day and 100 people connected at once. That's plenty for the beta.
 
 ## Step 8: Check that everything works (10 minutes)
 
@@ -135,7 +158,8 @@ Use your phone and one other browser (or an incognito window).
 - [ ] Open the site → **Sign up** → you land on onboarding, then Home.
 - [ ] **Create a link** (Confessions) → copy it → open it in incognito → send a message → it appears in your inbox, and the inbox count goes up.
 - [ ] From incognito, attach a **photo** and a **video bigger than 5 MB** → both send and play in your inbox.
-- [ ] **Push:** on your phone, go to **Settings → Notifications** → turn on and allow → send yourself another anonymous message from the other browser → a notification arrives.
+- [ ] **Push:** on your phone, a card asks to turn on notifications (or go to **Settings → Notifications**) → allow → a "Notifications are on" test arrives within seconds. Then send yourself an anonymous message from the other browser → a notification arrives, even with the browser closed.
+- [ ] **Live:** keep the inbox open on your phone and send a message from the other browser → it appears without refreshing (needs Step 7b).
   - Android: Chrome works directly.
   - iPhone: push only works after **Share → Add to Home Screen** (iOS 16.4+), then opening Sekretly from that icon.
 - [ ] **Games:** create a room on one device and join with the code on another → play one round.

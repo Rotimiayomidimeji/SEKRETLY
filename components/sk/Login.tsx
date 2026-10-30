@@ -34,7 +34,7 @@ export default class Login extends React.Component<Record<string, any>, any> {
       err: s.tries > 0 && !correct,
       errMsg: locked ? 'Too many tries. Wait 15 minutes, or reset your password.' : 'That username and password do not match. ' + (s.left == null ? 5 - s.tries : s.left) + (s.left === 1 ? ' try left.' : ' tries left.'),
       locked: locked,
-      btnLabel: locked ? 'Locked for 15 minutes' : s.busy ? 'Logging in…' : 'Log in',
+      busyCls: s.busy ? 'sk-busy' : '', busyStr: s.busy ? 'true' : 'false', btnLabel: locked ? 'Locked for 15 minutes' : s.busy ? 'Logging in…' : 'Log in',
       shakeCls: s.shake % 2 ? 'shake' : '',
       attempt: function () {
         if (locked || s.busy) return;
@@ -160,7 +160,7 @@ export default class Login extends React.Component<Record<string, any>, any> {
             {v.notOk ? (
               <>
               {" "}
-              <button className="btn btn-cta btn-lg btn-block tap" onClick={v.attempt} disabled={!!(v.locked)} style={{ marginTop: "18px" }}>
+              <button className={`btn btn-cta btn-lg btn-block tap ${v.busyCls}`} onClick={v.attempt} disabled={!!(v.locked)} aria-busy={v.busyStr} style={{ marginTop: "18px" }}>
                 {v.btnLabel}
               </button>
               {" "}

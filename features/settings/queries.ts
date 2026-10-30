@@ -11,8 +11,8 @@ import { db } from "@/lib/db";
 /** The timer choices in Settings › Messages, in days (the screen shows 1 day … 3 weeks). */
 export const TIMER_DAYS = [1, 2, 3, 7, 14, 21];
 
-/** Push switches start on, except quiet hours which also start on (nothing between 11pm and 7am). */
-export const DEFAULT_PREFS: Required<PushPrefs> = { msg: true, reply: true, join: true, turn: true, paused: true, warn: true, drop: true, streak: true, wrap: true, quiet: true };
+/** Push switches start on; quiet hours (nothing between 11pm and 7am) start off, so a new member sees pushes straight away. */
+export const DEFAULT_PREFS: Required<PushPrefs> = { msg: true, reply: true, join: true, turn: true, paused: true, warn: true, drop: true, streak: true, wrap: true, quiet: false };
 
 /** Everything Settings shows, from the member's saved choices. */
 export async function loadSettings(user: User) {

@@ -17,8 +17,8 @@ const quizSchema = z
       right: z.number().int().min(0),
     }),
   )
-  .min(3)
-  .max(10)
+  .min(1)
+  .max(25)
   .refine((qs) => qs.every((q) => q.right < q.options.length), "Every question needs a ✓ answer");
 
 const saveSchema = z.object({
@@ -29,6 +29,11 @@ const saveSchema = z.object({
   maxMessages: z.number().int().min(1).max(10_000).nullable().optional(),
   closesIn: z.string().nullable().optional(),
   quiz: quizSchema.nullable().optional(),
+  /** Rate me: the questions visitors rate, in order */
+  rate: z.array(z.string().trim().min(3).max(60)).min(1).max(12).nullable().optional(),
+  /** the owner's own heading and intro line (empty: the topic's) */
+  title: z.string().trim().max(60).optional().default(""),
+  intro: z.string().trim().max(120).optional().default(""),
 });
 
 export type SaveLinkInput = z.input<typeof saveSchema>;
@@ -55,10 +60,18 @@ export async function saveLink(input: SaveLinkInput): Promise<SaveResult> {
     slug,
     theme: v.theme,
     customQuestion: topic === "CUSTOM" ? v.custom : null,
+    title: topic === "CUSTOM" ? null : v.title || null,
+    intro: v.intro || null,
     maxMessages: v.maxMessages ?? null,
     closesAt,
   };
-  const questions = topic === "QUIZ" && v.quiz ? v.quiz.map((q, i) => ({ position: i, text: q.text, options: q.options, correctIndex: q.right })) : [];
+  // quiz questions carry options and the answer; Rate me questions are plain (no options, no answer)
+  const questions =
+    topic === "QUIZ" && v.quiz
+      ? v.quiz.map((q, i) => ({ position: i, text: q.text, options: q.options, correctIndex: q.right }))
+      : topic === "RATE" && v.rate
+        ? [...new Set(v.rate)].map((text, i) => ({ position: i, text, options: [], correctIndex: -1 }))
+        : [];
   try {
     if (existing) {
       await db.$transaction([

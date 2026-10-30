@@ -98,8 +98,15 @@ export default class WYRLobby extends React.Component<Record<string, any>, any> 
       holoTitle: s.go ? 'Starting!' : s.joined >= max ? 'Table full' : 'Waiting…', holoSub: s.go ? 'taking you to the table' : (max - s.joined) + ' seats open',
       isHost: host, notHost: !host, isGuest: role === 'guest',
       copy: function () { var u = (self.props.origin || '') + '/join/' + self.props.code; try { navigator.clipboard.writeText(u); } catch (e) {} self.setState({ copied: true }); self.flash('Link copied', u.replace(/^https?:\/\//, ''), gm.icon); }, copyLabel: s.copied ? 'Copied ✓' : 'Copy code',
-      invite: function () { self.flash('Invite ready', 'Share it anywhere. Joiners get a random nickname.', '/sk/busts_in_silhouette_3d.png'); },
-      qr: s.qr, toggleQr: function () { self.setState({ qr: !s.qr }); },
+      roomCode: self.props.code, joinShort: ((self.props.origin || '') + '/join/' + self.props.code).replace(/^https?:\/\//, ''),
+      inviteIcons: ['wa', 'sc', 'tg', 'x', 'sms', 'copy', 'more'].map(function (id) { var d = { wa: ['wa', 'WhatsApp', 'whatsapp'], ig: ['ig', 'Instagram', 'instagram'], sc: ['sc', 'Snapchat', 'snapchat'], tt: ['tt', 'TikTok', 'tiktok'], x: ['x', 'X', 'x'], fb: ['fb', 'Facebook', 'facebook'], tg: ['tg', 'Telegram', 'telegram'], sms: ['sms', 'Messages', 'sms'], copy: ['copy', 'Copy link', 'copy'], save: ['save', 'Save', 'save'], more: ['more', 'More', 'more'] }[id]; return { name: d[1], label: (id === 'copy' || id === 'save' || id === 'more' ? d[1] : 'Share on ' + d[1]), icon: '/brand/' + d[2] + '.svg', go: function () { var u = (self.props.origin || '') + '/join/' + self.props.code; if (window.skShare) window.skShare.open(d[0], { url: u, text: 'Join my ' + (gm.name || 'game') + ' room on Sekretly 🎲 code ' + self.props.code }).then(function (r) { if (r === 'copied') { self.setState({ copied: true }); self.flash('Link copied', u.replace(/^https?:\/\//, ''), gm.icon); } }); } }; }),
+      qrLabel: s.qr ? 'Hide QR code' : 'Show QR code',
+      qrSrc: s.qrSrc || '',
+      qr: s.qr && !!s.qrSrc, toggleQr: function () {
+        if (s.qr) { self.setState({ qr: false }); return; }
+        var u = (self.props.origin || window.location.origin) + '/join/' + self.props.code;
+        import('qrcode').then(function (q) { return q.toDataURL(u, { margin: 1, width: 340 }); }).then(function (src) { self.setState({ qr: true, qrSrc: src }); }).catch(function () {});
+      },
       invitedCount: Object.keys(s.invited).length,
       friends: FR.map(function (f) { var done = !!s.invited[f[0]]; return { name: f[0], initial: f[0].charAt(0), bg: f[1], sub: f[2], label: done ? 'Invited ✓' : 'Invite', cls: done ? '' : 'btn-cta', send: function () { var o = Object.assign({}, s.invited); o[f[0]] = true; self.setState({ invited: o }); } }; }),
       settings: settings,
@@ -329,7 +336,7 @@ export default class WYRLobby extends React.Component<Record<string, any>, any> 
                               Room code
                             </div>
                             <div className="lb-code">
-                              K7Q2
+                              {v.roomCode}
                             </div>
                           </div>
                           {" "}
@@ -340,29 +347,27 @@ export default class WYRLobby extends React.Component<Record<string, any>, any> 
                         </div>
                         {" "}
                         <div className="muted" style={{ fontSize: "13px", marginTop: "8px" }}>
-                          sekretly.com/g/K7Q2 · anyone with the link joins with a random nickname
+                          {v.joinShort}{" · anyone with the link joins with a random nickname"}
                         </div>
                         {" "}
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px", marginTop: "12px" }}>
-                          {" "}
-                          <button className="btn btn-sm tap" onClick={v.invite} style={{ background: "#128c4a", color: "#ffffff", border: "0" }}>
-                            WhatsApp
-                          </button>
-                          {" "}
-                          <button className="btn btn-sm tap" onClick={v.invite}>
-                            Copy link
-                          </button>
-                          {" "}
-                          <button className="btn btn-sm tap" onClick={v.toggleQr}>
-                            QR code
-                          </button>
-                          {" "}
+                        <div className="sk-share" style={{ marginTop: "12px", justifyContent: "flex-start" }}>
+                          {(v.inviteIcons || []).map((d, i0) => (
+                            <Fragment key={i0}>
+                            <button className="sk-share-ic tap" onClick={d.go} aria-label={d.label} title={d.name}>
+                              <img src={d.icon} alt="" />
+                            </button>
+                            </Fragment>
+                          ))}
                         </div>
+                        {" "}
+                        <button className="btn btn-sm btn-block tap" onClick={v.toggleQr} style={{ marginTop: "10px" }}>
+                          {v.qrLabel}
+                        </button>
                         {" "}
                         {v.qr ? (
                           <>
                           {" "}
-                          <div className="pop" style={{ margin: "12px auto 0", width: "150px", height: "150px", borderRadius: "16px", background: "repeating-conic-gradient(#211a2c 0 25%, #ffffff 0 50%) 0 0/18px 18px", border: "10px solid #ffffff" }} role="img" aria-label="QR code for K7Q2" />
+                          <img className="pop" src={v.qrSrc} alt={`QR code to join room ${v.roomCode}`} style={{ display: "block", margin: "12px auto 0", width: "170px", height: "170px", borderRadius: "16px", background: "#ffffff" }} />
                           {" "}
                           </>
                         ) : null}
@@ -371,46 +376,6 @@ export default class WYRLobby extends React.Component<Record<string, any>, any> 
                       {" "}
                       </>
                     ) : null}
-                    {" "}
-                    <section className="card" style={{ overflow: "hidden" }}>
-                      {" "}
-                      <div className="row" style={{ padding: "14px 14px 6px" }}>
-                        <b style={{ flex: "1" }}>
-                          Invite friends on Sekretly
-                        </b>
-                        <span className="muted" style={{ fontSize: "12.5px" }}>
-                          {v.invitedCount}{" invited"}
-                        </span>
-                      </div>
-                      {" "}
-                      {(v.friends || []).map((fr, i0) => (
-                        <Fragment key={i0}>
-                        {" "}
-                        <div className="list-row">
-                          {" "}
-                          <span className="av" style={{ background: fr.bg, width: "40px", height: "40px", borderRadius: "14px", color: "#1a0b14", fontWeight: "800" }}>
-                            {fr.initial}
-                          </span>
-                          {" "}
-                          <span style={{ flex: "1" }}>
-                            <b>
-                              {fr.name}
-                            </b>
-                            <div className="muted" style={{ fontSize: "12.5px" }}>
-                              {fr.sub}
-                            </div>
-                          </span>
-                          {" "}
-                          <button className={`btn btn-sm tap ${fr.cls}`} onClick={fr.send}>
-                            {fr.label}
-                          </button>
-                          {" "}
-                        </div>
-                        {" "}
-                        </Fragment>
-                      ))}
-                      {" "}
-                    </section>
                     {" "}
                     <section className="card" style={{ padding: "14px" }}>
                       {" "}

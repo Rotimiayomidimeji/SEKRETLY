@@ -18,7 +18,11 @@ declare global {
 export function AdFiller() {
   const path = usePathname();
   useEffect(() => {
-    if (!CLIENT) return;
+    // no ad account yet: the slots (and the desktop ad rail) stay out of sight instead of showing placeholders
+    if (!CLIENT) {
+      document.documentElement.classList.add("sk-noads");
+      return;
+    }
     if (!document.querySelector("script[data-sk-adsense]")) {
       const s = document.createElement("script");
       s.async = true;

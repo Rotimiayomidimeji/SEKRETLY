@@ -47,7 +47,7 @@ function guessOf(guesses: Guess[], names: Map<string, string>) {
 
 /** What the owner sees for one received message. */
 async function messageItem(m: MessageRow, warns: number, names: Map<string, string>) {
-  const data = (m.data ?? {}) as { words?: string[]; score?: number; of?: number; picks?: number[]; category?: string };
+  const data = (m.data ?? {}) as { words?: string[]; score?: number; avg?: number; scores?: { q: string; score: number }[]; of?: number; picks?: number[]; category?: string };
   let quiz;
   if (m.topic === "QUIZ" && typeof data.score === "number") {
     const better = await db.message.count({ where: { linkId: m.linkId, topic: "QUIZ", data: { path: ["score"], gt: data.score } } });
@@ -75,8 +75,9 @@ async function messageItem(m: MessageRow, warns: number, names: Map<string, stri
     acct: !!m.senderId,
     replyOk: m.wantsReply && !!m.sender && m.sender.status === "ACTIVE",
     quiz,
-    rate: m.topic === "RATE" ? data.score : undefined,
-    cat: m.topic === "RATE" ? data.category : undefined,
+    rate: m.topic === "RATE" ? (data.avg ?? data.score) : undefined,
+    // several questions: each one's score ("looks 8 · vibe 9"); one question: its label
+    cat: m.topic === "RATE" ? (data.scores && data.scores.length > 1 ? data.scores.map((x) => x.q.replace(/^rate (my |me )?/i, "").replace(/[?]$/, "") + " " + x.score).join(" · ") : data.category) : undefined,
     media: m.mediaUrl ? kindOf(m.mediaUrl) : undefined,
     mediaUrl: m.mediaUrl ?? undefined,
     hint: m.hint ?? "",

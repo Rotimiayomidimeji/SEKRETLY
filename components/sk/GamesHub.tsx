@@ -40,15 +40,10 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
       ads: this.props.ads === 'off' ? 'off' : 'on',
-      crews: [
-        { name: 'Hostel B gang', meta: '6 members · 4-week streak', next: 'Game night Fri 9pm · Most Likely To', icon: E.fire, tint: 'linear-gradient(135deg,#ffb35c,#ff4f6d)' },
-        { name: 'Class of 2027', meta: '8 members · question reveals 9pm', next: 'Today’s crew question is open', icon: E.eyes, tint: 'linear-gradient(135deg,#22e1ff,#3a6bff)' },
-        { name: 'Sunday brunch crew', meta: '4 members · 7-week streak', next: 'Hot Takes rematch · Sun 2pm', icon: E.shush, tint: 'linear-gradient(135deg,#ff5fa2,#7a3cff)' }
-      ].map(function (c) {
-        return Object.assign({}, c, {
-          open: function () { try { window.localStorage.setItem('sk-crew', c.name); } catch (e) {} },
-          play: function () { try { window.localStorage.setItem('sk-crew', c.name); window.localStorage.removeItem('sk-pick'); window.localStorage.removeItem('sk-edit'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} }
-        });
+      crews: (this.props.crews || []).map(function (c) {
+        return { name: c.name, href: '/crews?pick=' + c.id, icon: c.icon, tint: c.bg,
+          meta: c.who.length + (c.who.length === 1 ? ' member' : ' members') + (c.streak ? ' · ' + c.streak + '-day streak' : ''),
+          next: c.nightTitle, play: function () {} };
       }),
       code: s.code, onCode: function (e) { self.setState({ code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') }); }, codeOk: s.code.length >= 5, codeHref: '/join/' + s.code,
       games: G.map(function (g) { return Object.assign({ tint: 'var(--card2)' }, g, { newHref: '/games/new?game=' + g.id, pick: function () { try { window.localStorage.setItem('sk-pick', g.id); window.localStorage.removeItem('sk-edit'); window.localStorage.removeItem('sk-crew'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} } }); }),
@@ -279,7 +274,7 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
                   {" "}
                   <div className="card" style={{ flex: "none", width: "236px", padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
                     {" "}
-                    <SkLink href="/crews" onClick={cr.open} className="row" style={{ gap: "10px", textDecoration: "none", color: "var(--ink)" }}>
+                    <SkLink href={route(cr.href)} className="row" style={{ gap: "10px", textDecoration: "none", color: "var(--ink)" }}>
                       {" "}
                       <span className="av" style={{ width: "42px", height: "42px", borderRadius: "14px", background: cr.tint }}>
                         <img src={cr.icon} alt="" />
