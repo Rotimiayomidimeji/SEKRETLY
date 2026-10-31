@@ -7,8 +7,9 @@ import path from "node:path";
 import { get, put } from "@vercel/blob";
 
 // Photos and videos sent with messages and in chats.
-// With BLOB_READ_WRITE_TOKEN set (Vercel) files go to Vercel Blob; without it (local dev) they're kept in
-// .data/media. A Blob store can be public (files are served straight from Blob) or private (files are served by
+// With a Blob store connected (Vercel) files go to Vercel Blob; without one (local dev) they're kept in
+// .data/media. A store connects either with BLOB_READ_WRITE_TOKEN or, the newer way, with BLOB_STORE_ID (Vercel then
+// signs the server in by itself). Big videos go from the phone straight to Blob, which needs the read-write token. A Blob store can be public (files are served straight from Blob) or private (files are served by
 // /api/media/<file>, like local ones); which one is found out once, or set with BLOB_ACCESS=public|private.
 // Either way the address is long and random, never guessable.
 
@@ -35,9 +36,14 @@ const NAME = /^[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4)$/;
 
 let access: Promise<"public" | "private"> | null = null;
 
-/** Whether the Blob store is public or private (null without a Blob token). Asked once per server. */
+/** Whether a Blob store is connected (either way). */
+export const blobOn = () => !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+/** Whether phones can upload straight to Blob (big videos): only with the read-write token. */
+export const blobDirectOn = () => !!process.env.BLOB_READ_WRITE_TOKEN;
+
+/** Whether the Blob store is public or private (null without a Blob store). Asked once per server. */
 export function blobAccess(): Promise<"public" | "private"> | null {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+  if (!blobOn()) return null;
   const set = process.env.BLOB_ACCESS;
   if (set === "public" || set === "private") return Promise.resolve(set);
   return (access ??= put("media/.probe", "ok", { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: "text/plain" }).then(
@@ -70,7 +76,7 @@ export async function storeMedia(bytes: Buffer, type: (typeof TYPES)[number]) {
     }
   }
   // Vercel's disk is read-only: without a Blob store there's nowhere to keep the file
-  if (process.env.VERCEL) throw new Error("BLOB_READ_WRITE_TOKEN is not set: connect a Blob store to the project (Vercel › Storage) and redeploy");
+  if (process.env.VERCEL) throw new Error("no Blob store: connect one to the project (Vercel › Storage) and redeploy");
   await mkdir(LOCAL_DIR, { recursive: true });
   await writeFile(path.join(LOCAL_DIR, name), bytes);
   return LOCAL_PREFIX + name;

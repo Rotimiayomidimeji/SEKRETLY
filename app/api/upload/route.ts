@@ -1,7 +1,7 @@
 import { del, get, head } from "@vercel/blob";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 
-import { blobAccess, isOurMedia, kindOf, MAX_BYTES, servedAddress, sniff, storeMedia } from "@/features/media/storage";
+import { blobAccess, blobDirectOn, blobOn, isOurMedia, kindOf, MAX_BYTES, servedAddress, sniff, storeMedia } from "@/features/media/storage";
 import { deviceKey, standingWith, userKey } from "@/features/safety/standing";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
@@ -80,18 +80,19 @@ export async function POST(request: Request) {
 async function json(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") return fail("Bad request.");
-  const blobOn = !!process.env.BLOB_READ_WRITE_TOKEN;
+  const stored = blobOn(), direct = blobDirectOn();
 
   // preflight
   if (body.check) {
     const target = await checkTarget(body);
     if ("error" in target) return fail(target.error!, target.status);
-    return Response.json({ ok: true, direct: blobOn, access: blobOn ? await blobAccess() : null });
+    // on Vercel without direct uploads, the 4.5 MB request cap is the limit (local dev has none)
+    return Response.json({ ok: true, direct, access: direct ? await blobAccess() : null, limit: process.env.VERCEL && !direct ? 4_400_000 : 0 });
   }
 
   // the Blob client's token request
   if (typeof body.type === "string" && body.type.startsWith("blob.")) {
-    if (!blobOn) return fail("Uploads aren’t set up.", 501);
+    if (!direct) return fail("Uploads aren’t set up.", 501);
     try {
       const result = await handleUpload({
         request,
@@ -113,7 +114,7 @@ async function json(request: Request) {
   // after a direct upload: check what actually arrived
   if (typeof body.url === "string") {
     const url = body.url;
-    if (!blobOn || !isOurMedia(url) || url.startsWith("/")) return fail("That attachment can’t be sent.");
+    if (!stored || !isOurMedia(url) || url.startsWith("/")) return fail("That attachment can’t be sent.");
     const target = await checkTarget(body);
     if ("error" in target) return fail(target.error!, target.status);
     const priv = new URL(url).hostname.includes(".private.");

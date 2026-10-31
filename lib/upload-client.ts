@@ -63,9 +63,13 @@ export async function uploadMedia(fd: FormData): Promise<Result> {
   if (file.size <= SMALL) return post(fd);
 
   const target = { linkId: fd.get("linkId") || undefined, chatId: fd.get("chatId") || undefined };
-  const pre = (await post({ check: true, ...target })) as Result & { direct?: boolean; access?: "public" | "private" | null };
+  const pre = (await post({ check: true, ...target })) as Result & { direct?: boolean; access?: "public" | "private" | null; limit?: number };
   if (!pre?.ok) return pre;
-  if (!pre.direct) return post(fd); // local dev keeps files on disk; there's no size cap to dodge
+  if (!pre.direct) {
+    // local dev keeps files on disk with no size cap; a store without direct uploads takes up to about 4 MB
+    if (pre.limit && file.size > pre.limit) return { ok: false, error: "Videos over 4 MB can’t be sent yet. Try a shorter clip." };
+    return post(fd);
+  }
 
   const type = file.type || (/\.mov$/i.test(file.name) ? "video/quicktime" : /\.webm$/i.test(file.name) ? "video/webm" : "video/mp4");
   const ext = EXT[type];
