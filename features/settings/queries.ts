@@ -6,6 +6,7 @@ import { aliasBg } from "@/features/inbox/queries";
 import { TOPIC_TITLE } from "@/features/links/topics";
 import type { PushPrefs } from "@/features/notifications/push";
 import { userKey } from "@/features/safety/standing";
+import { avatarBg } from "@/lib/avatar";
 import { db } from "@/lib/db";
 
 /** The timer choices in Settings › Messages, in days (the screen shows 1 day … 3 weeks). */
@@ -39,10 +40,12 @@ export async function loadSettings(user: User) {
   const prefs = { ...DEFAULT_PREFS, ...((user.notifPrefs ?? {}) as PushPrefs) };
   return {
     username: user.username,
+    avatar: user.avatar,
+    avatarBg: avatarBg(user.avatar, user.avatarHue),
     email: user.recoveryEmail ?? "",
     emailVerified: !!user.emailVerifiedAt,
     kind: user.kindMode,
-    mys: { hints: user.allowHints, receipts: user.receiptReactions, guess: user.allowGuess },
+    mys: { hints: user.allowHints, receipts: user.receiptReactions, guess: user.allowGuess, rcpt: user.senderReceipts },
     chats: user.chatsFrom,
     visitors: user.allowVisitors,
     pub: user.publicProfile,

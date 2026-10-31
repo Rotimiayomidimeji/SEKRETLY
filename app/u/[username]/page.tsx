@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/u/[username]">): 
 export default async function PublicProfilePage({ params }: PageProps<"/u/[username]">) {
   const { username } = await params;
   const user = await db.user.findUnique({ where: { username: username.toLowerCase() } });
-  if (!user || user.status !== "ACTIVE") notFound();
+  if (!user || user.status !== "ACTIVE" || user.role === "ADMIN") notFound();
   const profile = await loadProfile(user, "public");
   return <Profile mode={await getMode()} view="public" {...profile} reportProfile={reportProfile} />;
 }

@@ -5,8 +5,10 @@ import { z } from "zod";
 
 import { getSetting, setSetting } from "@/features/admin/settings";
 import { notify } from "@/features/notifications/notify";
-import { getCurrentUser, destroyAllSessions } from "@/lib/auth/session";
+import { createSession, getCurrentUser, destroyAllSessions } from "@/lib/auth/session";
 import { db } from "@/lib/db";
+import { hashPassword, verifyPassword } from "@/lib/password";
+import { hitRateLimit } from "@/lib/rate-limit";
 
 async function admin() {
   const user = await getCurrentUser();
@@ -102,5 +104,19 @@ export async function setIpBlocked(ip: string, blocked: boolean) {
   const cur = await getSetting<{ ips: string[] }>("blockedIps", { ips: [] });
   const ips = blocked ? [...new Set([...cur.ips, v])] : cur.ips.filter((x) => x !== v);
   await setSetting("blockedIps", { ips });
+  return { ok: true };
+}
+
+/** The admin account's own password: the current one is asked for again, and the new one must be 12+ characters. */
+export async function changeAdminPassword(current: string, next: string) {
+  const user = await admin();
+  const limit = await hitRateLimit("admin-pass:" + user.id, 5, 15 * 60_000);
+  if (!limit.allowed) return { ok: false, error: "Too many tries. Wait 15 minutes." };
+  if (!(await verifyPassword(String(current ?? ""), user.passwordHash))) return { ok: false, error: "The current password is wrong." };
+  const pw = z.string().min(12).max(200).safeParse(next);
+  if (!pw.success) return { ok: false, error: "Use 12 characters or more." };
+  await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(pw.data) } });
+  await destroyAllSessions(user.id);
+  await createSession(user.id, true);
   return { ok: true };
 }

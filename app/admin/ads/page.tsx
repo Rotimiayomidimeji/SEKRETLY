@@ -9,6 +9,6 @@ import { getMode } from "@/lib/sk/mode";
 export const metadata: Metadata = { title: "Sekretly admin · Ads" };
 
 export default async function AdminAdsPage() {
-  await requireAdmin("/admin/ads");
+  await requireAdmin();
   return <AdminAds mode={await getMode()} config={await adsConfig()} save={saveAds} />;
 }

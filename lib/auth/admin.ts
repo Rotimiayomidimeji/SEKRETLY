@@ -2,11 +2,14 @@ import "server-only";
 
 import { notFound } from "next/navigation";
 
-import { requireUser } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 
-/** Admin pages: members with the ADMIN role only; everyone else gets a plain 404 (admin pages aren't advertised). */
-export async function requireAdmin(next: string) {
-  const user = await requireUser(next);
-  if (user.role !== "ADMIN") notFound();
+/**
+ * Admin pages: the ADMIN account only. Everyone else, logged in or not, gets the plain "page not found", the same as
+ * an address that doesn't exist, so nothing tells an outsider there's anything here (no login redirect either).
+ */
+export async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "ADMIN") notFound();
   return user;
 }

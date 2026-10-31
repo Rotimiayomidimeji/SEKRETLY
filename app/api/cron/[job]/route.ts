@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 // Scheduled pushes (vercel.json runs these; Vercel sends "Authorization: Bearer <CRON_SECRET>"):
 //   streak  5pm Lagos   "Your 12-day streak ends at 7pm" to members who haven't done anything that counts today
 //   drop    7pm Lagos   the new daily drop question
-//   wrap    Sunday 6pm  "Your week, wrapped"
+//   wrap    Sunday 6pm  "Your week, wrapped" (and the occasional in-app "Try Mystery features" note)
 // Each respects the member's switch for it and their quiet hours (see features/notifications/push).
 
 export const maxDuration = 60;
@@ -38,9 +38,41 @@ const JOBS: Record<string, () => Promise<number>> = {
       await sendPush(u.id, { title: "Your week, wrapped", body: n + (n === 1 ? " message" : " messages") + " this week. Tap to watch.", url: "/wrap", tag: "wrap" }, "wrap");
       sent++;
     }
+    await nudgeMystery();
     return sent;
   },
 };
+
+// Every 3 weeks or so, members with all four Mystery features off get one in-app note about them (never a push).
+async function nudgeMystery() {
+  const due = new Date(Date.now() - 21 * 86_400_000);
+  const users = await db.user.findMany({
+    where: {
+      status: "ACTIVE",
+      role: "MEMBER",
+      createdAt: { lt: new Date(Date.now() - 2 * 86_400_000) },
+      allowHints: false,
+      receiptReactions: false,
+      allowGuess: false,
+      senderReceipts: false,
+      OR: [{ mysteryNudgedAt: null }, { mysteryNudgedAt: { lt: due } }],
+    },
+    select: { id: true },
+    take: 5000,
+  });
+  if (!users.length) return;
+  const ids = users.map((u) => u.id);
+  await db.notification.createMany({
+    data: ids.map((userId) => ({
+      userId,
+      kind: "WELCOME" as const,
+      title: "Try Mystery features",
+      body: "Hints, receipts, reactions and Guess who make your messages more fun. Turn them on in Settings › Privacy.",
+      href: "/settings?s=privacy",
+    })),
+  });
+  await db.user.updateMany({ where: { id: { in: ids } }, data: { mysteryNudgedAt: new Date() } });
+}
 
 export async function GET(request: Request, { params }: RouteContext<"/api/cron/[job]">) {
   const secret = process.env.CRON_SECRET;

@@ -33,7 +33,7 @@ async function visitSource(tag?: string): Promise<"fromWhatsapp" | "fromInstagra
  */
 export async function loadLinkPage(params: { username: string; key: string; theme: string; slug: string; source?: string }, viewer: Viewer) {
   const owner = await db.user.findUnique({ where: { username: params.username.toLowerCase() } });
-  if (!owner || owner.status !== "ACTIVE" || owner.linkKey !== params.key) return null;
+  if (!owner || owner.status !== "ACTIVE" || owner.role === "ADMIN" || owner.linkKey !== params.key) return null;
   const link = await db.link.findUnique({
     where: { ownerId_theme_slug: { ownerId: owner.id, theme: params.theme, slug: params.slug } },
     include: { questions: { orderBy: { position: "asc" } } },

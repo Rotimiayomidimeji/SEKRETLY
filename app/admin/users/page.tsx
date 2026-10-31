@@ -9,7 +9,7 @@ import { getMode } from "@/lib/sk/mode";
 export const metadata: Metadata = { title: "Sekretly admin · Users" };
 
 export default async function AdminUsersPage() {
-  await requireAdmin("/admin/users");
+  await requireAdmin();
   return (
     <AdminUsers
       mode={await getMode()}

@@ -89,14 +89,14 @@ export async function lookupReceipts(codes: string[]) {
   if (!list.success || !list.data.length) return [];
   const limit = await hitRateLimit("receipt:" + (await requestFingerprint()), 120, HOUR);
   if (!limit.allowed) return [];
-  const rows = await db.message.findMany({ where: { receiptCode: { in: list.data } }, include: RECEIPT_INCLUDE, orderBy: { createdAt: "desc" } });
+  const rows = await db.message.findMany({ where: { receiptCode: { in: list.data }, recipient: { senderReceipts: true } }, include: RECEIPT_INCLUDE, orderBy: { createdAt: "desc" } });
   return rows.map(receiptView);
 }
 
 /** Adds to a message from its receipt (once). Goes to the same person, through the same checks as any message. */
 export async function sendFollowUp(code: string, text: string) {
-  const m = await db.message.findUnique({ where: { receiptCode: z.string().toUpperCase().parse(code) } });
-  if (!m || m.followUpOfId) return { ok: false as const, error: "You can’t add to this one." };
+  const m = await db.message.findUnique({ where: { receiptCode: z.string().toUpperCase().parse(code) }, include: { recipient: { select: { senderReceipts: true } } } });
+  if (!m || m.followUpOfId || !m.recipient.senderReceipts) return { ok: false as const, error: "You can’t add to this one." };
   const already = await db.message.count({ where: { followUpOfId: m.id } });
   if (already) return { ok: false as const, error: "You already added to this message." };
   const { sendMessage } = await import("@/features/messages/actions");

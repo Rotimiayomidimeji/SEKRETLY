@@ -318,7 +318,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
     return (
       <>
       {" "}
-      <div className="sk" data-ads={v.ads} style={{ background: v.th.bg, color: v.th.ink, overflow: "hidden", minHeight: v.minH }}>
+      <div className="sk" data-ads={v.ads} style={{ background: v.th.bg, color: v.th.ink, overflow: "hidden", minHeight: v.minH, "--focus": v.th.accent }}>
         {" "}
         <div style={{ maxWidth: "1120px", margin: "0 auto", padding: v.pad, display: "flex", flexDirection: "column", minHeight: v.minH }}>
           {" "}

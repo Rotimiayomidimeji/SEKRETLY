@@ -25,6 +25,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Android: the keyboard shrinks the page instead of sliding it up (see components/layout/KeyboardFit.tsx)
+  interactiveWidget: "resizes-content",
   themeColor: "#0c0811",
 };
 

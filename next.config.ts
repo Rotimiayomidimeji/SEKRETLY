@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
       },
       // the service worker must always be fresh so updates reach phones
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }] },
+      // admin pages: never indexed, never framed, never kept in a shared cache
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
     ];
   },
 };

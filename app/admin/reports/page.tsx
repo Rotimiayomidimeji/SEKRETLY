@@ -9,7 +9,7 @@ import { getMode } from "@/lib/sk/mode";
 export const metadata: Metadata = { title: "Sekretly admin · Reports" };
 
 export default async function AdminReportsPage() {
-  await requireAdmin("/admin/reports");
+  await requireAdmin();
   const { reports, log, kpis } = await loadReports();
   return <AdminReports mode={await getMode()} reports={reports} log={log} kpis={kpis} decide={decideReport} />;
 }

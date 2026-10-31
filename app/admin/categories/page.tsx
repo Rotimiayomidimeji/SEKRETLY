@@ -9,6 +9,6 @@ import { getMode } from "@/lib/sk/mode";
 export const metadata: Metadata = { title: "Sekretly admin · Report categories" };
 
 export default async function AdminCategoriesPage() {
-  await requireAdmin("/admin/categories");
+  await requireAdmin();
   return <AdminCategories mode={await getMode()} config={await categoryConfig()} save={saveCategories} />;
 }

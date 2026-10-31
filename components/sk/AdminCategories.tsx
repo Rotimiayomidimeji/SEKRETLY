@@ -123,8 +123,8 @@ export default class AdminCategories extends React.Component<Record<string, any>
               Ad placement map
             </SkLink>
             {" "}
-            <SkLink href="/home" className="nav-i" style={{ marginTop: "auto" }}>
-              Back to app
+            <SkLink href="/admin/account" className="nav-i" style={{ marginTop: "auto" }}>
+              Account & log out
             </SkLink>
             {" "}
           </nav>
@@ -206,8 +206,8 @@ export default class AdminCategories extends React.Component<Record<string, any>
                   Ad placement map
                 </SkLink>
                 {" "}
-                <SkLink href="/home" className="anav-s" style={{ color: "var(--muted)" }}>
-                  ← Back to the app
+                <SkLink href="/admin/account" className="anav-s" style={{ color: "var(--muted)" }}>
+                  Account & log out
                 </SkLink>
                 {" "}
               </div>

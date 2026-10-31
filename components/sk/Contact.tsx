@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Fragment } from "react";
-import { saveMode, SkLink } from "@/lib/sk/runtime";
+import { saveMode, SkLink, route } from "@/lib/sk/runtime";
 
 
 export default class Contact extends React.Component<Record<string, any>, any> {
@@ -33,6 +33,7 @@ export default class Contact extends React.Component<Record<string, any>, any> {
       jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
       jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
+      contactEmail: this.props.email || '',
       topics: T.map(function (t) { var on = s.topic === t; return { label: t, on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ topic: t }); } }; }),
       isSafety: s.topic === 'Safety concern' || s.topic === 'Report a problem',
       email: s.email,
@@ -266,7 +267,7 @@ export default class Contact extends React.Component<Record<string, any>, any> {
                   </div>
                   {" "}
                   <p className="muted" style={{ fontSize: "14.5px", marginTop: "4px", lineHeight: "1.5" }}>
-                    Call 112 for emergency services in Nigeria. For self-harm support, call [HELP-LINE NUMBER]. Do not wait for our reply.
+                    Call 112 for emergency services in Nigeria. For self-harm support, call SURPIN, free on 0800 078 7746 (24 hours) or 0908 021 7555, or MANI on 0809 111 6264. Do not wait for our reply.
                   </p>
                   {" "}
                 </div>
@@ -280,13 +281,11 @@ export default class Contact extends React.Component<Record<string, any>, any> {
                 </div>
                 {" "}
                 <p className="muted" style={{ fontSize: "14.5px", marginTop: "4px", lineHeight: "1.7" }}>
-                  General: [support email]
+                  <SkLink href={route(`mailto:${v.contactEmail}`)} style={{ color: "var(--ink)", fontWeight: "800" }}>
+                    {v.contactEmail}
+                  </SkLink>
                   <br />
-                  Safety: [safety email]
-                  <br />
-                  Ads & partnerships: [partners email]
-                  <br />
-                  Legal & data requests: [legal email]
+                  One inbox for everything for now: general questions, safety, ads & partnerships, legal and data requests. Put the topic in the subject.
                 </p>
                 {" "}
               </div>

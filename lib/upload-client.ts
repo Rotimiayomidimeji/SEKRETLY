@@ -16,7 +16,10 @@ type Result = { ok: true; url: string; kind: "photo" | "video"; size: number } |
 
 const post = (body: FormData | object): Promise<Result> =>
   fetch("/api/upload", body instanceof FormData ? { method: "POST", body } : { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
-    .then((r) => r.json())
+    .then((r) =>
+      // a reply that isn't ours (a crash page, or Vercel's "too big") still gets a straight answer
+      r.json().catch(() => ({ ok: false, error: r.status === 413 ? "That file is too big. Try a smaller one." : "Couldn’t upload that (error " + r.status + "). Try again in a bit." })),
+    )
     .catch(() => ({ ok: false, error: "Couldn’t upload that. Check your connection and try again." }));
 
 const randomName = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(18)))).replace(/\+/g, "-").replace(/\//g, "_");

@@ -417,7 +417,7 @@ export default class Safety extends React.Component<Record<string, any>, any> {
                 </h2>
                 {" "}
                 <p className="muted" style={{ marginTop: "8px", fontSize: "16px", lineHeight: "1.55" }}>
-                  If you or someone else is in danger, call 112. If you are thinking about hurting yourself, please talk to someone: [HELP-LINE NAME] on [HELP-LINE NUMBER], free and confidential.
+                  If you or someone else is in danger, call 112. If you are thinking about hurting yourself, please talk to someone: SURPIN, free on 0800 078 7746 (24 hours) or 0908 021 7555, or MANI on 0809 111 6264. It’s free and confidential.
                 </p>
                 {" "}
               </div>

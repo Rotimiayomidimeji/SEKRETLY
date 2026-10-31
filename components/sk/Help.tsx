@@ -417,7 +417,7 @@ export default class Help extends React.Component<Record<string, any>, any> {
                 </b>
                 {" "}
                 <p className="muted" style={{ fontSize: "14px", marginTop: "4px" }}>
-                  Call 112. For self-harm support call [HELP-LINE NUMBER].
+                  Call 112. For self-harm support call SURPIN, free on 0800 078 7746 (24 hours) or 0908 021 7555, or MANI on 0809 111 6264.
                 </p>
                 {" "}
               </div>

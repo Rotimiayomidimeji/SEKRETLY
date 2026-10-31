@@ -13,16 +13,19 @@ const REFRESH_AFTER_MS = 24 * 60 * 60 * 1000;
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
-/** Logs a user in on this device: a random token in an httpOnly cookie, its hash in the database. */
-export async function createSession(userId: string) {
+/**
+ * Logs a user in on this device: a random token in an httpOnly cookie, its hash in the database.
+ * The admin account's sessions are short (12 hours) and never sent along from other sites.
+ */
+export async function createSession(userId: string, admin = false) {
   const token = randomBytes(32).toString("base64url");
-  const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + (admin ? 12 * 60 * 60 * 1000 : SESSION_DAYS * 24 * 60 * 60 * 1000));
   const userAgent = (await headers()).get("user-agent")?.slice(0, 300) ?? null;
   await db.session.create({ data: { id: hashToken(token), userId, expiresAt, userAgent } });
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: admin ? "strict" : "lax",
     path: "/",
     expires: expiresAt,
   });
@@ -40,10 +43,11 @@ export const getCurrentUser = cache(async () => {
   return session.user;
 });
 
-/** For pages that need a member: sends visitors to log in, then back here. */
+/** For pages that need a member: sends visitors to log in, then back here. The admin account isn't a member. */
 export async function requireUser(next: string) {
   const user = await getCurrentUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
+  if (user.role === "ADMIN") redirect("/admin");
   return user;
 }
 

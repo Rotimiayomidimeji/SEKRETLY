@@ -65,7 +65,10 @@ export async function sendPush(userId: string, payload: { title: string; body?: 
         ),
       ),
     );
-    return sent.reduce<number>((a, b) => a + b, 0);
+    const reached = sent.reduce<number>((a, b) => a + b, 0);
+    // shows up in the Vercel logs, so a missing push can be told apart from a phone that held it back
+    console.log("push \"" + (payload.tag ?? "") + "\" reached " + reached + " of " + sent.length + " phone(s)");
+    return reached;
   } catch (e) {
     console.error("push failed", e);
     return 0;

@@ -74,10 +74,14 @@ model User {
   kindMode         Int                @default(1)
   /// The member's own hidden words: messages containing them are held
   hiddenWords      String[]           @default([])
-  /// Mystery features the member allows on their links
-  allowHints       Boolean            @default(true)
-  receiptReactions Boolean            @default(true)
-  allowGuess       Boolean            @default(true)
+  /// Mystery features the member allows on their links (all off until the member turns them on)
+  allowHints       Boolean            @default(false)
+  receiptReactions Boolean            @default(false)
+  allowGuess       Boolean            @default(false)
+  /// Senders get a receipt card (a code to check for reactions and replies) after messaging this member
+  senderReceipts   Boolean            @default(false)
+  /// Last "try Mystery features" note (an in-app nudge every few weeks while all of them are off)
+  mysteryNudgedAt  DateTime?
   streakSaves      Int                @default(2)
   /// Last Monday a free streak save was added (1 a week, holding at most 2)
   savesToppedAt    DateTime?

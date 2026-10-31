@@ -9,7 +9,7 @@ import { getMode } from "@/lib/sk/mode";
 export const metadata: Metadata = { title: "Sekretly admin · Overview" };
 
 export default async function AdminPage() {
-  await requireAdmin("/admin");
+  await requireAdmin();
   return (
     <>
       <LiveRefresh seconds={20} />

@@ -61,7 +61,13 @@ export function PushBridge() {
         try {
           if ((await Notification.requestPermission()) !== "granted") return "denied";
           const sub = await subscription(await ready);
-          const saved = await savePushSubscription(sub.toJSON(), navigator.userAgent, true);
+          // one "Notifications are on" per phone, ever (the server also skips phones it already has)
+          let first = true;
+          try {
+            first = !localStorage.getItem("sk-push-hello");
+            localStorage.setItem("sk-push-hello", "1");
+          } catch {}
+          const saved = await savePushSubscription(sub.toJSON(), navigator.userAgent, first);
           return saved.ok ? "on" : "error";
         } catch {
           return "error";

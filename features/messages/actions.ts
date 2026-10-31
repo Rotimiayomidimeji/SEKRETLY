@@ -170,7 +170,8 @@ async function deliver(
   if (link.maxMessages != null && link.messageCount + 1 === link.maxMessages)
     await notify(link.ownerId, "LINK_NAP", "Your link " + title + " is taking a nap", "/links", "Hit its " + link.maxMessages + " message limit · tap to resume");
   await logVisit("message", "/" + link.owner.username + "/…/" + link.slug, senderId);
-  return { ok: true, receipt: code };
+  // Settings › Mystery: the sender only gets a receipt when the owner allows them
+  return { ok: true, receipt: owner.senderReceipts ? code : "" };
 }
 
 /** "Send" on the link page. Logged-in senders are attached so the owner can reply; visitors stay fully anonymous. */

@@ -34,6 +34,7 @@ export default class Legal extends React.Component<Record<string, any>, any> {
       jumpHow: function () { try { window.localStorage.setItem('sk-jump', 'how'); } catch (e) {} self.setState({ drawer: false }); },
       jumpGames: function () { try { window.localStorage.setItem('sk-jump', 'games'); } catch (e) {} self.setState({ drawer: false }); },
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
+      contactEmail: this.props.email || 'us through the Contact page',
       tabs: [['privacy', 'Privacy policy'], ['terms', 'Terms of use'], ['ads', 'Cookies & ads']].map(function (t) { var on = s.tab === t[0]; return { label: t[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ tab: t[0] }); } }; }),
       isPrivacy: s.tab === 'privacy', isTerms: s.tab === 'terms', isAds: s.tab === 'ads',
       summary: S[s.tab]
@@ -368,7 +369,7 @@ export default class Legal extends React.Component<Record<string, any>, any> {
                   </h3>
                   {" "}
                   <p>
-                    You can access, correct, export or delete your data. Delete your account from Settings, or contact [legal email] for anything else.
+                    {"You can access, correct, export or delete your data. Delete your account from Settings, or email "}{v.contactEmail}{" for anything else."}
                   </p>
                   {" "}
                 </div>

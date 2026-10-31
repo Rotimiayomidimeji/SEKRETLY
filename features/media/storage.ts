@@ -53,14 +53,24 @@ export function blobAccess(): Promise<"public" | "private"> | null {
 export async function storeMedia(bytes: Buffer, type: (typeof TYPES)[number]) {
   const name = randomBytes(18).toString("base64url") + "." + type.ext;
   const mode = await blobAccess();
-  if (mode === "public") {
-    const blob = await put("media/" + name, bytes, { access: "public", contentType: type.mime, addRandomSuffix: false });
-    return blob.url;
+  if (mode) {
+    const save = async (how: "public" | "private") => {
+      const blob = await put("media/" + name, bytes, { access: how, contentType: type.mime, addRandomSuffix: false });
+      return how === "public" ? blob.url : LOCAL_PREFIX + name;
+    };
+    try {
+      return await save(mode);
+    } catch (e) {
+      // the store may be the other kind (a guess that went wrong, or BLOB_ACCESS set to the wrong one): try that once
+      const other = mode === "public" ? "private" : "public";
+      console.warn("blob " + mode + " upload failed, trying " + other + ":", e instanceof Error ? e.message : e);
+      const url = await save(other);
+      access = Promise.resolve(other);
+      return url;
+    }
   }
-  if (mode === "private") {
-    await put("media/" + name, bytes, { access: "private", contentType: type.mime, addRandomSuffix: false });
-    return LOCAL_PREFIX + name;
-  }
+  // Vercel's disk is read-only: without a Blob store there's nowhere to keep the file
+  if (process.env.VERCEL) throw new Error("BLOB_READ_WRITE_TOKEN is not set: connect a Blob store to the project (Vercel › Storage) and redeploy");
   await mkdir(LOCAL_DIR, { recursive: true });
   await writeFile(path.join(LOCAL_DIR, name), bytes);
   return LOCAL_PREFIX + name;

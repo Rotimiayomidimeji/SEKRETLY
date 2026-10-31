@@ -184,13 +184,14 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
     var quickCards = [];
     (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 260); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
     var pages = open && selRaw.kind === 'one' && !selRaw.quiz && !selRaw.rate ? split(selRaw.text, 260) : [];
+    var posts = pages.length ? split(selRaw.text, 620).length : 0;
     var pg = Math.min(s.page, Math.max(0, pages.length - 1));
     var w = selRaw ? selRaw.warns : 0;
     var r = s.result;
     var who = selRaw ? (selRaw.kind === 'chat' ? selRaw.who : 'This sender') : '';
     var resultTitle = '', resultBody = '', resultPreview = '', resultIcon = '/sk/sparkles.png';
     if (r) {
-      if (r.support) { resultTitle = 'We sent them support'; resultBody = 'Reports about self-harm don’t give warnings. The sender gets a private message with free help-lines instead.'; resultPreview = 'Someone who got your message is worried about you. You are not alone. Free, confidential help: [HELP-LINE NUMBER].'; resultIcon = '/sk/bell.png'; }
+      if (r.support) { resultTitle = 'We sent them support'; resultBody = 'Reports about self-harm don’t give warnings. The sender gets a private message with free help-lines instead.'; resultPreview = 'Someone who got your message is worried about you. You are not alone. Free, confidential help: SURPIN, free on 0800 078 7746 (24 hours) or 0908 021 7555, or MANI on 0809 111 6264.'; resultIcon = '/sk/bell.png'; }
       else if (r.n >= 4) { resultTitle = who + ' is blocked from you'; resultBody = 'That was report 4. They can’t send you anything anymore. You can undo this any time in Settings › Safety.'; resultPreview = 'You can no longer message @' + (this.props.username || 'you') + '. Your messages were reported 4 times.'; resultIcon = '/sk/hourglass_not_done.png'; }
       else { resultTitle = 'Warning ' + r.n + ' of 3 sent'; resultBody = (selRaw && selRaw.acct ? who + ' gets a warning notification now.' : 'They don’t have an account, so the warning shows on their device next time they open your link.') + ' ' + (r.n === 3 ? 'One more report blocks them from you.' : (4 - r.n) + ' more reports block them from you.'); resultPreview = self.warning(r.cat, r.n); }
     }
@@ -298,7 +299,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       hasQuizNote: open && !!selRaw.quiz && !!selRaw.text, quizNoteText: open && selRaw.text ? 'Their note: “' + selRaw.text + '”' : '',
       amaAnswer: open ? (s.ama[selRaw.id] || '') : '', onAma: function (e) { var o = Object.assign({}, s.ama); o[selRaw.id] = e.target.value.slice(0, 200); self.setState({ ama: o }); },
       shareStash: open ? stashOf([{ id: selRaw.id, topic: LL(selRaw).title, th: LL(selRaw).th.replace('th-', ''), text: shareText(selRaw) }]) : function () {},
-      shareLabel: !open ? '' : pages.length > 1 ? 'Share all ' + pages.length + ' cards to my story' : selRaw.link === 'ama' ? (s.ama[selRaw.id] && s.ama[selRaw.id].trim() ? 'Share question & answer' : 'Share the question') : 'Share to my story',
+      shareLabel: !open ? '' : posts > 1 ? 'Share all ' + posts + ' cards to my story' : selRaw.link === 'ama' ? (s.ama[selRaw.id] && s.ama[selRaw.id].trim() ? 'Share question & answer' : 'Share the question') : 'Share to my story',
       canReply: open && !!selRaw.replyOk, noReply: open && selRaw.kind === 'one' && !selRaw.replyOk,
       replyLabel: open && selRaw.chatId ? 'Open your chat' : 'Reply privately',
       replyPrivately: function () {

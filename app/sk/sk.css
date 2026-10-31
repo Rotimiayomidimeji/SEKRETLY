@@ -497,3 +497,16 @@ html{background:#0c0811}html[data-mode="light"]{background:#e7e3ee}html[data-mod
 /* menu drawer on phones: a plain dark backdrop (blurring the whole page made phones stutter as it opened) */
 .pdr-panel{will-change:transform}
 @media (max-width:900px){.pdr-scrim{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(8,5,12,.72)}}
+
+/* phones: the inbox and chat fill the part of the screen you can see, so the keyboard lifts the message box
+   instead of sliding the header and everything else off the top (--vvh: components/layout/KeyboardFit.tsx) */
+@media (max-width:899px){.sk .ib{height:var(--vvh,100dvh);min-height:0}}
+/* while typing on a phone, the bottom menu steps aside for the keyboard */
+@media (max-width:899px){html.sk-typing .sk .bnav{display:none}}
+
+/* the link page's focus ring takes the colour of the theme the owner picked (--focus set by Main) */
+.sk :focus-visible{outline-color:var(--focus,var(--pink))}
+
+/* posted story cards with long text: smaller type and less room above it, so each card holds about twice as much */
+.sk .ss-face.ss-top{padding-top:14cqi}
+.sk .ss-t-xs{font-family:var(--font-body),system-ui,sans-serif;font-size:4.35cqi;font-weight:700;line-height:1.42}

@@ -22,7 +22,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
     // the browser's own install prompt, when it offers one
     try { window.addEventListener('beforeinstallprompt', this.onBip = function (e) { e.preventDefault(); self.bip = e; }); } catch (e) {}
     try { if (window.matchMedia('(display-mode: standalone)').matches) self.setState({ installed: true }); } catch (e) {}
-    setTimeout(function () { if (window.skPush) window.skPush.isOn().then(function (on) { self.setState({ notif: Object.assign({}, self.state.notif, { push: on }) }); }); }, 300);
+    setTimeout(function () { if (window.skPush) window.skPush.isOn().then(function (on) { self.pushSync = true; self.setState({ notif: Object.assign({}, self.state.notif, { push: on }) }); }); }, 300);
   }
   componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} }
   componentDidUpdate(prev, ps) {
@@ -30,7 +30,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
     var s = this.state, patch = {}, changed = false;
     var put = function (k, v) { patch[k] = v; changed = true; };
     if (ps.kind !== s.kind) put('kindMode', s.kind);
-    if (ps.mys !== s.mys) { put('allowHints', !!s.mys.hints); put('receiptReactions', !!s.mys.receipts); put('allowGuess', !!s.mys.guess); }
+    if (ps.mys !== s.mys) { put('allowHints', !!s.mys.hints); put('receiptReactions', !!s.mys.receipts); put('allowGuess', !!s.mys.guess); put('senderReceipts', !!s.mys.rcpt); }
     if (ps.chats !== s.chats) put('chatsFrom', s.chats);
     if (ps.visitors !== s.visitors) put('allowVisitors', s.visitors);
     if (ps.pub !== s.pub) put('publicProfile', s.pub);
@@ -40,7 +40,8 @@ export default class Settings extends React.Component<Record<string, any>, any> 
     if (ps.blur !== s.blur) put('blurMedia', s.blur);
     if (ps.invites !== s.invites) put('gameInvites', s.invites);
     if (ps.listing !== s.listing) put('gameListing', s.listing);
-    if (ps.notif !== s.notif) {
+    var synced = this.pushSync; this.pushSync = false;
+    if (ps.notif !== s.notif && !synced) {
       var n = Object.assign({}, s.notif); delete n.push; put('notifPrefs', n);
       // "Push on this device" subscribes or unsubscribes this phone
       if (!!ps.notif.push !== !!s.notif.push && window.skPush) {
@@ -57,7 +58,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
     var I = { lock: '/sk/shushing_face.png', eyes: '/sk/eyes.png', hg: '/sk/hourglass_not_done.png', ghost: '/sk/ghost.png', letter: '/sk/love_letter.png', bell: '/sk/bell.png', moon: '/sk/crescent_moon.png', die: '/sk/game_die.png', sparkles: '/sk/sparkles.png', frog: '/sk/frog.png' };
     var T = ['1 day', '2 days', '3 days', '1 week', '2 weeks', '3 weeks'];
     var S = [
-      ['account', 'Account', 'Username, password, install, delete', I.frog],
+      ['account', 'Account', 'Username, password, install, delete', '/sk/' + ((this.props.settings || {}).avatar || 'frog') + '.png'],
       ['privacy', 'Privacy', 'Who can reach you', I.eyes],
       ['messages', 'Messages', 'Disappearing timers', I.hg],
       ['safety', 'Safety', 'Kind mode, hidden words, blocked senders', I.lock],
@@ -84,7 +85,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
       ads: this.props.ads === 'off' ? 'off' : 'on',
       listCls: s.sec ? 'st-list hide' : 'st-list', detailCls: s.sec ? 'st-detail open' : 'st-detail',
       back: function () { self.setState({ sec: null }); },
-      sections: S.map(function (x) { var on = x[0] === cur; return { label: x[1], sub: x[2], icon: x[3], cur: on ? 'true' : 'false', bg: on ? 'var(--card2)' : 'transparent', pick: function () { self.setState({ sec: x[0] }); } }; }),
+      sections: S.map(function (x) { var on = x[0] === cur; return { label: x[1], sub: x[2], icon: x[3], iconBg: x[0] === 'account' ? ((self.props.settings || {}).avatarBg || 'transparent') : 'transparent', iconPad: x[0] === 'account' ? '3px' : '0', iconR: x[0] === 'account' ? '9px' : '0', cur: on ? 'true' : 'false', bg: on ? 'var(--card2)' : 'transparent', pick: function () { self.setState({ sec: x[0] }); } }; }),
       secTitle: curRow[1],
       secAccount: cur === 'account', secPrivacy: cur === 'privacy', secMessages: cur === 'messages', secSafety: cur === 'safety', secLinks: cur === 'links', secNotif: cur === 'notif', secLook: cur === 'look', secGames: cur === 'games', secHelp: cur === 'help',
       installed: s.installed, installBtn: s.installed ? 'Installed' : 'Install', installHint: s.installed ? 'On your home screen' : s.manualInstall ? 'Open your browser menu (⋮ or Share) and tap “Add to Home screen”' : 'Opens like an app',
@@ -137,7 +138,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
       kindTitle: ['Everything comes straight in', 'Insults and harassment are held', 'Only kind things get through'][s.kind],
       kindText: ['Only threats and illegal content are blocked. Not recommended for public links.', 'Clear insults, slurs, body shaming and spam wait in Inbox › Held. Jokes and honest opinions still come through.', 'Anything negative or unclear is held, even teasing. Best for big public links.'][s.kind],
       openHeld: function () { try { window.localStorage.setItem('sk-ibf', 'held'); } catch (e) {} },
-      mystery: [['hints', 'Let senders leave a hint', 'An optional clue on their message, never a name'], ['receipts', 'Show my reactions on receipts', 'Senders see your reaction and private reply'], ['guess', 'Guess who', 'Guess senders; they choose whether to reveal']].map(function (x) { var on = !!s.mys[x[0]]; return { label: x[1], sub: x[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.mys); o[x[0]] = !on; self.setState({ mys: o }); } }; }),
+      mystery: [['hints', 'Let senders leave a hint', 'An optional clue on their message, never a name'], ['receipts', 'Show my reactions on receipts', 'Senders see your reaction and private reply'], ['guess', 'Guess who', 'Guess senders; they choose whether to reveal'], ['rcpt', 'Give senders a receipt', 'After sending, they get a code to check for your reaction and private reply']].map(function (x) { var on = !!s.mys[x[0]]; return { label: x[1], sub: x[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.mys); o[x[0]] = !on; self.setState({ mys: o }); } }; }),
       notifs: N.map(function (n) { var on = !!s.notif[n[0]]; return { label: n[1], sub: n[2], on: on ? 'true' : 'false', toggle: function () { var o = Object.assign({}, s.notif); o[n[0]] = !on; self.setState({ notif: o }); } }; }),
       lookOpts: [['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(function (o) { return { label: o[1], on: s.look === o[0] ? 'true' : 'false', pick: function () {
         var n = o[0] === 'system' ? 'dark' : o[0];
@@ -301,7 +302,7 @@ export default class Settings extends React.Component<Record<string, any>, any> 
                         {" "}
                         <button className="list-row tap" onClick={x.pick} aria-current={x.cur} style={{ width: "100%", border: "0", borderBottom: "1px solid var(--line)", background: x.bg, textAlign: "left" }}>
                           {" "}
-                          <img src={x.icon} alt="" style={{ width: "28px", height: "28px" }} />
+                          <img src={x.icon} alt="" style={{ width: "28px", height: "28px", boxSizing: "border-box", padding: x.iconPad, borderRadius: x.iconR, background: x.iconBg }} />
                           {" "}
                           <span style={{ flex: "1", minWidth: "0" }}>
                             <b style={{ display: "block", fontSize: "15px" }}>

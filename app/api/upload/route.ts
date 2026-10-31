@@ -67,7 +67,13 @@ export async function POST(request: Request) {
   if (!type) return fail("Send a photo (JPG, PNG, WebP, GIF) or a video (MP4, MOV, WebM).", 415);
   if (bytes.length > MAX_BYTES[type.kind]) return fail(type.kind === "photo" ? "Photos can be up to 8 MB." : "Videos can be up to 25 MB.", 413);
 
-  const url = await storeMedia(bytes, type);
+  let url: string;
+  try {
+    url = await storeMedia(bytes, type);
+  } catch (e) {
+    console.error("upload failed:", e instanceof Error ? e.message : e);
+    return fail("Uploads aren’t working right now. Try again in a bit.", 503);
+  }
   return Response.json({ ok: true, url, kind: type.kind, size: bytes.length });
 }
 

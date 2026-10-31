@@ -14,7 +14,7 @@ export default async function ReceiptPage({ searchParams }: PageProps<"/receipt"
   const { m } = await searchParams;
   const user = await getCurrentUser();
   const mine = user
-    ? (await db.message.findMany({ where: { senderId: user.id }, orderBy: { createdAt: "desc" }, take: 30, include: RECEIPT_INCLUDE })).map(receiptView)
+    ? (await db.message.findMany({ where: { senderId: user.id, recipient: { senderReceipts: true } }, orderBy: { createdAt: "desc" }, take: 30, include: RECEIPT_INCLUDE })).map(receiptView)
     : [];
   return (
     <Receipt

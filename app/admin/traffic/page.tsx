@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Sekretly admin · Traffic" };
 const fiveMinAgo = () => new Date(Date.now() - 5 * 60_000);
 
 export default async function AdminTrafficPage() {
-  await requireAdmin("/admin/traffic");
+  await requireAdmin();
   const [today, week, month, live] = await Promise.all([
     trafficFor("today"),
     trafficFor("week"),

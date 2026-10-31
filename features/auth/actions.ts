@@ -51,10 +51,12 @@ export async function login(input: { username: string; password: string; next?: 
   const ok = !!user && user.status === "ACTIVE" && (await verifyPassword(String(input.password ?? ""), user.passwordHash));
   if (!ok || !user) return { left: perAccount.remaining, locked: perAccount.remaining === 0 };
   await clearRateLimit(`login:${name}`);
-  await createSession(user.id);
+  const isAdmin = user.role === "ADMIN";
+  await createSession(user.id, isAdmin);
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
-  // the admin account lands on the admin overview
-  redirect(safeNext(input.next) ?? (user.role === "ADMIN" ? "/admin" : user.onboardedAt ? "/home" : "/onboarding"));
+  // the admin account only has the admin pages
+  if (isAdmin) redirect(safeNext(input.next)?.startsWith("/admin") ? safeNext(input.next)! : "/admin");
+  redirect(safeNext(input.next) ?? (user.onboardedAt ? "/home" : "/onboarding"));
 }
 
 export async function logout() {

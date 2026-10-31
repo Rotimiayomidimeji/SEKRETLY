@@ -36,12 +36,14 @@ export async function savePushSubscription(input: unknown, userAgent?: string, h
   const user = await getCurrentUser();
   if (!user) return { ok: false };
   const sub = subSchema.parse(input);
+  // the confirmation goes to a phone once, the first time it's saved, however often push is switched on
+  const known = await db.pushSubscription.findUnique({ where: { endpoint: sub.endpoint }, select: { id: true } });
   await db.pushSubscription.upsert({
     where: { endpoint: sub.endpoint },
     create: { userId: user.id, endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth, userAgent: userAgent?.slice(0, 200) },
     update: { userId: user.id, p256dh: sub.keys.p256dh, auth: sub.keys.auth },
   });
-  if (hello) after(() => sendPush(user.id, { title: "Notifications are on", body: "New messages and replies will show up here, even with Sekretly closed.", url: "/notifications", tag: "hello" }, "always"));
+  if (hello && !known) after(() => sendPush(user.id, { title: "Notifications are on", body: "New messages and replies will show up here, even with Sekretly closed.", url: "/notifications", tag: "hello" }, "always"));
   return { ok: true };
 }
 

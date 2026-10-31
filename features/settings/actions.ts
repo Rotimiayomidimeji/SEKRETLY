@@ -26,6 +26,7 @@ const settingsSchema = z.object({
   allowHints: bool,
   receiptReactions: bool,
   allowGuess: bool,
+  senderReceipts: bool,
   chatsFrom: z.enum(["everyone", "nobody"]).optional(),
   allowVisitors: bool,
   publicProfile: bool,
