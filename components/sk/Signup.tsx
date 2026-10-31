@@ -253,10 +253,6 @@ export default class Signup extends React.Component<Record<string, any>, any> {
                 {" "}
                 <div style={{ display: "flex", alignItems: "center", minHeight: "54px", borderRadius: "16px", border: `1px solid ${v.userLine}`, background: "var(--field)", padding: "0 14px" }}>
                   {" "}
-                  <span className="muted" style={{ fontSize: "15px" }}>
-                    sekretlyy.vercel.app/
-                  </span>
-                  {" "}
                   <input id="su-user" value={v.user ?? ""} onChange={v.onUser} autoComplete="username" placeholder="yourname" maxLength="20" style={{ flex: "1", minWidth: "0", border: "0", background: "transparent", color: "var(--ink)", fontSize: "16px", fontWeight: "700", outline: "none", padding: "14px 0" }} />
                   {" "}
                 </div>

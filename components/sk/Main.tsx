@@ -244,7 +244,7 @@ export default class Main extends React.Component<Record<string, any>, any> {
       warnTitle: w >= 3 ? 'Last warning with @' + OWNER + '' : 'You have ' + w + (w === 1 ? ' warning' : ' warnings') + ' with @' + OWNER + '',
       warnBody: w >= 3 ? 'One more report and you will be blocked from messaging them.' : (3 - w) + ' more and the next report blocks you from messaging them.',
       cantSend: !can || !!s.sending || !!s.uploading, sendOpacity: can && !s.sending && !s.uploading ? 1 : 0.55, hasSendErr: !!s.sendErr, sendErr: s.sendErr || '', needHint: !can, needText: need,
-      sendLabel: topic === 'confess' ? 'Send confession' : topic === 'rate' ? (rateDone ? 'Send my ' + (Math.round(avg * 10) / 10) + '/10' : 'Send rating') : topic === 'quiz' ? 'Send my score to @' + OWNER + '' : topic === 'describe' ? 'Send my 3 words' : 'Send anonymously',
+      sendLabel: topic === 'confess' ? 'Spill it' : topic === 'rate' ? (rateDone ? 'Send my ' + (Math.round(avg * 10) / 10) + '/10' : 'Send rating') : topic === 'quiz' ? 'Send my score to @' + OWNER + '' : topic === 'describe' ? 'Send my 3 words' : 'Send anonymously',
       replyStr: s.wantReply ? 'true' : 'false', toggleReply: function () { self.setState({ wantReply: !s.wantReply }); },
       send: function () {
         if (!can) return;

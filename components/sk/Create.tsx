@@ -85,7 +85,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
     var TP = [
       { id: 'describe-3', title: 'Describe me in 3 words', sub: 'Friends tap 3 words that sum you up', hint: 'Tap 3 words. That’s it.', story: 'sum me up in 3 words', send: 'Send my 3 words', emoji: E.sparkles, pv: 'describe' },
       { id: 'know-me', title: 'How well do you know me?', sub: 'You write a quiz, friends guess and get a score', hint: 'Answer my questions. See your score.', story: 'take my quiz, if you dare', send: 'See my score', emoji: E.crown, pv: 'quiz', isNew: true },
-      { id: 'confess', title: 'Confess something', sub: 'A blank page for long, honest messages', hint: 'Say the whole thing. Nobody will know.', story: 'tell me anything, anonymously', send: 'Send confession', emoji: E.shush, pv: 'confess' },
+      { id: 'confess', title: 'Confess something', sub: 'A blank page for long, honest messages', hint: 'Say the whole thing. Nobody will know.', story: 'tell me anything, anonymously', send: 'Spill it', emoji: E.shush, pv: 'confess' },
       { id: 'rate-me', title: 'Rate me 1–10', sub: 'Friends tap a number and say why', hint: 'You’re rating me. Be honest.', story: 'rate me, anonymously', send: 'Send my rating', emoji: E.fire, pv: 'rate' },
       { id: 'ama', title: 'Ask me anything', sub: 'Questions you answer on your story', hint: 'Any question. I answer, you stay unknown.', story: 'ask me anything', send: 'Ask anonymously', emoji: E.ghost, pv: 'ask' },
       { id: 'custom', title: 'Custom topic', sub: 'Write your own question', hint: 'Answer anonymously.', story: 'send me anonymous messages', send: 'Send anonymously', emoji: E.letter, pv: 'ask' }

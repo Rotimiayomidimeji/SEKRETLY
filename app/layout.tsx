@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import { AdFiller } from "@/components/layout/AdFiller";
 import { Analytics } from "@/components/layout/Analytics";
 import { PageLoader } from "@/components/layout/PageLoader";
+import { PhotoViewer } from "@/components/layout/PhotoViewer";
 import { PushBridge } from "@/components/layout/PushBridge";
 import { ShareKit } from "@/components/layout/ShareKit";
 
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <PageLoader />
         <PushBridge />
         <ShareKit />
+        <PhotoViewer />
         <Analytics />
         <AdFiller />
       </body>

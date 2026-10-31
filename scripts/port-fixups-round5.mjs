@@ -13,7 +13,20 @@ const QUICK = [
   ["save", "Save images", "var(--card)", "var(--ink)"],
 ];
 
+const swap = (a, b) => (src) => {
+  if (!src.includes(a)) throw new Error("round5 fixup: can't find " + a.slice(0, 60));
+  return src.split(a).join(b);
+};
+
+// the confession button: "Spill it" says what it is without sounding like a form (and fits a long or a short one)
+const SPILL = [swap(`'Send confession'`, `'Spill it'`)];
+
 export const ROUND5_FIXUPS = {
+  // the username box holds just the username (the site address in front of it read as part of the box)
+  Signup: [swap(`<span class="muted" style="font-size: 15px">sekretlyy.vercel.app/</span>`, ``)],
+  Main: SPILL,
+  Create: SPILL,
+
   Inbox: [
     // the share button unmounted under the finger (the selection cleared as it was tapped), so the page never changed;
     // leaving the inbox resets the selection anyway
