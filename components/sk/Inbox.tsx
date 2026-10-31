@@ -182,7 +182,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
     var chatList = chatKeys.map(function (k) { var b = selRaw.thread[Number(k.split(':').pop())]; return { id: k, topic: b.me ? 'Your reply to ' + selRaw.who : 'Chat · ' + selRaw.who, th: 'default', text: b.text, own: !!b.me }; });
     var chatPublic = chatList.filter(function (x) { return !x.own; });
     var quickCards = [];
-    (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 260); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
+    (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 620); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
     var pages = open && selRaw.kind === 'one' && !selRaw.quiz && !selRaw.rate ? split(selRaw.text, 260) : [];
     var posts = pages.length ? split(selRaw.text, 620).length : 0;
     var pg = Math.min(s.page, Math.max(0, pages.length - 1));
@@ -215,8 +215,8 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       selectAll: function () { var c = {}; if (!allChosen) shown.forEach(function (m) { c[m.id] = true; }); self.setState({ chosen: c }); },
       cancelSel: function () { self.setState({ selMode: false, chosen: {} }); },
       noShare: shareList.length === 0, noShareStr: shareList.length === 0 ? 'true' : 'false', shareOp: shareList.length ? 1 : 0.4, sharePe: shareList.length ? 'auto' : 'none',
-      bulkStash: function () { stashOf(shareList)(); self.setState({ selMode: false, chosen: {} }); },
-      bulkStashFromQuick: function () { stashOf(s.quick ? s.quick.list : shareList)(); self.setState({ selMode: false, chosen: {}, quick: null }); },
+      bulkStash: function () { stashOf(shareList)(); },
+      bulkStashFromQuick: function () { stashOf(s.quick ? s.quick.list : shareList)(); },
       archiveWord: inArchive ? 'Unarchive' : 'Archive',
       bulkArchive: function () {
         var a = Object.assign({}, s.archived); chosenIds.forEach(function (id) { if (inArchive) delete a[id]; else a[id] = true; });
@@ -258,11 +258,8 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       closeQuick: function () { clearInterval(self.qt); var done = s.quick && s.quick.dest && s.quick.k >= quickCards.length; self.setState(done ? { quick: null, selMode: false, chosen: {}, chatSel: false, chatChosen: {} } : { quick: null }); },
       quickTitle: s.quick ? 'Post ' + quickCards.length + ' card' + (quickCards.length === 1 ? '' : 's') : '',
       quickSub: s.quick ? 'From ' + s.quick.list.length + ' message' + (s.quick.list.length === 1 ? '' : 's') + ', in order, with their own colours. Long ones become several cards.' : '',
-      quickDests: [['WhatsApp Status', '#25d366', '#0b2a1c'], ['Instagram story', 'linear-gradient(135deg,#7a2ff7,#d81b72 55%,#f29b38)', '#ffffff'], ['Snapchat', '#fffc00', '#111111'], ['Save images', 'var(--card)', 'var(--ink)']].map(function (d) {
-        return { name: d[0], bg: d[1], ink: d[2], go: function () {
-          var n = quickCards.length; self.setState({ quick: Object.assign({}, s.quick, { dest: d[0], k: 0 }) }); clearInterval(self.qt);
-          self.qt = setInterval(function () { var q = self.state.quick; if (!q) { clearInterval(self.qt); return; } var k = q.k + 1; self.setState({ quick: Object.assign({}, q, { k: k }) }); if (k >= n) clearInterval(self.qt); }, 700);
-        } };
+      quickDests: [['wa','WhatsApp Status','#25d366','#0b2a1c'],['ig','Instagram story','linear-gradient(135deg,#7a2ff7,#d81b72 55%,#f29b38)','#ffffff'],['sc','Snapchat','#fffc00','#111111'],['tt','TikTok','#111111','#ffffff'],['save','Save images','var(--card)','var(--ink)']].map(function (d) {
+        return { name: d[1], bg: d[2], ink: d[3], span: d[0] === 'save' ? '1 / -1' : 'auto', go: function () { stashOf(s.quick ? s.quick.list : shareList)(); try { window.localStorage.setItem('sk-post', d[0]); } catch (e) {} } };
       }),
       quickRunTitle: s.quick && s.quick.dest ? (s.quick.k >= quickCards.length ? 'Posted to ' + s.quick.dest + ' ✓' : 'Posting to ' + s.quick.dest + '…') : '',
       quickSteps: quickCards.map(function (c, i) { var k = s.quick ? s.quick.k || 0 : 0, done = i < k; return { mark: done ? '✓' : i + 1, label: c, bg: done ? '#5be0a0' : 'var(--card2)', ink: done ? '#0b2a1c' : 'var(--ink)' }; }),
@@ -273,7 +270,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       chatSelCount: chatKeys.length + ' selected', chatNone: chatKeys.length === 0,
       cancelChatSel: function () { self.setState({ chatSel: false, chatChosen: {} }); },
       chatShareOp: chatList.length ? 1 : 0.4, chatSharePe: chatList.length ? 'auto' : 'none',
-      chatStash: function () { stashOf(chatList)(); self.setState({ chatSel: false, chatChosen: {} }); },
+      chatStash: function () { stashOf(chatList)(); },
       chatNoPublic: chatPublic.length === 0,
       chatQuick: function () { if (chatPublic.length) self.setState({ quick: { list: chatPublic } }); },
       chatDelete: function () { var d = Object.assign({}, s.deletedBubbles); chatKeys.forEach(function (k) { d[k] = true; }); self.props.deleteBubbles(selRaw.id, chatKeys.map(function (k) { var b = selRaw.thread[Number(k.split(':').pop())]; return b && b.bid; }).filter(Boolean)); self.setState({ deletedBubbles: d, chatSel: false, chatChosen: {} }); },
@@ -1884,9 +1881,9 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                     {" "}
                     {(v.quickDests || []).map((qd, i0) => (
                       <Fragment key={i0}>
-                      <button className="btn btn-lg tap" onClick={qd.go} style={{ background: qd.bg, color: qd.ink, border: "0" }}>
+                      <SkLink href="/share" onClick={qd.go} className="btn btn-lg tap" style={{ background: qd.bg, color: qd.ink, border: "0", gridColumn: qd.span }}>
                         {qd.name}
-                      </button>
+                      </SkLink>
                       </Fragment>
                     ))}
                     {" "}

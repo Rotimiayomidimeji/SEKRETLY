@@ -6,8 +6,9 @@ import { useEffect } from "react";
 // Tapping an app's icon goes to that app, never the phone's share sheet (that's what "More" is for):
 //   · links: WhatsApp, Telegram, Snapchat, X and Facebook open their own "post / send to" screen with the link filled
 //     in. Instagram and TikTok can't take a link from a website, so it's copied and the app opened to paste it.
-//   · images: no website can hand a picture straight to an app, so they're saved to the phone and the app opened to
-//     pick them from the gallery (iPhones save to Files rather than Photos, so there they go through the share sheet).
+//   · images: a website can't drop a picture into one chosen app, but the phone's share list can, so the images go
+//     through it already attached (tap the app there: WhatsApp then asks chat or My status). Where a browser can't
+//     share images (computers), they're saved and the app or its website opened.
 // On Android the app is opened with an intent (the website if the app isn't installed); on iPhones with the app's own
 // address, falling back to the website when nothing answers.
 // The icons live in /public/brand/<dest>.svg; the ported screens show them as plain round buttons, no labels.
@@ -95,9 +96,16 @@ function launch(t: Target, delay = 0): "app" | "web" {
   return "app";
 }
 
-/** Saves the images, then opens the app to pick them (iPhones: the share sheet, see the note at the top). */
+/** The images into the app through the share list; saved and the app opened where a browser can't share images. */
 async function imagesTo(dest: AppDest, p: Payload, url: string): Promise<ShareResult> {
-  if (ios()) return (await sheet(p, url)) ?? "failed";
+  if (navigator.share && navigator.canShare?.({ files: p.files })) {
+    try {
+      await navigator.share({ files: p.files, text: (p.text ? p.text + " " : "") + url });
+      return "shared";
+    } catch (e) {
+      if ((e as Error)?.name === "AbortError") return "cancelled";
+    }
+  }
   download(p.files!);
   launch(APP[dest], p.files!.length * 400 + 700);
   return "saved";
@@ -126,17 +134,20 @@ const copy = async (text: string) => {
   }
 };
 
-const download = (files: File[]) =>
+/** Saves each file under its own name (a repeat name makes phones ask to "download the file again"). */
+const download = (files: File[]) => {
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, "");
   files.forEach((f, i) =>
     setTimeout(() => {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(f);
-      a.download = f.name;
+      a.download = f.name.replace(/(\.\w+)?$/, "-" + stamp + (files.length > 1 ? "-" + (i + 1) : "") + "$1");
       document.body.appendChild(a);
       a.click();
       a.remove();
     }, i * 400),
   );
+};
 
 /** The phone's share sheet: images when given (and the phone can share them), else the text and link. */
 async function sheet(p: Payload, url: string): Promise<ShareResult | null> {

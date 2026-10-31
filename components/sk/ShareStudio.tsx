@@ -22,9 +22,10 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     var base = this.msgs(), extra = {};
     (ids || []).forEach(function (x) { if (x && typeof x === 'object') extra[x.id] = { topic: x.topic, th: x.th, text: x.text, own: !!x.own, icon: x.own ? '/sk/locked_3d.png' : (x.icon || (base[x.id] && base[x.id].icon) || '/sk/ghost.png') }; });
     this.extra = extra;
+    this.autoPost = ''; try { this.autoPost = window.localStorage.getItem('sk-post') || ''; window.localStorage.removeItem('sk-post'); } catch (e) {}
     var all = this.msgs();
     var picked = (ids || []).map(function (x) { return x && typeof x === 'object' ? x.id : x; }).filter(function (id) { return !!all[id]; });
-    return { mode: mode, tray: picked.length ? picked : Object.keys(all).filter(function (id) { return !all[id].promo; }).slice(0, 3), off: {}, theme: {}, paint: false, focus: 0, dest: 'wa', posting: null, posted: {}, sent: null, done: false, friends: false, sentTo: {} };
+    return { mode: mode, tray: picked.length ? picked : Object.keys(all).filter(function (id) { return !all[id].promo; }).slice(0, 3), off: {}, theme: {}, paint: false, focus: 0, dest: this.autoPost || 'wa', posting: null, posted: {}, sent: null, done: false, friends: false, sentTo: {}, ready: false };
   }
   msgs() {
     return Object.assign({}, this.props.pool || {}, this.props.promos || {}, {
@@ -35,7 +36,9 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     var self = this;
     this.onStore = function (e) { if (e.key === 'sk-mode' && e.newValue) self.setState({ mode: e.newValue }); };
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
-    this.setState(this.arrive(this.state.mode));
+    var start = this.arrive(this.state.mode), d = this.autoPost || this.queued || '';
+    this.queued = d; // dev mounts twice and the second arrive finds sk-post already used
+    this.setState(start, function () { if (d && self.queued) { self.queued = ''; setTimeout(function () { self.runPost(self.pubKeys || [], d); }, 50); } });
     // load the image maker now so posting starts straight away
     import('html-to-image').catch(function () {});
   }
@@ -83,7 +86,8 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     clearTimeout(this.pt);
     this.pt = setTimeout(function () {
       var keys = (self.pubKeys || []).slice();
-      var next = function () { if (!keys.length || self.state.posting) return; self.draw(keys.shift()).then(next, next); };
+      var gap = function () { setTimeout(function () { (window.requestIdleCallback || setTimeout)(next); }, 150); };
+      var next = function () { if (!keys.length || self.state.posting) return; self.draw(keys.shift()).then(gap, gap); };
       next();
     }, 600);
   }
@@ -92,11 +96,11 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     if (this.state.posting || !keys.length) return;
     clearTimeout(this.pt);
     this.setState({ posting: { dest: dest, keys: keys, k: 0 }, done: false, drawErr: false, shareNote: '' });
-    var files = [], k = 0;
+    var files = [], k = 0, stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
     var step = function () {
       if (k >= keys.length) { self.finish(files, dest, keys); return; }
       self.draw(keys[k]).then(function (f) {
-        if (f) files.push(new File([f], 'sekretly-' + (k + 1) + '.png', { type: 'image/png' }));
+        if (f) files.push(new File([f], 'sekretly-' + stamp + '-' + (k + 1) + '.png', { type: 'image/png' }));
         k++; step();
       }).catch(function (e) { console.error('Share studio could not draw a card', e); self.setState({ posting: null, drawErr: true }); });
     };
@@ -105,7 +109,8 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
   finish(files, dest, keys) {
     var self = this, WEB = { wa: 'https://web.whatsapp.com/', ig: 'https://www.instagram.com/', sc: 'https://web.snapchat.com/', tt: 'https://www.tiktok.com/upload' };
     var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    var can = ios && dest !== 'save' && files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
+    if (files.length && navigator.userActivation && !navigator.userActivation.isActive) { self.setState({ posting: null, files: files, pendingKeys: keys, lastDest: dest, sentN: 0, done: true, needTap: true, ready: true }); return; }
+    var can = dest !== 'save' && files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
     if (!can) {
       files.forEach(function (f, i) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 400); });
       var via = dest === 'save' ? '' : window.skShare && window.skShare.app ? window.skShare.app(dest, files.length * 400 + 700) : (window.open(WEB[dest], '_blank', 'noopener'), 'web');
@@ -214,13 +219,13 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
       cantPost: pubSel === 0 || !!s.posting, postOp: pubSel === 0 || s.posting ? 0.55 : 1,
       postLabel: s.posting ? 'Posting…' : pubSel === 0 ? 'Select a card to post' : s.dest === 'save' ? 'Save ' + pubSel + ' image' + (pubSel === 1 ? '' : 's') + ' in order' : 'Post ' + pubSel + ' card' + (pubSel === 1 ? '' : 's') + ' to ' + dest[2],
       post: function () { if (pubSel && !s.posting) self.runPost(pubKeys, s.dest); },
-      doneOpen: s.done, doneTitle: (function () { var n = s.sentN || 0, d = DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0]; return s.savedOnly ? n + (n === 1 ? ' image saved' : ' images saved') + (s.lastDest === 'save' ? '' : s.via === 'app' ? ' · pick them from your gallery in ' + d[1] : ' · upload them in ' + d[1] + ' (it opened in a new tab)') : n + (n === 1 ? ' card shared to ' : ' cards shared to ') + d[1]; })(),
+      doneOpen: s.done, doneTitle: s.ready ? (s.files || []).length + ((s.files || []).length === 1 ? ' card is ready' : ' cards are ready') : (function () { var n = s.sentN || 0, d = DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0]; return s.savedOnly ? n + (n === 1 ? ' image saved' : ' images saved') + (s.lastDest === 'save' ? '' : s.via === 'app' ? ' · pick them from your gallery in ' + d[1] : ' · upload them in ' + d[1] + ' (it opened in a new tab)') : n + (n === 1 ? ' card shared to ' : ' cards shared to ') + d[1]; })(),
       steps: postedList.map(function (c) { return { num: c.num, label: (c.parts.length > 1 ? 'Part ' + (c.pi + 1) + ' · ' : '') + c.text }; }),
       needTap: s.needTap, drawErr: !!s.drawErr,
-      shareNow: function () { if (s.savedOnly && s.via === 'app' && window.skShare) { window.skShare.app(s.lastDest, 0); return; } if (s.files) self.shareBatch(s.sentN || 0); },
-      tapLabel: s.savedOnly && s.via === 'app' ? 'Open ' + ((DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0])[1]) : s.files && s.sentN > 0 && s.sentN < s.files.length ? 'Post card ' + (s.sentN + 1) + ' of ' + s.files.length : 'Open share sheet',
+      shareNow: function () { if (s.ready) { self.setState({ ready: false, done: false }); self.finish(s.files || [], s.lastDest, s.pendingKeys || []); return; } if (s.savedOnly && s.via === 'app' && window.skShare) { window.skShare.app(s.lastDest, 0); return; } if (s.files) self.shareBatch(s.sentN || 0); },
+      tapLabel: s.ready ? (s.lastDest === 'save' ? 'Save the images' : 'Post to ' + ((DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0])[1])) : s.savedOnly && s.via === 'app' ? 'Open ' + ((DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0])[1]) : s.files && s.sentN > 0 && s.sentN < s.files.length ? 'Post card ' + (s.sentN + 1) + ' of ' + s.files.length : 'Open share sheet',
       brand: this.props.brand || '', ads: this.props.ads === 'on' ? 'on' : 'off',
-      again: function () { self.setState({ done: false, posted: {}, sent: null }); },
+      again: function () { self.setState({ done: false, posted: {}, sent: null, ready: false }); },
       noAny: anySel === 0, hasOwn: flat.some(function (c) { return !!c.m.own; }),
       friendsLabel: anySel ? 'Send ' + anySel + ' card' + (anySel === 1 ? '' : 's') + ' to friends in the app' : 'Send in app',
       friends: s.friends, openFriends: function () { self.setState({ friends: true }); }, closeFriends: function () { self.setState({ friends: false }); },

@@ -24,10 +24,11 @@ import { CREW_FIXUPS } from "./port-fixups-crews.mjs";
 import { POLISH_FIXUPS } from "./port-fixups-polish.mjs";
 import { BUILDER_FIXUPS } from "./port-fixups-builders.mjs";
 import { ROUND4_FIXUPS } from "./port-fixups-round4.mjs";
+import { ROUND5_FIXUPS } from "./port-fixups-round5.mjs";
 
 // a board can be fixed by several files; they apply in this order
 const FIXUPS = {};
-for (const set of [BASE_FIXUPS, LINK_FIXUPS, INBOX_FIXUPS, HOME_FIXUPS, MYSTERY_FIXUPS, SHARE_FIXUPS, PROFILE_FIXUPS, ADMIN_FIXUPS, GAME_FIXUPS, CREW_FIXUPS, POLISH_FIXUPS, BUILDER_FIXUPS, ROUND4_FIXUPS])
+for (const set of [BASE_FIXUPS, LINK_FIXUPS, INBOX_FIXUPS, HOME_FIXUPS, MYSTERY_FIXUPS, SHARE_FIXUPS, PROFILE_FIXUPS, ADMIN_FIXUPS, GAME_FIXUPS, CREW_FIXUPS, POLISH_FIXUPS, BUILDER_FIXUPS, ROUND4_FIXUPS, ROUND5_FIXUPS])
   for (const [board, fixes] of Object.entries(set)) FIXUPS[board] = (FIXUPS[board] || []).concat(fixes);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -12,11 +12,18 @@ declare global {
 
 /**
  * Keeps every member screen in step with the server: listens on the member's own Pusher channel and refreshes the
- * screen's data the moment something changes. Also refreshes a screen brought back with Back/Forward (the browser
- * shows the copy it kept, which can be out of date) or when the app comes back to the foreground.
+ * screen's data the moment something changes. Also refreshes a screen brought back with Back/Forward from another
+ * page (the browser shows the copy it kept, which can be out of date) or when the app comes back to the foreground.
+ * Back inside one screen (closing a message, a settings section) stays on the copy it has: nothing new to fetch.
  */
 export function Realtime({ userId }: { userId: string }) {
   const router = useRouter();
+  // the page on screen; a Back that lands on the same page was only an inner view closing
+  const pathname = usePathname();
+  const shown = useRef(pathname);
+  useEffect(() => {
+    shown.current = pathname;
+  }, [pathname]);
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     // several events in a burst cause one refresh
@@ -24,13 +31,19 @@ export function Realtime({ userId }: { userId: string }) {
       clearTimeout(timer);
       timer = setTimeout(() => router.refresh(), 250);
     };
+    const onPop = () => {
+      if (location.pathname !== shown.current) refresh();
+    };
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) refresh();
+    };
     let hidden = 0;
     const onVisible = () => {
       if (document.visibilityState === "hidden") hidden = Date.now();
       else if (Date.now() - hidden > 15_000) refresh();
     };
-    window.addEventListener("popstate", refresh);
-    window.addEventListener("pageshow", refresh);
+    window.addEventListener("popstate", onPop);
+    window.addEventListener("pageshow", onShow);
     document.addEventListener("visibilitychange", onVisible);
 
     const key = process.env.NEXT_PUBLIC_PUSHER_KEY, cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
@@ -59,8 +72,8 @@ export function Realtime({ userId }: { userId: string }) {
     return () => {
       clearTimeout(timer);
       stop();
-      window.removeEventListener("popstate", refresh);
-      window.removeEventListener("pageshow", refresh);
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("pageshow", onShow);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [router, userId]);

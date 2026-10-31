@@ -6,7 +6,8 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 // The Sekretly logo breathing over a blurred screen, so nobody is left staring at a page that seems stuck.
 // It shows when:
 //   · a link to another screen is tapped (until that screen arrives)
-//   · the page is about to reload or leave (window.location changes)
+//   · the page is about to reload or leave (window.location changes). Opening another app (WhatsApp, a phone call,
+//     email) also looks like leaving, so then it waits a moment and steps aside as soon as the other app takes over.
 // Quick things on the same screen (saving a switch, sending a chat, pausing a link) never show it: their own
 // button shows it's working, and a full-screen cover for those just gets in the way.
 
@@ -23,6 +24,8 @@ export function LoaderMark({ label = "Loading" }: { label?: string }) {
 
 const SHOW_AFTER_MS = 140; // fast screens never flash the loader
 const GIVE_UP_MS = 12_000;
+const LEAVE_AFTER_MS = 300;
+const LEAVE_GIVE_UP_MS = 4_000;
 
 function Watcher({ onRoute }: { onRoute: () => void }) {
   const path = usePathname();
@@ -48,11 +51,11 @@ export function PageLoader() {
     clearTimeout(timers.current.giveUp);
     setOn(false);
   }, []);
-  const show = useCallback((after: number) => {
+  const show = useCallback((after: number, giveUp = GIVE_UP_MS) => {
     clearTimeout(timers.current.show);
     clearTimeout(timers.current.giveUp);
     timers.current.show = setTimeout(() => setOn(true), after);
-    timers.current.giveUp = setTimeout(() => setOn(false), GIVE_UP_MS);
+    timers.current.giveUp = setTimeout(() => setOn(false), giveUp);
   }, []);
 
   useEffect(() => {
@@ -68,14 +71,20 @@ export function PageLoader() {
       show(SHOW_AFTER_MS);
     };
     // the generated screens sometimes navigate with window.location
-    const onLeave = () => show(0);
+    const onLeave = () => show(LEAVE_AFTER_MS, LEAVE_GIVE_UP_MS);
+    // another app came to the front (an app link, the share list): nothing here is loading
+    const onHidden = () => {
+      if (document.visibilityState === "hidden") hide();
+    };
     // back from another site (bfcache): nothing is loading
     const onShow = () => hide();
 
     document.addEventListener("click", onClick, true);
     window.addEventListener("beforeunload", onLeave);
     window.addEventListener("pageshow", onShow);
+    document.addEventListener("visibilitychange", onHidden);
     return () => {
+      document.removeEventListener("visibilitychange", onHidden);
       document.removeEventListener("click", onClick, true);
       window.removeEventListener("beforeunload", onLeave);
       window.removeEventListener("pageshow", onShow);

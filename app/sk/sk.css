@@ -475,10 +475,10 @@ html{background:#0c0811}html[data-mode="light"]{background:#e7e3ee}html[data-mod
 /* long words never push a card sideways */
 .sk .ss-face,.sk .ss-face *,.sk [class*="msg"] p{overflow-wrap:anywhere}
 
-/* the menu's Profile button: your animal on your colour (variables set by app/(app)/layout.tsx) */
-:root .sk .bnav a[href="/profile"] svg,:root .sk .nav-i[href="/profile"] svg{display:none}
-.sk .bnav a[href="/profile"]::before,.sk .nav-i[href="/profile"]::before{content:"";display:block;flex:none;width:26px;height:26px;border-radius:9px;background:var(--me-img,none) center/74% no-repeat,var(--me-bg,var(--card2))}
-.sk .nav-i[href="/profile"]::before{width:22px;height:22px;border-radius:7px}
+/* the computer menu's Profile button: your animal on your colour (variables set by app/(app)/layout.tsx);
+   the phone's bottom menu keeps its plain person icon */
+:root .sk .nav-i[href="/profile"] svg{display:none}
+.sk .nav-i[href="/profile"]::before{content:"";display:block;flex:none;width:22px;height:22px;border-radius:7px;background:var(--me-img,none) center/74% no-repeat,var(--me-bg,var(--card2))}
 
 /* avatar colour slider: a rainbow strip with a round handle */
 .sk-hue-wrap{display:flex;align-items:center;gap:12px}
