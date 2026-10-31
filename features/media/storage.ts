@@ -4,11 +4,13 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 
 // Photos and videos sent with messages and in chats.
 // With BLOB_READ_WRITE_TOKEN set (Vercel) files go to Vercel Blob; without it (local dev) they're kept in
-// .data/media and served by /api/media/<file>. Either way the address is long and random, never guessable.
+// .data/media. A Blob store can be public (files are served straight from Blob) or private (files are served by
+// /api/media/<file>, like local ones); which one is found out once, or set with BLOB_ACCESS=public|private.
+// Either way the address is long and random, never guessable.
 
 export type MediaKind = "photo" | "video";
 
@@ -29,13 +31,35 @@ export const sniff = (b: Buffer) => TYPES.find((t) => t.test(b)) ?? null;
 
 const LOCAL_DIR = path.join(process.cwd(), ".data", "media");
 const LOCAL_PREFIX = "/api/media/";
+const NAME = /^[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4)$/;
 
-/** Stores a checked file and returns its public address. */
+let access: Promise<"public" | "private"> | null = null;
+
+/** Whether the Blob store is public or private (null without a Blob token). Asked once per server. */
+export function blobAccess(): Promise<"public" | "private"> | null {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+  const set = process.env.BLOB_ACCESS;
+  if (set === "public" || set === "private") return Promise.resolve(set);
+  return (access ??= put("media/.probe", "ok", { access: "public", addRandomSuffix: false, allowOverwrite: true, contentType: "text/plain" }).then(
+    () => "public" as const,
+    (e: unknown) => {
+      console.warn("blob store is not public, using private access:", e instanceof Error ? e.message : e);
+      return "private" as const;
+    },
+  ));
+}
+
+/** Stores a checked file and returns its address. */
 export async function storeMedia(bytes: Buffer, type: (typeof TYPES)[number]) {
   const name = randomBytes(18).toString("base64url") + "." + type.ext;
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  const mode = await blobAccess();
+  if (mode === "public") {
     const blob = await put("media/" + name, bytes, { access: "public", contentType: type.mime, addRandomSuffix: false });
     return blob.url;
+  }
+  if (mode === "private") {
+    await put("media/" + name, bytes, { access: "private", contentType: type.mime, addRandomSuffix: false });
+    return LOCAL_PREFIX + name;
   }
   await mkdir(LOCAL_DIR, { recursive: true });
   await writeFile(path.join(LOCAL_DIR, name), bytes);
@@ -44,22 +68,46 @@ export async function storeMedia(bytes: Buffer, type: (typeof TYPES)[number]) {
 
 /** Only addresses this app handed out can be attached to a message (so nobody can post an outside link as "media"). */
 export function isOurMedia(url: string) {
-  if (url.startsWith(LOCAL_PREFIX)) return /^\/api\/media\/[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4)$/.test(url);
+  if (url.startsWith(LOCAL_PREFIX)) return NAME.test(url.slice(LOCAL_PREFIX.length));
   try {
     const u = new URL(url);
-    return u.protocol === "https:" && u.hostname.endsWith(".public.blob.vercel-storage.com") && u.pathname.startsWith("/media/");
+    return u.protocol === "https:" && /\.(public|private)\.blob\.vercel-storage\.com$/.test(u.hostname) && u.pathname.startsWith("/media/");
   } catch {
     return false;
   }
 }
 
+/** The /api/media/<file> address for a file uploaded straight to a private store (its blob URL isn't viewable). */
+export const servedAddress = (url: string) => {
+  try {
+    const u = new URL(url);
+    return u.hostname.includes(".private.") ? LOCAL_PREFIX + u.pathname.slice("/media/".length) : url;
+  } catch {
+    return url;
+  }
+};
+
 export const kindOf = (url: string): MediaKind => (/\.(webm|mov|mp4)$/.test(url) ? "video" : "photo");
 
-/** Reads a locally stored file (dev only). */
+const mimeOf = (name: string) => TYPES.find((t) => name.endsWith("." + t.ext))!.mime;
+
+/** Reads a file kept on this machine (local dev). */
 export async function readLocal(name: string) {
-  if (!/^[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4)$/.test(name)) return null;
+  if (!NAME.test(name)) return null;
   try {
-    return { bytes: await readFile(path.join(LOCAL_DIR, name)), mime: TYPES.find((t) => name.endsWith("." + t.ext))!.mime };
+    return { bytes: await readFile(path.join(LOCAL_DIR, name)), mime: mimeOf(name) };
+  } catch {
+    return null;
+  }
+}
+
+/** Streams a file from a private Blob store (with the byte range a video player asks for). */
+export async function readPrivate(name: string, range: string | null) {
+  if (!NAME.test(name) || (await blobAccess()) !== "private") return null;
+  try {
+    const r = await get("media/" + name, { access: "private", headers: range ? { range } : undefined });
+    if (!r || r.statusCode !== 200 || !r.stream) return null;
+    return { stream: r.stream, mime: mimeOf(name), headers: r.headers };
   } catch {
     return null;
   }

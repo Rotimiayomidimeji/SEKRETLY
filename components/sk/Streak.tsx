@@ -29,7 +29,7 @@ export default class Streak extends React.Component<Record<string, any>, any> {
       var done = !!dropped[d] && !saved[d];
       var save = !!saved[d] || (s.used && d === today && !dropped[d]);
       var bg = done ? 'linear-gradient(135deg,#ff8a2b,#ff3d6e)' : save ? '#3a6bff' : 'var(--card2)';
-      cal.push({ n: d, label: MO.name + ' ' + d + (done ? ', dropped' : save ? ', save used' : ''), bg: bg, ink: (done || save) ? '#fff' : 'var(--ink)', ring: d === today ? '#ff8a2b' : 'transparent', op: d > today ? 0.45 : 1 });
+      cal.push({ n: d, label: MO.name + ' ' + d + (done ? ', active' : save ? ', save used' : ''), bg: bg, ink: (done || save) ? '#fff' : 'var(--ink)', ring: d === today ? '#ff8a2b' : 'transparent', op: d > today ? 0.45 : 1 });
     }
     var cur = this.props.current || 0, longest = this.props.longest || 0;
     var M = [
@@ -46,7 +46,7 @@ export default class Streak extends React.Component<Record<string, any>, any> {
       saveDots: [0, 1].map(function (i) { var has = i < s.saves; return { bg: has ? '#3a6bff' : 'var(--card2)', ink: has ? '#ffffff' : 'var(--muted)' }; }),
       dow: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       cal: cal, doneCount: MO.dropped.length, monthName: MO.name, current: cur, atRisk: !!this.props.atRisk && !s.used,
-      streakSub: this.props.atRisk && !s.used ? 'Drop today’s link before 7pm to make it ' + (cur + 1) + '.' : cur ? 'Today is done. Come back after 7pm for the next drop.' : 'Drop today’s link to start your streak.',
+      streakSub: this.props.atRisk && !s.used ? 'Do one thing before 7pm (make or answer a link, send, reply or play) to make it ' + (cur + 1) + '.' : cur ? 'Today counts. Keep it going tomorrow.' : 'Make a link, send a message, reply or play a game to start your streak.',
       riskTitle: 'Your ' + cur + '-day streak ends at 7pm',
       miles: M.map(function (x) { return { days: x.days, reward: x.reward, got: x.got, state: x.got ? 'Unlocked' : (x.days - cur) + ' more days', bg: x.got ? 'linear-gradient(135deg,#ff8a2b,#ff3d6e)' : 'var(--card2)', ink: x.got ? '#fff' : 'var(--ink)' }; }),
       friends: [{ rank: 1, name: 'You', days: cur, icon: '/sk/' + (this.props.avatar || 'fox') + '.png', tint: 'linear-gradient(135deg,#d6ff6b,#22c4a0)', bg: 'rgba(255,59,141,.10)' }],

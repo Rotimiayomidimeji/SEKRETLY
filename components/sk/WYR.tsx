@@ -275,7 +275,7 @@ export default class WYR extends React.Component<Record<string, any>, any> {
     return this.P().filter(function (p) { return s.kicked.indexOf(p[0]) < 0; }).map(function (p) {
       var nm = p[0], sc = s.scores[nm] || 0;
       var score = id === 'nhie' ? s.lives[nm] * 10 + (s.catches[nm] || 0) : id === 'mlt' ? (s.crowns[nm] || 0) * 10 + sc : sc;
-      var label = id === 'nhie' ? s.lives[nm] + ' cups · ' + (s.catches[nm] || 0) + ' caught' : id === 'mlt' ? (s.crowns[nm] || 0) + ' crowns · ' + sc + ' pts' : sc + ' pts';
+      var label = id === 'nhie' ? s.lives[nm] + ' cups · ' + (s.catches[nm] || 0) + ' caught' : id === 'mlt' ? (s.crowns[nm] || 0) + ' crowns · ' + sc + (sc === 1 ? ' pt' : ' pts') : sc + (sc === 1 ? ' pt' : ' pts');
       return { name: nm === 'MangoMoon' ? myNick : nm, color: p[1], score: score, label: label };
     }).sort(function (a, b) { return b.score - a.score; });
   }
@@ -431,7 +431,7 @@ export default class WYR extends React.Component<Record<string, any>, any> {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark,
       ads: this.props.ads === 'off' ? 'off' : 'on',
       g: G, sc: G.sc, isTod: id === 'tod', isWyr: id === 'wyr',
-      turnLine: (this.room || G.room) + ' · ' + P.length + ' players · code K7Q2', totalTurns: total,
+      turnLine: (this.room || G.room) + ' · ' + P.length + ' players · code ' + (this.props.code || ''), totalTurns: total,
       turnChip: ph === 'over' ? 'Final' : started ? 'Turn ' + (k + 1) + ' of ' + total : total + ' turns', spiceChip: SP[lv] + (lv === 2 ? ' 🔥' : ''), spiceBg: SPC[lv],
       strip: strip, banner: banner, bannerPulse: myMoment ? 'gr-pulse' : '', panelCls: myMoment ? 'is-me' : '',
       seats: seats, cupsets: cupsets, spin: spinDeg + 'deg',
@@ -450,7 +450,7 @@ export default class WYR extends React.Component<Record<string, any>, any> {
       nextColor: nextName ? C[nextName] : '#ffd23d', nextInitial: nextName ? nextName.charAt(0) : '★',
       nextText: nextName ? (nextName === 'MangoMoon' ? 'Next up: YOU. Get ready to lead.' : 'Next up: ' + nextName + (nextIdx + 1 === myPos ? ' · you’re after them' : '')) : 'That was the last turn. Final results next.',
       reacts: RE.map(function (x) { return { name: x[0], src: x[1], send: function () { self.react(x[1]); } }; }), fx: s.fx,
-      myRank: myRank || 1, myScore: id === 'nhie' ? s.lives.MangoMoon + ' cups' : (s.scores.MangoMoon || 0) + ' pts',
+      myRank: myRank || 1, myScore: id === 'nhie' ? s.lives.MangoMoon + ' cups' : (s.scores.MangoMoon || 0) + ((s.scores.MangoMoon || 0) === 1 ? ' pt' : ' pts'),
       comboLabel: s.combo >= 2 ? 'Combo ×' + s.combo + ' 🔥' : 'No combo', comboBg: s.combo >= 2 ? '#ff3b8d' : 'var(--card2)',
       secs: secs, secsShown: timed ? secs : '–', ringDash: timed ? (secs / limit * 119).toFixed(1) : '0', ringColor: secs <= 5 ? '#ff4f6d' : (myMoment ? '#ff3b8d' : '#ffd23d'),
       paused: s.paused, pauseText: host ? 'Paused' : 'The host paused the game',

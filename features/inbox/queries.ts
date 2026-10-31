@@ -64,6 +64,7 @@ async function messageItem(m: MessageRow, warns: number, names: Map<string, stri
   return {
     id: "m:" + m.id,
     kind: "one",
+    at: m.createdAt.getTime(),
     link: TOPIC_COMPOSER[m.topic],
     th: "th-" + m.link.theme,
     title: topicTitle(m.link),
@@ -105,6 +106,8 @@ export async function chatItem(c: ChatRow, viewerId: string, warns?: number) {
   const original = c.message.text || (c.message.topic === "QUIZ" ? "Took your quiz" : c.message.topic === "RATE" ? "Rated you" : "");
   return {
     id: "c:" + c.id,
+    // newest activity first in the inbox
+    at: c.lastAt.getTime(),
     kind: "chat",
     role: asOwner ? "owner" : "guest",
     link: TOPIC_COMPOSER[c.message.topic],
@@ -158,6 +161,7 @@ export async function loadInbox(userId: string) {
     ...(await Promise.all(chats.filter((c) => c.lastAt.getTime() + c.owner.chatTimerDays * MESSAGE_TTL_MS > now.getTime()).map((c) => chatItem(c, userId, warnsOf(userKey(c.ownerId === userId ? c.guestId : c.ownerId)))))),
     ...(await Promise.all(messages.map((m) => messageItem(m, warnsOf(senderKeyOf(m)), names)))),
   ];
+  items.sort((a, b) => b.at - a.at);
   return { items, unread: items.filter((i) => i.unread && !i.archived).length };
 }
 

@@ -53,14 +53,29 @@ export const myDrop = (userId: string, number = dropNumber()) =>
  * Streak: drops posted on consecutive days (a streak save covers a missed day). Today counts once it's dropped;
  * until 7pm an undropped today doesn't break the streak yet, it puts it at risk.
  */
+/**
+ * The streak counts every day (drop days: they turn over at 7pm Lagos) on which the member did something that
+ * matters: made or answered a link (the drop included), sent an anonymous message, replied in a chat, reacted to a
+ * message, or played a game. Just reading doesn't count. A streak save fills a missed day.
+ */
 export async function streakOf(userId: string) {
-  const [drops, saves] = await Promise.all([
+  const since = new Date(Date.now() - 400 * DAY);
+  const [drops, saves, active] = await Promise.all([
     db.link.findMany({ where: { ownerId: userId, topic: "DROP" }, select: { dropNumber: true } }),
     db.streakSave.findMany({ where: { userId }, select: { dropNumber: true } }),
+    db.$queryRaw<{ d: number }[]>`
+      select distinct (floor((extract(epoch from t) * 1000 + ${SHIFT}) / ${DAY}) - ${FIRST} + 1)::int as d from (
+        select "createdAt" as t from "Link" where "ownerId" = ${userId} and "createdAt" >= ${since}
+        union all select "createdAt" from "Message" where "senderId" = ${userId} and "createdAt" >= ${since}
+        union all select "reactedAt" from "Message" where "recipientId" = ${userId} and "reactedAt" >= ${since}
+        union all select cm."createdAt" from "ChatMessage" cm join "Chat" c on c.id = cm."chatId"
+          where cm."createdAt" >= ${since} and ((cm."fromOwner" and c."ownerId" = ${userId}) or (not cm."fromOwner" and c."guestId" = ${userId}))
+        union all select "joinedAt" from "GamePlayer" where "userId" = ${userId} and "joinedAt" >= ${since}
+      ) x`,
   ]);
   const dropped = new Set(drops.map((d) => d.dropNumber!).filter((n) => n != null));
   const saved = new Set(saves.map((s) => s.dropNumber));
-  const done = new Set([...dropped, ...saved]);
+  const done = new Set([...dropped, ...saved, ...active.map((r) => r.d)]);
   const today = dropNumber();
   const doneToday = done.has(today);
   let current = 0;
@@ -70,7 +85,9 @@ export async function streakOf(userId: string) {
     run = done.has(n - 1) ? run + 1 : 1;
     longest = Math.max(longest, run);
   }
-  return { current, longest, doneToday, atRisk: !doneToday && current > 0, today, dropped, saved };
+  // days that count on their own (activity or a drop), as opposed to days a save filled
+  const activeDays = new Set([...dropped, ...active.map((r) => r.d)]);
+  return { current, longest, doneToday, atRisk: !doneToday && current > 0, today, dropped, saved, active: activeDays };
 }
 
 /** Adds the week's free streak save (Mondays, Lagos time; holding at most 2). Safe to call on every visit. */

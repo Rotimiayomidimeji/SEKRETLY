@@ -35,7 +35,7 @@ export default async function StreakPage() {
         offset: new Date(Date.UTC(year, month, 1)).getUTCDay(),
         days: new Date(Date.UTC(year, month + 1, 0)).getUTCDate(),
         today: now.getUTCDate(),
-        dropped: days(streak.dropped),
+        dropped: days(streak.active),
         saved: days(streak.saved),
       }}
       spendSave={spendStreakSave}

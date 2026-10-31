@@ -208,7 +208,7 @@ export default class Home extends React.Component<Record<string, any>, any> {
                 {" "}
                 <header className="topbar">
                   {" "}
-                  <SkLink href="/profile" className="av tap" aria-label="Your profile" style={{ background: "linear-gradient(135deg,#d6ff6b,#22c4a0)" }}>
+                  <SkLink href="/profile" className="av tap" aria-label="Your profile" style={{ background: v.avatarBg }}>
                     <img src={`/sk/${v.avatar}.png`} alt="" />
                   </SkLink>
                   {" "}

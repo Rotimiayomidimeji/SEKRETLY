@@ -93,6 +93,8 @@ model User {
   inboxTimerDays   Int                @default(1)
   /// When the member last chose their message timer (the inbox stops suggesting it after that)
   timerSetAt       DateTime?
+  /// The member's own background colour behind their avatar (a hue, 0–360); empty: the animal's own colours
+  avatarHue        Int?
   chatTimerDays    Int                @default(1)
   /// Settings › Safety: photos and videos stay blurred until tapped
   blurMedia        Boolean            @default(true)

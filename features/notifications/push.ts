@@ -12,7 +12,10 @@ function configure() {
   if (ready) return true;
   const pub = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY, priv = process.env.VAPID_PRIVATE_KEY;
   if (!pub || !priv) return false;
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:hello@sekretly.app", pub, priv);
+  // the subject must be "mailto:you@…" or an https address; a bare email (a common slip in the env settings) is fixed up
+  const raw = (process.env.VAPID_SUBJECT || "hello@sekretly.app").trim();
+  const subject = /^(mailto:|https:)/i.test(raw) ? raw : "mailto:" + raw.replace(/^mailto:/i, "");
+  webpush.setVapidDetails(subject, pub.trim(), priv.trim());
   ready = true;
   return true;
 }

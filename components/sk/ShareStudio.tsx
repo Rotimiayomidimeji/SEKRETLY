@@ -40,7 +40,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     import('html-to-image').catch(function () {});
   }
   componentWillUnmount() { try { window.removeEventListener('storage', this.onStore); } catch (e) {} clearInterval(this.tk); clearInterval(this.nt); clearTimeout(this.dt); }
-  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }
+  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); this.prepSoon(); }
   // long text fills each card top to bottom (about 390 characters) and carries on in the next one.
   // The inbox pages through the same cards.
   split(t, max) {
@@ -61,50 +61,71 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     return out;
   }
   // posting plays out on the stage: each card comes to the middle, lifts, and its circle turns into a green tick
-  runPost(keys, dest) {
-    var self = this, files = [], k = 0;
-    clearInterval(this.tk); clearTimeout(this.dt);
-    var next = function () {
-      if (!self.state.posting) return;
-      if (k >= keys.length) { self.finish(files, dest); return; }
-      var key = keys[k], idx = self.keyIndex[key];
-      self.setState({ focus: idx === undefined ? self.state.focus : idx });
-      self.dt = setTimeout(function () {
-        var node = document.querySelector('[data-card="' + key + '"]');
-        import('html-to-image').then(function (h) {
-          return h.toBlob(node, { canvasWidth: 1080, canvasHeight: 1920, pixelRatio: 1, style: { borderRadius: '0', boxShadow: 'none' }, filter: function (n) { return !(n.classList && n.classList.contains('ss-ctl')); } });
-        }).then(function (blob) {
-          if (blob) files.push(new File([blob], 'sekretly-' + (k + 1) + '.png', { type: 'image/png' }));
-          var s = self.state, posted = Object.assign({}, s.posted); posted[key] = true; k++;
-          self.setState({ posted: posted, posting: Object.assign({}, s.posting, { k: k }), sent: key });
-          next();
-        }).catch(function (e) { console.error('Share studio could not draw a card', e); self.setState({ posting: null, posted: {}, drawErr: true }); });
-      }, 450);
-    };
-    // start once React has applied the posting state (next() checks it to know it wasn't cancelled)
-    this.setState({ posting: { dest: dest, keys: keys, k: 0 }, posted: {}, done: false, paint: false, files: null, needTap: false, drawErr: false }, next);
-  }
-  // hands the images over: the share sheet where the phone has one (WhatsApp Status, Instagram, Snapchat…), else downloads
-  finish(files, dest) {
+  // one card's story image (1080×1920), without the on-screen controls
+  draw(key) {
+    var node = document.querySelector('[data-card="' + key + '"]');
+    if (!node) return Promise.resolve(null);
+    var sig = node.className + '|' + node.textContent, hit = (this.cache || {})[key];
+    if (hit && hit.sig === sig) return Promise.resolve(hit.file);
     var self = this;
-    var one = files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
-    if (dest === 'save' || !one) {
+    return import('html-to-image').then(function (h) {
+      return h.toBlob(node, { canvasWidth: 1080, canvasHeight: 1920, pixelRatio: 1, style: { borderRadius: '0', boxShadow: 'none', transform: 'none', opacity: '1' }, filter: function (n) { return !(n.classList && n.classList.contains('ss-ctl')); } });
+    }).then(function (blob) {
+      if (!blob) return null;
+      var file = new File([blob], 'sekretly-' + key.replace(/[^a-z0-9]/gi, '') + '.png', { type: 'image/png' });
+      self.cache = Object.assign({}, self.cache); self.cache[key] = { sig: sig, file: file };
+      return file;
+    });
+  }
+  // draws the selected cards in the background, so posting doesn't wait
+  prepSoon() {
+    var self = this;
+    clearTimeout(this.pt);
+    this.pt = setTimeout(function () {
+      var keys = (self.pubKeys || []).slice();
+      var next = function () { if (!keys.length || self.state.posting) return; self.draw(keys.shift()).then(next, next); };
+      next();
+    }, 600);
+  }
+  runPost(keys, dest) {
+    var self = this;
+    if (this.state.posting || !keys.length) return;
+    clearTimeout(this.pt);
+    this.setState({ posting: { dest: dest, keys: keys, k: 0 }, done: false, drawErr: false, shareNote: '' });
+    var files = [], k = 0;
+    var step = function () {
+      if (k >= keys.length) { self.finish(files, dest, keys); return; }
+      self.draw(keys[k]).then(function (f) {
+        if (f) files.push(new File([f], 'sekretly-' + (k + 1) + '.png', { type: 'image/png' }));
+        k++; step();
+      }).catch(function (e) { console.error('Share studio could not draw a card', e); self.setState({ posting: null, drawErr: true }); });
+    };
+    step();
+  }
+  finish(files, dest, keys) {
+    var self = this, WEB = { wa: 'https://web.whatsapp.com/', ig: 'https://www.instagram.com/', sc: 'https://web.snapchat.com/', tt: 'https://www.tiktok.com/upload' };
+    var can = dest !== 'save' && files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
+    if (!can) {
       files.forEach(function (f, i) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 400); });
-      self.setState({ posting: null, done: true, files: files, sentN: files.length, needTap: false });
+      if (dest !== 'save' && WEB[dest]) window.open(WEB[dest], '_blank', 'noopener');
+      var p = Object.assign({}, self.state.posted); keys.forEach(function (x) { p[x] = true; });
+      self.setState({ posting: null, done: true, files: files, sentN: files.length, needTap: false, posted: p, lastDest: dest, savedOnly: true });
       return;
     }
-    var all = navigator.canShare({ files: files });
-    self.setState({ posting: null, files: files, batch: all ? files.length : 1, sentN: 0 }, function () { self.shareBatch(0); });
+    self.setState({ posting: null, files: files, batch: navigator.canShare({ files: files }) ? files.length : 1, sentN: 0, lastDest: dest, savedOnly: false, pendingKeys: keys }, function () { self.shareBatch(0); });
   }
-  // shares the next batch of images; when some are left (or the tap expired) the done sheet offers the next tap
+  // the phone's share sheet with the images (all at once, or one by one where the app takes one)
   shareBatch(from) {
-    var self = this, files = this.state.files || [], size = this.state.batch || files.length, part = files.slice(from, from + size);
+    var self = this, files = this.state.files || [], size = this.state.batch || files.length, part = files.slice(from, from + size), keys = this.state.pendingKeys || [];
     if (!part.length) return;
-    navigator.share({ files: part, title: 'Sekretly' }).then(function () {
-      var n = from + part.length;
-      self.setState({ done: true, sentN: n, needTap: n < files.length });
+    navigator.share({ files: part }).then(function () {
+      var n = from + part.length, p = Object.assign({}, self.state.posted);
+      keys.slice(from, n).forEach(function (x) { p[x] = true; });
+      self.setState({ done: true, sentN: n, needTap: n < files.length, posted: p });
     }).catch(function (e) {
-      self.setState({ done: true, sentN: from, needTap: !(e && e.name === 'AbortError') || from > 0 });
+      if (e && e.name === 'AbortError') { self.setState(from > 0 ? { done: true, needTap: true } : { done: false, shareNote: 'Not shared. Tap an app to try again.' }); return; }
+      // the tap went stale while the images were drawn: one more tap opens the share sheet
+      self.setState({ done: true, sentN: from, needTap: true });
     });
   }
   renderVals() {
@@ -115,7 +136,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     var ends = function (x) { return /[.!?”"]$/.test(x); };
     s.tray.forEach(function (id) {
       var m = M[id]; if (!m) return;
-      var parts = self.split(m.text, 390);
+      var parts = self.split(m.text, 260);
       groups.push({ id: id, icon: m.icon, label: (m.topic.length > 18 ? m.topic.slice(0, 17) + '…' : m.topic) + (parts.length > 1 ? ' · ' + parts.length : ''), thumbs: [] });
       parts.forEach(function (txt, pi) {
         var key = id + ':' + pi, on = !s.off[key];
@@ -158,6 +179,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
     var pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });
     var pool = Object.keys(M).filter(function (id) { return s.tray.indexOf(id) < 0 && !M[id].promo; });
     var allOn = anySel === total && total > 0 && !pool.length;
+    self.pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });
     var promos = Object.keys(M).filter(function (id) { return !!M[id].promo; });
     var FR = [['Fox', '#ffb35c', 'chatting now'], ['Moon', '#9db8ff', 'active 2h ago'], ['KolaNut', '#ff9ad5', 'from Friday Night Never'], ['PixelOwl', '#7ef0c1', 'from Hostel B confessions']];
     var postedList = flat.filter(function (c) { return !!s.posted[c.key]; });
@@ -174,7 +196,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
       atFirst: focus <= 0, atLast: focus >= total - 1, prevOp: focus <= 0 ? 0.4 : 1, nextOp: focus >= total - 1 ? 0.4 : 1,
       capTitle: !fc ? '' : !fc.on ? 'Skipped' : fc.m.own ? 'Card ' + fc.num + ' · friends only' : 'Card ' + fc.num + ' of ' + anySel,
       capSub: !fc ? '' : (fParts > 1 ? 'Part ' + (fc.pi + 1) + ' of ' + fParts + ' · ' : '') + fc.m.topic + (fc.on ? '' : ' · tap the circle to add it back'),
-      isPosting: !!s.posting, progressText: s.posting ? 'Posting ' + Math.max(1, s.posting.k) + ' of ' + s.posting.keys.length + ' to ' + dest[1] + '…' : '',
+      isPosting: !!s.posting, progressText: s.posting ? 'Getting your images ready…' : '',
       paintOpen: !!s.paint && !!fc, paintTitle: fc && fc.on ? 'Colour for card ' + fc.num : 'Colour for this card',
       swatches: TH.map(function (t) { var on = !!fc && fc.th === t[0]; return { cls: 'th-' + t[0], name: t[1], on: on ? 'true' : 'false', ring: on ? 'var(--ink)' : 'transparent', pick: function () { var o = Object.assign({}, s.theme); o[fc.key] = t[0]; self.setState({ theme: o }); } }; }),
       canApplyAll: fParts > 1, applyAllLabel: 'Use on all ' + fParts + ' parts',
@@ -186,11 +208,12 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
         if (allOn && !pool.length) { var o = {}; flat.forEach(function (c) { o[c.key] = true; }); self.setState({ off: o }); return; }
         self.setState({ off: {}, tray: s.tray.concat(pool) });
       },
-      dests: DEST.map(function (x) { var on = s.dest === x[0]; return { name: x[1], icon: '/brand/' + x[3] + '.svg', on: on ? 'true' : 'false', pick: function () { self.setState({ dest: x[0] }); } }; }),
+      dests: DEST.map(function (x) { return { name: x[1], label: x[0] === 'save' ? 'Save the images' : 'Post to ' + x[1], icon: '/brand/' + x[3] + '.svg', go: function () { if (pubSel && !s.posting) self.runPost(pubKeys, x[0]); } }; }),
+      postHint: s.posting ? 'Getting ' + s.posting.keys.length + (s.posting.keys.length === 1 ? ' image' : ' images') + ' ready…' : s.shareNote || (pubSel === 0 ? 'Select a card to post' : 'Tap an app to post ' + pubSel + (pubSel === 1 ? ' card' : ' cards') + ', in order'),
       cantPost: pubSel === 0 || !!s.posting, postOp: pubSel === 0 || s.posting ? 0.55 : 1,
       postLabel: s.posting ? 'Posting…' : pubSel === 0 ? 'Select a card to post' : s.dest === 'save' ? 'Save ' + pubSel + ' image' + (pubSel === 1 ? '' : 's') + ' in order' : 'Post ' + pubSel + ' card' + (pubSel === 1 ? '' : 's') + ' to ' + dest[2],
       post: function () { if (pubSel && !s.posting) self.runPost(pubKeys, s.dest); },
-      doneOpen: s.done, doneTitle: postedList.length + ' card' + (postedList.length === 1 ? '' : 's') + (s.dest === 'save' ? ' saved to ' : ' posted to ') + dest[2],
+      doneOpen: s.done, doneTitle: (function () { var n = s.sentN || 0, d = DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0]; return s.savedOnly ? n + (n === 1 ? ' image saved' : ' images saved') + (s.lastDest !== 'save' ? ' · upload them in ' + d[1] + ' (it opened in a new tab)' : '') : n + (n === 1 ? ' card shared to ' : ' cards shared to ') + d[1]; })(),
       steps: postedList.map(function (c) { return { num: c.num, label: (c.parts.length > 1 ? 'Part ' + (c.pi + 1) + ' · ' : '') + c.text }; }),
       needTap: s.needTap, drawErr: !!s.drawErr,
       shareNow: function () { if (s.files) self.shareBatch(s.sentN || 0); },
@@ -204,7 +227,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
       friendList: FR.map(function (f) { var done = !!s.sentTo[f[0]]; return { name: f[0], initial: f[0].charAt(0), bg: f[1], sub: f[2], label: done ? 'Sent ✓' : 'Send', cls: done ? '' : 'btn-cta', send: function () { var o = Object.assign({}, s.sentTo); o[f[0]] = true; self.setState({ sentTo: o }); } }; }),
       promos: promos.map(function (id) { var m = M[id], inTray = s.tray.indexOf(id) >= 0; return { th: 'th-' + m.th, tag: m.promo, title: m.topic, inTray: inTray, label: inTray ? 'Added ✓' : '+ Add card', add: function () { if (!inTray) self.setState({ tray: s.tray.concat([id]), focus: total }); } }; }),
       poolCount: pool.length,
-      pool: pool.map(function (id) { var m = M[id], n = self.split(m.text, 390).length; return { th: 'th-' + m.th, icon: m.icon, meta: m.topic + ' · ' + n + ' card' + (n === 1 ? '' : 's'), text: m.text, own: !!m.own, add: function () { self.setState({ tray: s.tray.concat([id]), focus: total }); } }; })
+      pool: pool.map(function (id) { var m = M[id], n = self.split(m.text, 260).length; return { th: 'th-' + m.th, icon: m.icon, meta: m.topic + ' · ' + n + ' card' + (n === 1 ? '' : 's'), text: m.text, own: !!m.own, add: function () { self.setState({ tray: s.tray.concat([id]), focus: total }); } }; })
     };
   }
 
@@ -541,7 +564,7 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
               {(v.dests || []).map((d, i0) => (
                 <Fragment key={i0}>
                 {" "}
-                <button className="ss-d ss-d-ic tap" onClick={d.pick} role="radio" aria-checked={d.on} aria-pressed={d.on} aria-label={d.name} title={d.name}>
+                <button className="ss-d ss-d-ic tap" onClick={d.go} aria-label={d.label} title={d.name} disabled={!!(v.cantPost)}>
                   <img src={d.icon} alt="" />
                 </button>
                 {" "}
@@ -558,9 +581,9 @@ export default class ShareStudio extends React.Component<Record<string, any>, an
               </>
             ) : null}
             {" "}
-            <button className="btn btn-cta btn-lg btn-block tap" onClick={v.post} disabled={!!(v.cantPost)} style={{ marginTop: "12px", opacity: v.postOp }}>
-              {v.postLabel}
-            </button>
+            <p className="muted" role="status" style={{ marginTop: "10px", fontSize: "13.5px", textAlign: "center" }}>
+              {v.postHint}
+            </p>
             {" "}
             <button className="btn btn-block tap" onClick={v.openFriends} disabled={!!(v.noAny)} style={{ marginTop: "8px", gap: "8px", display: "none" }}>
               <img src="/sk/busts_in_silhouette_3d.png" alt="" style={{ width: "22px", height: "22px" }} />

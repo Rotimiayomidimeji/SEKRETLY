@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { allows } from "@/lib/consent";
+
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 
 type PostHog = typeof import("posthog-js").default;
@@ -29,7 +31,7 @@ const load = () =>
 export function Analytics() {
   const path = usePathname();
   useEffect(() => {
-    if (!KEY) return;
+    if (!KEY || !allows("stats")) return;
     // link addresses carry the owner's key: report the page shape, not the address
     const shape = path.replace(/^\/([^/]+)\/[^/]+\/([^/]+)\/([^/]+)$/, "/link/$2/$3");
     load().then((posthog) => posthog.capture("$pageview", { $current_url: window.location.origin + shape }));

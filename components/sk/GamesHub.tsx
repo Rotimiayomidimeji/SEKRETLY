@@ -45,6 +45,7 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
           meta: c.who.length + (c.who.length === 1 ? ' member' : ' members') + (c.streak ? ' · ' + c.streak + '-day streak' : ''),
           next: c.nightTitle, play: function () {} };
       }),
+      streakTitle: (this.props.streak || 0) === 1 ? '1-day streak' : (this.props.streak || 0) + '-day streak', streakSub: this.props.streak ? 'Play or drop today' : 'Drop today to start one',
       code: s.code, onCode: function (e) { self.setState({ code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') }); }, codeOk: s.code.length >= 5, codeHref: '/join/' + s.code,
       games: G.map(function (g) { return Object.assign({ tint: 'var(--card2)' }, g, { newHref: '/games/new?game=' + g.id, pick: function () { try { window.localStorage.setItem('sk-pick', g.id); window.localStorage.removeItem('sk-edit'); window.localStorage.removeItem('sk-crew'); window.localStorage.setItem('sk-nav', String(Date.now())); } catch (e) {} } }); }),
       filters: [['all', 'All'], ['nhie', 'Never Have I Ever'], ['tod', 'Truth or Dare'], ['wyr', 'Would You Rather'], ['mlt', 'Most Likely To'], ['hot', 'Hot Takes'], ['poll', 'Polls']].map(function (f) { var on = s.filter === f[0]; return { label: f[1], on: on ? 'true' : 'false', cls: on ? 'on' : '', pick: function () { self.setState({ filter: f[0] }); } }; }),
@@ -218,7 +219,7 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
                   Game code
                 </label>
                 {" "}
-                <input id="gh-code" value={v.code ?? ""} onChange={v.onCode} placeholder="Got a game code? e.g. MANGO7" maxLength="6" style={{ flex: "1", minWidth: "0", border: "0", background: "transparent", color: "var(--ink)", fontSize: "16px", fontWeight: "700", outline: "none", textTransform: "uppercase", minHeight: "44px" }} />
+                <input id="gh-code" value={v.code ?? ""} onChange={v.onCode} placeholder="Got a game code? e.g. 7KQ2M" maxLength="5" style={{ flex: "1", minWidth: "0", border: "0", background: "transparent", color: "var(--ink)", fontSize: "16px", fontWeight: "700", outline: "none", textTransform: "uppercase", minHeight: "44px" }} />
                 {" "}
                 {v.codeOk ? (
                   <>
@@ -236,10 +237,10 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
                   <img src="/sk/fire.png" alt="" style={{ width: "36px", height: "36px" }} />
                   <span>
                     <b className="d" style={{ fontSize: "17px", display: "block" }}>
-                      12-day streak
+                      {v.streakTitle}
                     </b>
                     <span className="muted" style={{ fontSize: "12.5px" }}>
-                      Play or drop today
+                      {v.streakSub}
                     </span>
                   </span>
                 </SkLink>
@@ -248,10 +249,10 @@ export default class GamesHub extends React.Component<Record<string, any>, any> 
                   <img className="float" src="/sk/wrapped_gift_3d.png" alt="" style={{ width: "36px", height: "36px" }} />
                   <span>
                     <b className="d" style={{ fontSize: "17px", display: "block" }}>
-                      Daily pack
+                      Join a game
                     </b>
                     <span className="muted" style={{ fontSize: "12.5px" }}>
-                      2 invites waiting
+                      Enter a room code
                     </span>
                   </span>
                 </SkLink>

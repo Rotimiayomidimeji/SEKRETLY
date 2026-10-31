@@ -145,9 +145,10 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
       };
     }
     var groups = ['quiz', 'describe', 'rate', 'confess', 'ama', 'custom'].map(function (k) {
-      var its = shown.filter(function (m) { return m.link === k; }).map(function (m) { var d = decorate(m); counter++; d.adAfter = counter % 5 === 0; return d; });
-      return { title: L[k].title, th: L[k].th, n: its.length, items: its };
-    }).filter(function (g) { return g.n > 0; });
+      var raw = shown.filter(function (m) { return m.link === k; });
+      var its = raw.map(function (m) { var d = decorate(m); counter++; d.adAfter = counter % 5 === 0; if (m.kind === 'one' && m.th) { d.avCls = (d.avCls || '') + ' ' + m.th; d.avBg = ''; } return d; });
+      return { title: L[k].title, th: (raw[0] && raw[0].th) || L[k].th, n: its.length, items: its, first: raw.length ? shown.indexOf(raw[0]) : 1e9 };
+    }).filter(function (g) { return g.n > 0; }).sort(function (a, b) { return a.first - b.first; });
     var selRaw = s.items.filter(function (m) { return m.id === s.openId; })[0];
     var sel = selRaw ? decorate(selRaw) : { stash: function () {}, who: '', sub: '', av: GHOST, avBg: '', avCls: '', th: '', topic: '', textQuoted: '', ago: '', left: '', mediaTag: '' };
     var thread = selRaw && selRaw.kind === 'chat' ? selRaw.thread.map(function (b, i) {
@@ -181,8 +182,8 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
     var chatList = chatKeys.map(function (k) { var b = selRaw.thread[Number(k.split(':').pop())]; return { id: k, topic: b.me ? 'Your reply to ' + selRaw.who : 'Chat · ' + selRaw.who, th: 'default', text: b.text, own: !!b.me }; });
     var chatPublic = chatList.filter(function (x) { return !x.own; });
     var quickCards = [];
-    (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 390); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
-    var pages = open && selRaw.kind === 'one' && !selRaw.quiz && !selRaw.rate ? split(selRaw.text, 390) : [];
+    (s.quick ? s.quick.list : []).forEach(function (x) { var p = split(x.text, 260); p.forEach(function (t, i) { quickCards.push((p.length > 1 ? 'Part ' + (i + 1) + '/' + p.length + ' · ' : '') + t); }); });
+    var pages = open && selRaw.kind === 'one' && !selRaw.quiz && !selRaw.rate ? split(selRaw.text, 260) : [];
     var pg = Math.min(s.page, Math.max(0, pages.length - 1));
     var w = selRaw ? selRaw.warns : 0;
     var r = s.result;
@@ -1056,7 +1057,7 @@ export default class Inbox extends React.Component<Record<string, any>, any> {
                       {v.selPlain ? (
                         <>
                         {" "}
-                        <p className={v.pageCls} style={{ marginTop: "16px", fontSize: v.pageFs, fontWeight: v.pageW, letterSpacing: v.pageLs, lineHeight: v.pageLh }}>
+                        <p className={v.pageCls} style={{ overflowWrap: "anywhere", marginTop: "16px", fontSize: v.pageFs, fontWeight: v.pageW, letterSpacing: v.pageLs, lineHeight: v.pageLh }}>
                           {v.pageText}
                         </p>
                         {" "}

@@ -47,6 +47,7 @@ export async function loadProfile(user: User, view: "own" | "public") {
   return {
     username: user.username,
     avatar: user.avatar,
+    hue: user.avatarHue,
     bio: user.bio ?? "",
     pub: user.publicProfile,
     cloudPub: user.cloudPublic,

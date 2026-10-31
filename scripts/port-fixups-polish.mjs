@@ -382,3 +382,218 @@ for (const board of ["Signup", "Home", "Settings"])
 POLISH_FIXUPS.Profile = POLISH_FIXUPS.Profile.concat([
   [`<a href="ShareStudio.dc.html" onClick="{{shareCloud}}" class="btn btn-cta tap">Share my cloud</a>`, `<sc-if value="{{hasWords}}" hint-placeholder-val="{{ true }}"><a href="ShareStudio.dc.html" onClick="{{shareCloud}}" class="btn btn-cta tap">Share my cloud</a></sc-if>`],
 ]);
+
+// Game tables: the room's real code (not the mockup's K7Q2), and "1 pt" / "2 pts"
+for (const board of ["NHIE", "TruthDare", "WYR", "MostLikely", "HotTakes", "Polls"])
+  POLISH_FIXUPS[board] = (POLISH_FIXUPS[board] || []).concat([
+    (src) => {
+      if (!src.includes("' players · code K7Q2'")) throw new Error(board + ": no K7Q2 turn line");
+      return src
+        .split("' players · code K7Q2'").join("' players · code ' + (this.props.code || '')")
+        .split("(s.scores.MangoMoon || 0) + ' pts'").join("(s.scores.MangoMoon || 0) + ((s.scores.MangoMoon || 0) === 1 ? ' pt' : ' pts')")
+        .split("sc + ' pts'").join("sc + (sc === 1 ? ' pt' : ' pts')");
+    },
+  ]);
+
+// Games hub: the member's real streak, and "Join a game" instead of the demo daily pack; 5-letter code example
+// props added: streak (days)
+POLISH_FIXUPS.GamesHub = POLISH_FIXUPS.GamesHub.concat([
+  [`placeholder="Got a game code? e.g. MANGO7" maxlength="6"`, `placeholder="Got a game code? e.g. 7KQ2M" maxlength="5"`],
+  [`<b class="d" style="font-size: 17px; display: block">12-day streak</b><span class="muted" style="font-size: 12.5px">Play or drop today</span>`, `<b class="d" style="font-size: 17px; display: block">{{streakTitle}}</b><span class="muted" style="font-size: 12.5px">{{streakSub}}</span>`],
+  [`<b class="d" style="font-size: 17px; display: block">Daily pack</b><span class="muted" style="font-size: 12.5px">2 invites waiting</span>`, `<b class="d" style="font-size: 17px; display: block">Join a game</b><span class="muted" style="font-size: 12.5px">Enter a room code</span>`],
+  [`      code: s.code,`, `      streakTitle: (this.props.streak || 0) === 1 ? '1-day streak' : (this.props.streak || 0) + '-day streak', streakSub: this.props.streak ? 'Play or drop today' : 'Drop today to start one',\n      code: s.code,`],
+]);
+
+// Share studio, simplified: tapping an app posts at once. The story images are drawn ahead of time (whenever the
+// cards change), so the phone's share sheet opens straight from the tap; a card counts as posted only when the
+// share went through. On a laptop (no share sheet) the images download and that app's website opens.
+POLISH_FIXUPS.ShareStudio = POLISH_FIXUPS.ShareStudio.concat([
+  [
+    `<button class="ss-d ss-d-ic tap" onClick="{{d.pick}}" role="radio" aria-checked="{{d.on}}" aria-pressed="{{d.on}}" aria-label="{{d.name}}" title="{{d.name}}">`,
+    `<button class="ss-d ss-d-ic tap" onClick="{{d.go}}" aria-label="{{d.label}}" title="{{d.name}}" disabled="{{cantPost}}">`,
+  ],
+  [
+    `<button class="btn btn-cta btn-lg btn-block tap" onClick="{{post}}" disabled="{{cantPost}}" style="margin-top: 12px; opacity: {{postOp}}">{{postLabel}}</button>`,
+    `<p class="muted" role="status" style="margin-top: 10px; font-size: 13.5px; text-align: center">{{postHint}}</p>`,
+  ],
+  [
+    `  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); }`,
+    `  componentDidUpdate(prev) { if (prev.mode !== this.props.mode && this.props.mode) this.setState({ mode: this.props.mode }); this.prepSoon(); }`,
+  ],
+  between(
+    `  runPost(keys, dest) {`,
+    `  renderVals() {`,
+    `  // one card's story image (1080×1920), without the on-screen controls
+  draw(key) {
+    var node = document.querySelector('[data-card="' + key + '"]');
+    if (!node) return Promise.resolve(null);
+    var sig = node.className + '|' + node.textContent, hit = (this.cache || {})[key];
+    if (hit && hit.sig === sig) return Promise.resolve(hit.file);
+    var self = this;
+    return import('html-to-image').then(function (h) {
+      return h.toBlob(node, { canvasWidth: 1080, canvasHeight: 1920, pixelRatio: 1, style: { borderRadius: '0', boxShadow: 'none', transform: 'none', opacity: '1' }, filter: function (n) { return !(n.classList && n.classList.contains('ss-ctl')); } });
+    }).then(function (blob) {
+      if (!blob) return null;
+      var file = new File([blob], 'sekretly-' + key.replace(/[^a-z0-9]/gi, '') + '.png', { type: 'image/png' });
+      self.cache = Object.assign({}, self.cache); self.cache[key] = { sig: sig, file: file };
+      return file;
+    });
+  }
+  // draws the selected cards in the background, so posting doesn't wait
+  prepSoon() {
+    var self = this;
+    clearTimeout(this.pt);
+    this.pt = setTimeout(function () {
+      var keys = (self.pubKeys || []).slice();
+      var next = function () { if (!keys.length || self.state.posting) return; self.draw(keys.shift()).then(next, next); };
+      next();
+    }, 600);
+  }
+  runPost(keys, dest) {
+    var self = this;
+    if (this.state.posting || !keys.length) return;
+    clearTimeout(this.pt);
+    this.setState({ posting: { dest: dest, keys: keys, k: 0 }, done: false, drawErr: false, shareNote: '' });
+    var files = [], k = 0;
+    var step = function () {
+      if (k >= keys.length) { self.finish(files, dest, keys); return; }
+      self.draw(keys[k]).then(function (f) {
+        if (f) files.push(new File([f], 'sekretly-' + (k + 1) + '.png', { type: 'image/png' }));
+        k++; step();
+      }).catch(function (e) { console.error('Share studio could not draw a card', e); self.setState({ posting: null, drawErr: true }); });
+    };
+    step();
+  }
+  finish(files, dest, keys) {
+    var self = this, WEB = { wa: 'https://web.whatsapp.com/', ig: 'https://www.instagram.com/', sc: 'https://web.snapchat.com/', tt: 'https://www.tiktok.com/upload' };
+    var can = dest !== 'save' && files.length && navigator.canShare && navigator.canShare({ files: [files[0]] });
+    if (!can) {
+      files.forEach(function (f, i) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 400); });
+      if (dest !== 'save' && WEB[dest]) window.open(WEB[dest], '_blank', 'noopener');
+      var p = Object.assign({}, self.state.posted); keys.forEach(function (x) { p[x] = true; });
+      self.setState({ posting: null, done: true, files: files, sentN: files.length, needTap: false, posted: p, lastDest: dest, savedOnly: true });
+      return;
+    }
+    self.setState({ posting: null, files: files, batch: navigator.canShare({ files: files }) ? files.length : 1, sentN: 0, lastDest: dest, savedOnly: false, pendingKeys: keys }, function () { self.shareBatch(0); });
+  }
+  // the phone's share sheet with the images (all at once, or one by one where the app takes one)
+  shareBatch(from) {
+    var self = this, files = this.state.files || [], size = this.state.batch || files.length, part = files.slice(from, from + size), keys = this.state.pendingKeys || [];
+    if (!part.length) return;
+    navigator.share({ files: part }).then(function () {
+      var n = from + part.length, p = Object.assign({}, self.state.posted);
+      keys.slice(from, n).forEach(function (x) { p[x] = true; });
+      self.setState({ done: true, sentN: n, needTap: n < files.length, posted: p });
+    }).catch(function (e) {
+      if (e && e.name === 'AbortError') { self.setState(from > 0 ? { done: true, needTap: true } : { done: false, shareNote: 'Not shared. Tap an app to try again.' }); return; }
+      // the tap went stale while the images were drawn: one more tap opens the share sheet
+      self.setState({ done: true, sentN: from, needTap: true });
+    });
+  }
+`,
+  ),
+  [`var allOn = anySel === total && total > 0 && !pool.length;`, `var allOn = anySel === total && total > 0 && !pool.length;\n    self.pubKeys = flat.filter(function (c) { return c.on && !c.m.own; }).map(function (c) { return c.key; });`],
+  [
+    `dests: DEST.map(function (x) { var on = s.dest === x[0]; return { name: x[1], icon: '/brand/' + x[3] + '.svg', on: on ? 'true' : 'false', pick: function () { self.setState({ dest: x[0] }); } }; }),`,
+    `dests: DEST.map(function (x) { return { name: x[1], label: x[0] === 'save' ? 'Save the images' : 'Post to ' + x[1], icon: '/brand/' + x[3] + '.svg', go: function () { if (pubSel && !s.posting) self.runPost(pubKeys, x[0]); } }; }),
+      postHint: s.posting ? 'Getting ' + s.posting.keys.length + (s.posting.keys.length === 1 ? ' image' : ' images') + ' ready…' : s.shareNote || (pubSel === 0 ? 'Select a card to post' : 'Tap an app to post ' + pubSel + (pubSel === 1 ? ' card' : ' cards') + ', in order'),`,
+  ],
+  line(
+    /doneTitle: postedList\.length \+ [^\n]*?dest\[2\],/,
+    `doneTitle: (function () { var n = s.sentN || 0, d = DEST.filter(function (x) { return x[0] === s.lastDest; })[0] || DEST[0]; return s.savedOnly ? n + (n === 1 ? ' image saved' : ' images saved') + (s.lastDest !== 'save' ? ' · upload them in ' + d[1] + ' (it opened in a new tab)' : '') : n + (n === 1 ? ' card shared to ' : ' cards shared to ') + d[1]; })(),`,
+  ),
+  [`progressText: s.posting ? 'Posting ' + Math.max(1, s.posting.k) + ' of ' + s.posting.keys.length + ' to ' + dest[1] + '…' : '',`, `progressText: s.posting ? 'Getting your images ready…' : '',`],
+]);
+
+// Long messages: ~260 characters per card (was 390) so every card's text fits the inbox card and the story card;
+// the inbox and the Share studio split the same way, so "Share all N cards" matches
+for (const board of ["Inbox", "ShareStudio"])
+  POLISH_FIXUPS[board] = POLISH_FIXUPS[board].concat([
+    (src) => {
+      if (!src.includes(", 390)")) throw new Error(board + ": no 390 split");
+      return src.split(", 390)").join(", 260)");
+    },
+  ]);
+
+// Cookie choices are remembered for a year (localStorage + a cookie), not just for this tab; Analytics and
+// AdFiller honour them (components/layout)
+POLISH_FIXUPS.Landing = (POLISH_FIXUPS.Landing || []).concat([
+  (src) => {
+    if (!src.includes("window.sessionStorage.getItem('sk-consent')")) throw new Error("Landing: no consent read");
+    const save = (v) => `(window.localStorage.setItem('sk-consent', ${v}), document.cookie = 'sk-consent=' + ${v} + '; path=/; max-age=31536000; samesite=lax')`;
+    return src
+      .split("window.sessionStorage.getItem('sk-consent')").join("(window.localStorage.getItem('sk-consent') || (document.cookie.match(/(?:^|; )sk-consent=([^;]*)/) || [])[1] || null)")
+      .split("window.sessionStorage.setItem('sk-consent', 'all')").join(save("'all'"))
+      .split("window.sessionStorage.setItem('sk-consent', v)").join(save("v"));
+  },
+]);
+POLISH_FIXUPS.Inbox = POLISH_FIXUPS.Inbox.concat([[`<p class="{{pageCls}}" style="margin-top: 16px;`, `<p class="{{pageCls}}" style="overflow-wrap: anywhere; margin-top: 16px;`]]);
+
+// Streak: any day with something that counts (a link, the drop, a message sent, a reply, a reaction, a game)
+POLISH_FIXUPS.Streak = (POLISH_FIXUPS.Streak || []).concat([
+  (src) => {
+    const pairs = [
+      ["'Drop today’s link before 7pm to make it '", "'Do one thing before 7pm (make or answer a link, send, reply or play) to make it '"],
+      ["'Today is done. Come back after 7pm for the next drop.'", "'Today counts. Keep it going tomorrow.'"],
+      ["'Drop today’s link to start your streak.'", "'Make a link, send a message, reply or play a game to start your streak.'"],
+      ["', dropped'", "', active'"],
+    ];
+    for (const [a, b] of pairs) { if (!src.includes(a)) throw new Error("Streak: missing " + a); src = src.split(a).join(b); }
+    return src;
+  },
+]);
+
+// Avatar colour: drag along the rainbow to pick the background behind your animal (Home, Profile and the menu use it)
+// props added: hue (0–360 or null)
+const HUE_BG = "'linear-gradient(135deg,hsl(' + s.hue + ',90%,66%),hsl(' + ((s.hue + 40) % 360) + ',85%,48%))'";
+POLISH_FIXUPS.Profile = POLISH_FIXUPS.Profile.concat([
+  (src) => {
+    if (!src.includes("cloudPub: props.cloudPub !== false };")) throw new Error("Profile: no state end");
+    return src.replace("cloudPub: props.cloudPub !== false };", "cloudPub: props.cloudPub !== false, hue: props.hue == null ? null : props.hue };");
+  },
+  [`avSrc: av.src, avBg: av.bg,`, `avSrc: av.src, avBg: s.hue == null ? av.bg : ${HUE_BG},`],
+  [
+    `pick: function () { self.setState({ av: i }); self.props.save({ avatar: a.name }); } };`,
+    `pick: function () { self.setState({ av: i }); self.props.save({ avatar: a.name }); } };`,
+  ],
+  [
+    `        <button class="btn btn-cta btn-lg btn-block tap" onClick="{{closePicker}}" style="margin-top: 16px">Done</button>`,
+    `        <div style="margin-top: 18px">
+          <div class="row"><b style="flex: 1; font-size: 15px">Background colour</b><sc-if value="{{hasHue}}" hint-placeholder-val="{{ false }}"><button class="btn btn-sm btn-ghost tap" onClick="{{resetHue}}">Animal’s own</button></sc-if></div>
+          <div class="sk-hue-wrap" style="margin-top: 10px"><span class="sk-hue-prev" style="background: {{avBg}}"><img src="{{avSrc}}" alt=""></span><input type="range" class="sk-hue" min="0" max="359" value="{{hueVal}}" onChange="{{onHue}}" aria-label="Background colour"></div>
+          <p class="muted" style="font-size: 12.5px; margin-top: 6px">Drag the dot to pick any colour.</p>
+        </div>
+        <button class="btn btn-cta btn-lg btn-block tap" onClick="{{closePicker}}" style="margin-top: 16px">Done</button>`,
+  ],
+  [
+    `      picker: s.picker,`,
+    `      picker: s.picker, hasHue: s.hue != null, hueVal: s.hue == null ? 300 : s.hue,
+      onHue: function (e) { var h = Number(e.target.value); self.setState({ hue: h }); clearTimeout(self.ht); self.ht = setTimeout(function () { self.props.save({ avatarHue: h }); }, 350); },
+      resetHue: function () { clearTimeout(self.ht); self.setState({ hue: null }); self.props.save({ avatarHue: null }); },`,
+  ],
+]);
+POLISH_FIXUPS.Home = POLISH_FIXUPS.Home.concat([
+  [`<a href="Profile.dc.html" class="av tap" aria-label="Your profile" style="background: linear-gradient(135deg,#d6ff6b,#22c4a0)">`, `<a href="Profile.dc.html" class="av tap" aria-label="Your profile" style="background: {{avatarBg}}">`],
+]);
+
+// Landing's menu button: the same icon as every other page (shorter last line)
+POLISH_FIXUPS.Landing = POLISH_FIXUPS.Landing.concat([
+  (src) => {
+    const a = `aria-label="Open menu" aria-expanded="{{drawerOpen}}">\n        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>`;
+    if (!src.includes(a)) throw new Error("Landing: menu icon not found");
+    return src.replace(a, a.replace("M4 17h16", "M4 17h10"));
+  },
+]);
+
+// Inbox: the topic with the newest message or chat reply comes first, and each group/message wears its link's theme
+POLISH_FIXUPS.Inbox = POLISH_FIXUPS.Inbox.concat([
+  [
+    `      var its = shown.filter(function (m) { return m.link === k; }).map(function (m) { var d = decorate(m); counter++; d.adAfter = counter % 5 === 0; return d; });
+      return { title: L[k].title, th: L[k].th, n: its.length, items: its };
+    }).filter(function (g) { return g.n > 0; });`,
+    `      var raw = shown.filter(function (m) { return m.link === k; });
+      var its = raw.map(function (m) { var d = decorate(m); counter++; d.adAfter = counter % 5 === 0; if (m.kind === 'one' && m.th) { d.avCls = (d.avCls || '') + ' ' + m.th; d.avBg = ''; } return d; });
+      return { title: L[k].title, th: (raw[0] && raw[0].th) || L[k].th, n: its.length, items: its, first: raw.length ? shown.indexOf(raw[0]) : 1e9 };
+    }).filter(function (g) { return g.n > 0; }).sort(function (a, b) { return a.first - b.first; });`,
+  ],
+]);

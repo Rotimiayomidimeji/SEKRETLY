@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { allows } from "@/lib/consent";
+
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 declare global {
@@ -19,7 +21,7 @@ export function AdFiller() {
   const path = usePathname();
   useEffect(() => {
     // no ad account yet: the slots (and the desktop ad rail) stay out of sight instead of showing placeholders
-    if (!CLIENT) {
+    if (!CLIENT || !allows("ads")) {
       document.documentElement.classList.add("sk-noads");
       return;
     }

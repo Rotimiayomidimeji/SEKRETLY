@@ -11,7 +11,7 @@ export default class Profile extends React.Component<Record<string, any>, any> {
   constructor(props) {
     super(props);
     var m = null; // light/dark arrives as props.mode from the sk-mode cookie
-    this.state = { mode: m || props.mode || 'dark', av: Math.max(0, ['fox', 'panda', 'frog', 'octopus', 'unicorn', 'koala'].indexOf(props.avatar)), bio: props.bio || '', editing: false, pub: props.pub !== false, picker: false, reported: false, range: 0, word: '', cloudPub: props.cloudPub !== false };
+    this.state = { mode: m || props.mode || 'dark', av: Math.max(0, ['fox', 'panda', 'frog', 'octopus', 'unicorn', 'koala'].indexOf(props.avatar)), bio: props.bio || '', editing: false, pub: props.pub !== false, picker: false, reported: false, range: 0, word: '', cloudPub: props.cloudPub !== false, hue: props.hue == null ? null : props.hue };
   }
   componentDidMount() {
     skStack(this, ["editing","picker"]);
@@ -57,7 +57,7 @@ export default class Profile extends React.Component<Record<string, any>, any> {
       isOwn: own, isPublic: !own,
       mainPad: own ? '116px' : '40px',
       hiddenPublic: !own && !s.pub, showProfile: own || s.pub,
-      avSrc: av.src, avBg: av.bg, avName: av.name,
+      avSrc: av.src, avBg: s.hue == null ? av.bg : 'linear-gradient(135deg,hsl(' + s.hue + ',90%,66%),hsl(' + ((s.hue + 40) % 360) + ',85%,48%))', avName: av.name,
       bio: s.bio, onBio: function (e) { self.setState({ bio: e.target.value.slice(0, 150) }); }, bioCount: s.bio.length,
       editing: s.editing && own, notEditing: !(s.editing && own),
       editLabel: s.editing ? 'Save' : 'Edit profile',
@@ -66,7 +66,9 @@ export default class Profile extends React.Component<Record<string, any>, any> {
       togglePub: function () { self.setState({ pub: !s.pub }); self.props.save({ publicProfile: !s.pub }); },
       linksTitle: own ? 'Active links' : 'Send @' + U + ' something',
       links: L.map(function (l) { return { topic: l.topic, th: l.th, emoji: l.emoji, href: l.href, cta: own ? 'Manage' : 'Send' }; }),
-      picker: s.picker,
+      picker: s.picker, hasHue: s.hue != null, hueVal: s.hue == null ? 300 : s.hue,
+      onHue: function (e) { var h = Number(e.target.value); self.setState({ hue: h }); clearTimeout(self.ht); self.ht = setTimeout(function () { self.props.save({ avatarHue: h }); }, 350); },
+      resetHue: function () { clearTimeout(self.ht); self.setState({ hue: null }); self.props.save({ avatarHue: null }); },
       openPicker: function () { self.setState({ picker: true }); },
       closePicker: function () { self.setState({ picker: false }); },
       avatars: A.map(function (a, i) { var on = s.av === i; return { name: a.name, src: a.src, bg: a.bg, on: on ? 'true' : 'false', ring: on ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ av: i }); self.props.save({ avatar: a.name }); } }; })
@@ -697,6 +699,34 @@ export default class Profile extends React.Component<Record<string, any>, any> {
                   {" "}
                   </Fragment>
                 ))}
+                {" "}
+              </div>
+              {" "}
+              <div style={{ marginTop: "18px" }}>
+                {" "}
+                <div className="row">
+                  <b style={{ flex: "1", fontSize: "15px" }}>
+                    Background colour
+                  </b>
+                  {v.hasHue ? (
+                    <>
+                    <button className="btn btn-sm btn-ghost tap" onClick={v.resetHue}>
+                      Animal’s own
+                    </button>
+                    </>
+                  ) : null}
+                </div>
+                {" "}
+                <div className="sk-hue-wrap" style={{ marginTop: "10px" }}>
+                  <span className="sk-hue-prev" style={{ background: v.avBg }}>
+                    <img src={v.avSrc} alt="" />
+                  </span>
+                  <input type="range" className="sk-hue" min="0" max="359" value={v.hueVal ?? ""} onChange={v.onHue} aria-label="Background colour" />
+                </div>
+                {" "}
+                <p className="muted" style={{ fontSize: "12.5px", marginTop: "6px" }}>
+                  Drag the dot to pick any colour.
+                </p>
                 {" "}
               </div>
               {" "}

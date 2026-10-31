@@ -24,6 +24,7 @@ const profileSchema = z.object({
   bio: z.string().trim().max(150).optional(),
   publicProfile: z.boolean().optional(),
   cloudPublic: z.boolean().optional(),
+  avatarHue: z.number().int().min(0).max(360).nullable().optional(),
 });
 
 /** Saves whatever the Profile screen changed (avatar, bio, public profile, word cloud on profile). */

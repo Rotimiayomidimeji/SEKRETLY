@@ -1,7 +1,7 @@
-import { del, head } from "@vercel/blob";
+import { del, get, head } from "@vercel/blob";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 
-import { isOurMedia, kindOf, MAX_BYTES, sniff, storeMedia } from "@/features/media/storage";
+import { blobAccess, isOurMedia, kindOf, MAX_BYTES, servedAddress, sniff, storeMedia } from "@/features/media/storage";
 import { deviceKey, standingWith, userKey } from "@/features/safety/standing";
 import { getCurrentUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
@@ -80,7 +80,7 @@ async function json(request: Request) {
   if (body.check) {
     const target = await checkTarget(body);
     if ("error" in target) return fail(target.error!, target.status);
-    return Response.json({ ok: true, direct: blobOn });
+    return Response.json({ ok: true, direct: blobOn, access: blobOn ? await blobAccess() : null });
   }
 
   // the Blob client's token request
@@ -110,16 +110,19 @@ async function json(request: Request) {
     if (!blobOn || !isOurMedia(url) || url.startsWith("/")) return fail("That attachment can’t be sent.");
     const target = await checkTarget(body);
     if ("error" in target) return fail(target.error!, target.status);
-    const [info, start] = await Promise.all([
-      head(url).catch(() => null),
-      fetch(url, { headers: { Range: "bytes=0-31" }, cache: "no-store" }).then((r) => (r.ok ? r.arrayBuffer() : null)).catch(() => null),
-    ]);
-    const type = start ? sniff(Buffer.from(start)) : null;
+    const priv = new URL(url).hostname.includes(".private.");
+    const firstBytes = priv
+      ? get(new URL(url).pathname.slice(1), { access: "private", headers: { range: "bytes=0-31" } })
+          .then(async (r) => (r && r.statusCode === 200 && r.stream ? (await r.stream.getReader().read()).value ?? null : null))
+          .catch(() => null)
+      : fetch(url, { headers: { Range: "bytes=0-31" }, cache: "no-store" }).then((r) => (r.ok ? r.arrayBuffer() : null)).catch(() => null);
+    const [info, start] = await Promise.all([head(url).catch(() => null), firstBytes]);
+    const type = start ? sniff(Buffer.from(start as ArrayBuffer)) : null;
     if (!info || !type || type.kind !== kindOf(url) || info.size > MAX_BYTES[type.kind]) {
       await del(url).catch(() => {});
       return fail(!type ? "Send a photo (JPG, PNG, WebP, GIF) or a video (MP4, MOV, WebM)." : type.kind === "photo" ? "Photos can be up to 8 MB." : "Videos can be up to 25 MB.", 415);
     }
-    return Response.json({ ok: true, url, kind: type.kind, size: info.size });
+    return Response.json({ ok: true, url: servedAddress(url), kind: type.kind, size: info.size });
   }
 
   return fail("Bad request.");

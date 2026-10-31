@@ -3,7 +3,7 @@ import { sendPush } from "@/features/notifications/push";
 import { db } from "@/lib/db";
 
 // Scheduled pushes (vercel.json runs these; Vercel sends "Authorization: Bearer <CRON_SECRET>"):
-//   streak  5pm Lagos   "Your 12-day streak ends at 7pm" to members who haven't dropped yet
+//   streak  5pm Lagos   "Your 12-day streak ends at 7pm" to members who haven't done anything that counts today
 //   drop    7pm Lagos   the new daily drop question
 //   wrap    Sunday 6pm  "Your week, wrapped"
 // Each respects the member's switch for it and their quiet hours (see features/notifications/push).
@@ -18,7 +18,7 @@ const JOBS: Record<string, () => Promise<number>> = {
     for (const u of await withPush()) {
       const s = await streakOf(u.id);
       if (!s.atRisk) continue;
-      await sendPush(u.id, { title: "Your " + s.current + "-day streak ends at 7pm", body: "Drop today’s question to keep it going.", url: "/drop", tag: "streak" }, "streak");
+      await sendPush(u.id, { title: "Your " + s.current + "-day streak ends at 7pm", body: "Do one thing to keep it going: answer the drop, send a message, reply or play a game.", url: "/home", tag: "streak" }, "streak");
       sent++;
     }
     return sent;

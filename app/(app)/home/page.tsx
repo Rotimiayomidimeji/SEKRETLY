@@ -11,6 +11,7 @@ import { unreadNotifications } from "@/features/notifications/queries";
 import { badgesOf } from "@/features/stats/stats";
 import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
+import { avatarBg } from "@/lib/avatar";
 import { getMode } from "@/lib/sk/mode";
 
 export const metadata: Metadata = { title: "Sekretly · Home" };
@@ -84,6 +85,7 @@ export default async function HomePage() {
         ads={await adsFlag("home")}
         username={user.username}
         avatar={user.avatar}
+        avatarBg={avatarBg(user.avatar, user.avatarHue)}
         greeting={greeting()}
         unread={unread}
         notifUnread={notifUnread}

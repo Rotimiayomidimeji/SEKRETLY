@@ -21,7 +21,7 @@ export default class Landing extends React.Component<Record<string, any>, any> {
     try { window.addEventListener('storage', this.onStore); } catch (e) {}
     try { this.motionOn(); } catch (e) {}
     var seen = null;
-    try { seen = window.sessionStorage.getItem('sk-consent'); } catch (e) {}
+    try { seen = (window.localStorage.getItem('sk-consent') || (document.cookie.match(/(?:^|; )sk-consent=([^;]*)/) || [])[1] || null); } catch (e) {}
     if (!seen || this.props.consent === 'show') this.setState({ consent: true });
     // arriving from another page's "How it works" / "Games" link
     var j = null;
@@ -108,8 +108,8 @@ export default class Landing extends React.Component<Record<string, any>, any> {
       toggleCkAds: function () { self.setState({ ckAds: !s.ckAds }); }, toggleCkStats: function () { self.setState({ ckStats: !s.ckStats }); },
       ckToggleMore: function () { self.setState({ ckMore: !s.ckMore }); },
       ckSaveLabel: s.ckMore ? 'Save my choices' : 'Essential only',
-      ckAccept: function () { try { window.sessionStorage.setItem('sk-consent', 'all'); } catch (e) {} self.setState({ consent: false }); },
-      ckSave: function () { var v = s.ckMore ? (s.ckAds ? 'ads' : '') + (s.ckStats ? '+stats' : '') || 'essential' : 'essential'; try { window.sessionStorage.setItem('sk-consent', v); } catch (e) {} self.setState({ consent: false }); },
+      ckAccept: function () { try { (window.localStorage.setItem('sk-consent', 'all'), document.cookie = 'sk-consent=' + 'all' + '; path=/; max-age=31536000; samesite=lax'); } catch (e) {} self.setState({ consent: false }); },
+      ckSave: function () { var v = s.ckMore ? (s.ckAds ? 'ads' : '') + (s.ckStats ? '+stats' : '') || 'essential' : 'essential'; try { (window.localStorage.setItem('sk-consent', v), document.cookie = 'sk-consent=' + v + '; path=/; max-age=31536000; samesite=lax'); } catch (e) {} self.setState({ consent: false }); },
       openConsent: function () { self.setState({ consent: true, ckMore: true }); },
       toggleDrawer: function () { self.setState({ drawer: !self.state.drawer }); },
       goHow: function (e) { if (e && e.preventDefault) e.preventDefault(); self.setState({ drawer: false }); setTimeout(function () { self.jump('how'); }, 60); },
@@ -258,7 +258,7 @@ export default class Landing extends React.Component<Record<string, any>, any> {
             <button className="icon-btn pub-menu tap" onClick={v.toggleDrawer} aria-label="Open menu" aria-expanded={v.drawerOpen}>
               {" "}
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" />
+                <path d="M4 7h16M4 12h16M4 17h10" />
               </svg>
               {" "}
             </button>
