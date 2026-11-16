@@ -5,6 +5,7 @@ import { AdFiller } from "@/components/layout/AdFiller";
 import { Analytics } from "@/components/layout/Analytics";
 import { PageLoader } from "@/components/layout/PageLoader";
 import { PhotoViewer } from "@/components/layout/PhotoViewer";
+import { Presence } from "@/components/layout/Presence";
 import { PushBridge } from "@/components/layout/PushBridge";
 import { ShareKit } from "@/components/layout/ShareKit";
 
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ShareKit />
         <PhotoViewer />
         <Analytics />
+        <Presence />
         <AdFiller />
       </body>
     </html>

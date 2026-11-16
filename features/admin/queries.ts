@@ -1,7 +1,8 @@
 import "server-only";
 
+import { addressesOf, duration, livePeople, LIVE_WINDOW_MS, timeOnSite } from "@/features/admin/presence";
 import { isSerious } from "@/features/admin/settings";
-import { networkOf } from "@/features/admin/traffic";
+import { networkOf, stateName } from "@/features/admin/traffic";
 import { db } from "@/lib/db";
 
 const DAY = 86_400_000;
@@ -20,9 +21,24 @@ async function senderNames(keys: string[]) {
   return (k: string) => (k.startsWith("u:") ? "@" + (users.get(k.slice(2)) ?? "deleted") : "a visitor (device v_" + k.slice(2, 8) + ")");
 }
 
+/** Serious reports (last 30 days) nobody has decided on yet, by category: the red badge on every admin page. */
+async function openSerious() {
+  const open = await db.report.findMany({ where: { decision: null, createdAt: { gte: new Date(Date.now() - 30 * DAY) } }, select: { category: true } });
+  const flags = await Promise.all(open.map((r) => isSerious(r.category)));
+  const byCat = new Map<string, number>();
+  open.forEach((r, i) => flags[i] && byCat.set(r.category, (byCat.get(r.category) ?? 0) + 1));
+  return byCat;
+}
+
+/** How many serious reports wait for a human (0 hides the badge). */
+export async function reviewCount() {
+  return [...(await openSerious()).values()].reduce((a, n) => a + n, 0);
+}
+
 /** Admin home: today at a glance. */
 export async function loadDashboard() {
   const today = lagosToday(), week = new Date(Date.now() - 7 * DAY);
+  const [livePpl, timeToday, serious] = await Promise.all([livePeople(), timeOnSite(today), openSerious()]);
   const [live, visitsToday, devicesToday, messagesToday, usersToday, reportsToday, blocksToday, review, hourly, cats, weekVisits, weekMessages, weekSignups, recent, joined] = await Promise.all([
     db.visitLog.findMany({ where: { at: { gte: new Date(Date.now() - 5 * 60_000) } }, distinct: ["fingerprint"], select: { id: true } }),
     db.visitLog.count({ where: { kind: "visit", at: { gte: today } } }),
@@ -40,7 +56,9 @@ export async function loadDashboard() {
     db.visitLog.findMany({ orderBy: { at: "desc" }, take: 8 }),
     db.user.findMany({ where: { createdAt: { lte: new Date(Date.now() - DAY) } }, select: { createdAt: true, sessions: { select: { lastUsedAt: true } } }, take: 2000 }),
   ]);
+  void live;
   const needsReview = (await Promise.all(review.map((r) => isSerious(r.category)))).filter(Boolean).length;
+  const seriousList = [...serious.entries()].sort((a, b) => b[1] - a[1]).map(([c, n]) => n + " " + c.toLowerCase());
   const hours = Array.from({ length: 24 }, () => 0);
   for (const v of hourly) hours[new Date(v.at.getTime() + 3_600_000).getUTCHours()]++;
   const maxH = Math.max(1, ...hours), maxCat = Math.max(1, ...cats.map((c) => c._count));
@@ -52,8 +70,17 @@ export async function loadDashboard() {
   };
   const warnings = reportsToday.filter((r) => !["Self-harm", "Suicide talk"].includes(r.category)).length;
   return {
-    live: live.length,
+    live: livePpl.count,
+    liveRows: livePpl.rows.slice(0, 12),
+    liveMembers: livePpl.members,
+    reviewCount: needsReview,
+    dateLabel: new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Lagos" }) + " · live data, refreshes every 20s",
+    seriousTitle: needsReview ? needsReview + (needsReview === 1 ? " serious report" : " serious reports") : "No serious reports",
+    seriousText: needsReview ? " need a human: " + seriousList.join(", ") + "." : " waiting. The review queue is clear.",
+    seriousC: needsReview ? "var(--bad)" : "var(--ok)",
     kpis: [
+      { label: "Live now", value: fmt(livePpl.count), delta: livePpl.members + (livePpl.members === 1 ? " member" : " members") + " · " + (livePpl.count - livePpl.members) + " visitors", c: "var(--ok)", href: "/admin/traffic" },
+      { label: "Time on site", value: timeToday.avg, delta: "average visit today · " + timeToday.visits + " visits", c: "var(--muted)", href: "/admin/traffic" },
       { label: "Visitors today", value: fmt(visitsToday), delta: "link visits", c: "var(--ok)", href: "/admin/traffic" },
       { label: "Unique devices", value: fmt(devicesToday.length), delta: "today", c: "var(--muted)", href: "/admin/traffic" },
       { label: "Messages sent", value: fmt(messagesToday), delta: "today", c: "var(--ok)", href: "/admin/traffic" },
@@ -76,7 +103,7 @@ export async function loadDashboard() {
       { label: "Sign-ups", value: fmt(weekSignups), rate: pct(weekSignups, weekMessages), w: pct(weekSignups, weekVisits).replace("—", "0%") },
     ],
     feed: recent.map((l, i) => ({
-      text: (l.kind === "signup" ? "New account" : l.userId ? "Member" : "Visitor") + " · " + (l.city || l.region || "Unknown place") + " · " + networkOf(l.ip) + " · " + l.os + (l.kind === "visit" ? " opened " + l.path : l.kind === "message" ? " sent a message" : " signed up"),
+      text: (l.kind === "signup" ? "New account" : l.userId ? "Member" : "Visitor") + " · " + (l.city || stateName(l.region, l.country)) + " · " + networkOf(l.ip) + " · " + l.os + (l.kind === "visit" ? " opened " + l.path : l.kind === "message" ? " sent a message" : " signed up"),
       c: l.kind === "signup" ? "#5be0a0" : l.kind === "message" ? "#ff3b8d" : "#22e1ff",
       t: ago(l.at),
       cls: i === 0 ? "fresh" : "",
@@ -126,29 +153,44 @@ export async function loadReports() {
   };
 }
 
-/** Admin › Users: every member with their warnings and blocks. */
+/** Admin › Users: every member with warnings, blocks, where they are, their network addresses and time on site. */
 export async function loadUsers() {
-  const users = await db.user.findMany({ where: { status: { not: "DELETED" } }, orderBy: { createdAt: "desc" }, take: 500, include: { _count: { select: { links: true, sent: true } } } });
-  const keys = users.map((u) => "u:" + u.id);
-  const [standings, reports, lastVisits] = await Promise.all([
+  const users = await db.user.findMany({ where: { status: { not: "DELETED" }, role: { not: "ADMIN" } }, orderBy: { createdAt: "desc" }, take: 500, include: { _count: { select: { links: true, sent: true } } } });
+  const keys = users.map((u) => "u:" + u.id), ids = users.map((u) => u.id);
+  const [standings, reports, lastVisits, lastPresence, addrs, total, suspended, active7] = await Promise.all([
     db.senderStanding.findMany({ where: { senderKey: { in: keys } } }),
     db.report.findMany({ where: { senderKey: { in: keys } }, select: { senderKey: true, reporterId: true, category: true } }),
-    db.visitLog.findMany({ where: { userId: { in: users.map((u) => u.id) } }, orderBy: { at: "desc" }, distinct: ["userId"] }),
+    db.visitLog.findMany({ where: { userId: { in: ids } }, orderBy: { at: "desc" }, distinct: ["userId"] }),
+    db.presence.findMany({ where: { userId: { in: ids } }, orderBy: { lastSeenAt: "desc" }, distinct: ["userId"] }),
+    addressesOf(ids),
+    db.user.count({ where: { status: { not: "DELETED" }, role: { not: "ADMIN" } } }),
+    db.user.count({ where: { status: "SUSPENDED" } }),
+    db.user.count({ where: { status: "ACTIVE", role: { not: "ADMIN" }, lastSeenAt: { gte: new Date(Date.now() - 7 * DAY) } } }),
   ]);
   const names = new Map((await db.user.findMany({ where: { id: { in: standings.map((s) => s.recipientId) } }, select: { id: true, username: true } })).map((u) => [u.id, u.username]));
-  return users.map((u) => {
-    const key = "u:" + u.id, last = lastVisits.find((v) => v.userId === u.id);
+  const liveSince = Date.now() - LIVE_WINDOW_MS;
+  const list = users.map((u) => {
+    const key = "u:" + u.id;
+    const pv = lastPresence.find((v) => v.userId === u.id), lv = lastVisits.find((v) => v.userId === u.id);
+    // the newest of their last page visit and their last link visit or send
+    const last = pv && (!lv || pv.lastSeenAt >= lv.at) ? pv : (lv ?? null);
+    const a = addrs.get(u.id);
+    const seen = u.lastSeenAt ?? pv?.lastSeenAt ?? null;
     return {
       name: u.username,
       av: u.avatar,
-      joined: u.createdAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
+      joined: u.createdAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
       isNew: u.createdAt.getTime() > Date.now() - 7 * DAY,
-      state: last?.region || "Unknown",
+      state: last ? stateName(last.region, last.country) : "Unknown",
       device: last ? (last.os === "iOS" ? "iPhone" : last.os) : "Unknown",
       links: u._count.links,
       sent: u._count.sent,
       status: u.status === "SUSPENDED" ? "Suspended" : "",
-      ips: last ? last.ip.split(".").slice(0, 2).join(".") + ".•••.•••" : "—",
+      ips: last?.ip ?? "—",
+      ipList: a ? [...a.ips.entries()].sort((x, y) => y[1].getTime() - x[1].getTime()).slice(0, 8).map(([ip, at]) => ({ ip, net: networkOf(ip), when: ago(at) })) : [],
+      timeOnSite: a ? duration(a.seconds) : "0s",
+      lastSeen: seen ? (seen.getTime() >= liveSince ? "online now" : ago(seen) + " ago") : "never",
+      online: !!pv && pv.lastSeenAt.getTime() >= liveSince,
       pairs: standings
         .filter((s) => s.senderKey === key)
         .map((s) => {
@@ -157,4 +199,5 @@ export async function loadUsers() {
         }),
     };
   });
+  return { list, total, suspended, active7, online: list.filter((u) => u.online).length };
 }

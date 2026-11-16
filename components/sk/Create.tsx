@@ -144,7 +144,14 @@ export default class Create extends React.Component<Record<string, any>, any> {
       sTheme: cur === 'theme', sTopic: cur === 'topic', sQuiz: cur === 'quiz', sLimits: cur === 'limits',
       notShare: cur !== 'share', isShare: cur === 'share',
       themes: T.map(function (t) { var a = t[0] === s.theme; return { name: t[1], cls: 'th-' + t[0], emoji: t[2], on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ theme: t[0] }); } }; }),
-      topics: TP.map(function (t) { var a = t.id === tp.id; return { title: t.title, sub: t.sub, emoji: t.emoji, isNew: !!t.isNew, on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : line, dot: a ? '#ff3b8d' : 'transparent', pick: function () { self.setState({ topic: t.id }); } }; }),
+      topics: TP.map(function (t) { var a = t.id === tp.id; return { title: t.title, sub: t.sub, emoji: t.emoji, isNew: !!t.isNew, on: a ? 'true' : 'false', ring: a ? '#ff3b8d' : line, dot: a ? '#ff3b8d' : 'transparent', pick: function (e) {
+        // the editor drops open right under the tapped topic; bring it into view so nobody has to scroll for it
+        var btn = e && e.currentTarget;
+        self.setState({ topic: t.id }, function () {
+          var drop = btn && btn.nextElementSibling;
+          if (drop && drop.classList.contains('cr-drop')) requestAnimationFrame(function () { drop.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+        });
+      } }; }),
       notCustom: !isCustom, titleVal: titleVal, introVal: introVal, titleDefault: tp.title, introDefault: INTRO[tp.id],
       onTitle: function (e) { setCopy('title', e.target.value.slice(0, 60)); }, onIntro: function (e) { setCopy('intro', e.target.value.slice(0, 120)); },
       resetCopy: function () { var c = Object.assign({}, s.copy); delete c[tp.id]; self.setState({ copy: c }); }, copyEdited: !!s.copy[tp.id],
@@ -644,15 +651,12 @@ export default class Create extends React.Component<Record<string, any>, any> {
                         {" "}
                       </button>
                       {" "}
-                      </Fragment>
-                    ))}
-                    {" "}
-                  </div>
-                  {" "}
+                      {tp.on === "true" ? (
+                      <div className="cr-drop">
                   {v.isCustom ? (
                     <>
                     {" "}
-                    <div style={{ marginTop: "10px" }}>
+                    <div>
                       {" "}
                       <label htmlFor="cr-custom" className="label">
                         Your question
@@ -669,7 +673,7 @@ export default class Create extends React.Component<Record<string, any>, any> {
                     </>
                   ) : null}
                   {" "}
-                  <div className="card" style={{ padding: "14px", marginTop: "12px" }}>
+                  <div className="card" style={{ padding: "14px" }}>
                     {" "}
                     <div className="row">
                       <b style={{ flex: "1", fontSize: "15px" }}>
@@ -707,6 +711,12 @@ export default class Create extends React.Component<Record<string, any>, any> {
                     </label>
                     {" "}
                     <input id="cr-intro" className="field" value={v.introVal ?? ""} onChange={v.onIntro} maxLength="120" placeholder={v.introDefault} />
+                    {" "}
+                  </div>
+                      </div>
+                      ) : null}
+                      </Fragment>
+                    ))}
                     {" "}
                   </div>
                   {" "}

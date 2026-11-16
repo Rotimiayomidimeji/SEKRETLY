@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 
 import { checkCode, issueCode } from "@/features/auth/codes";
+import { linkedToSuspended } from "@/features/admin/presence";
+import { clientIp, ipBlocked } from "@/features/admin/traffic";
 import { createAccount, RESERVED } from "@/features/auth/accounts";
 import { maskEmail, passwordSchema, signupSchema, usernameSchema, type SignupInput } from "@/features/auth/schemas";
 import { createSession, destroyAllSessions, destroySession, getCurrentUser } from "@/lib/auth/session";
@@ -23,7 +25,11 @@ export async function checkUsername(name: string) {
   return { available: !taken };
 }
 
-export async function signup(input: SignupInput): Promise<{ error: string; taken?: boolean }> {
+export async function signup(input: SignupInput): Promise<{ error: string; taken?: boolean; suspended?: boolean }> {
+  // blocked networks and devices of suspended accounts get their own message, not a vague failure
+  if (await ipBlocked()) return { error: "New accounts can’t be made from this network: it was blocked for breaking the community rules.", suspended: true };
+  if (await linkedToSuspended(await requestFingerprint(), await clientIp()))
+    return { error: "This device is linked to a suspended Sekretly account, so you can’t make a new one. If you think this is a mistake, contact us from the Contact page.", suspended: true };
   const limit = await hitRateLimit(`signup:${await requestFingerprint()}`, 5, 60 * MINUTE);
   if (!limit.allowed) return { error: "Too many new accounts from this device. Try again in an hour." };
   const parsed = signupSchema.safeParse(input);
@@ -41,14 +47,17 @@ export async function signup(input: SignupInput): Promise<{ error: string; taken
   redirect("/onboarding");
 }
 
-export async function login(input: { username: string; password: string; next?: string }): Promise<{ left: number; locked: boolean }> {
+export async function login(input: { username: string; password: string; next?: string }): Promise<{ left: number; locked: boolean; suspended?: boolean }> {
   const name = String(input.username ?? "").trim().toLowerCase().slice(0, 40);
   // 5 tries per account per 15 minutes (as the screen says), and a looser cap per device
   const perAccount = await hitRateLimit(`login:${name}`, 5, 15 * MINUTE);
   const perDevice = await hitRateLimit(`login-device:${await requestFingerprint()}`, 30, 15 * MINUTE);
   if (!perAccount.allowed || !perDevice.allowed) return { left: 0, locked: true };
   const user = await db.user.findUnique({ where: { username: name } });
-  const ok = !!user && user.status === "ACTIVE" && (await verifyPassword(String(input.password ?? ""), user.passwordHash));
+  const passOk = !!user && (await verifyPassword(String(input.password ?? ""), user.passwordHash));
+  // the right password on a suspended account: say so (only the owner can see this, since the password matched)
+  if (passOk && user?.status === "SUSPENDED") return { left: perAccount.remaining, locked: false, suspended: true };
+  const ok = passOk && user?.status === "ACTIVE";
   if (!ok || !user) return { left: perAccount.remaining, locked: perAccount.remaining === 0 };
   await clearRateLimit(`login:${name}`);
   const isAdmin = user.role === "ADMIN";
@@ -56,6 +65,8 @@ export async function login(input: { username: string; password: string; next?: 
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
   // the admin account only has the admin pages
   if (isAdmin) redirect(safeNext(input.next)?.startsWith("/admin") ? safeNext(input.next)! : "/admin");
+  // a room host goes to his editor's desk (where he also sets his own password the first time)
+  if (!safeNext(input.next) && (await db.room.findUnique({ where: { hostId: user.id }, select: { id: true } }))) redirect("/desk");
   redirect(safeNext(input.next) ?? (user.onboardedAt ? "/home" : "/onboarding"));
 }
 

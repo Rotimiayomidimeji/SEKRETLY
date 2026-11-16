@@ -3,6 +3,7 @@ import "server-only";
 import { headers } from "next/headers";
 import UAParser from "ua-parser-js";
 
+import { duration, timeOnSite } from "@/features/admin/presence";
 import { getSetting } from "@/features/admin/settings";
 import { db } from "@/lib/db";
 import { requestFingerprint } from "@/lib/rate-limit";
@@ -12,7 +13,7 @@ import { requestFingerprint } from "@/lib/rate-limit";
 
 const DAY = 86_400_000;
 
-async function clientIp() {
+export async function clientIp() {
   const h = await headers();
   return (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || "127.0.0.1";
 }
@@ -53,7 +54,30 @@ export async function ipBlocked() {
   return blocked.ips.includes(await clientIp());
 }
 
-const COUNTRY: Record<string, string> = { NG: "Nigeria", GH: "Ghana", GB: "United Kingdom", US: "United States" };
+/** Vercel sends Nigerian states as ISO codes ("LA"); admins read the full name ("Lagos"). */
+const NG_STATES: Record<string, string> = {
+  AB: "Abia", AD: "Adamawa", AK: "Akwa Ibom", AN: "Anambra", BA: "Bauchi", BE: "Benue", BO: "Borno", BY: "Bayelsa", CR: "Cross River",
+  DE: "Delta", EB: "Ebonyi", ED: "Edo", EK: "Ekiti", EN: "Enugu", FC: "FCT Abuja", GO: "Gombe", IM: "Imo", JI: "Jigawa", KD: "Kaduna",
+  KE: "Kebbi", KN: "Kano", KO: "Kogi", KT: "Katsina", KW: "Kwara", LA: "Lagos", NA: "Nasarawa", NI: "Niger", OG: "Ogun", ON: "Ondo",
+  OS: "Osun", OY: "Oyo", PL: "Plateau", RI: "Rivers", SO: "Sokoto", TA: "Taraba", YO: "Yobe", ZA: "Zamfara",
+};
+let regionNames: Intl.DisplayNames | null = null;
+/** "NG" → "Nigeria": any country code → its English name. */
+export function countryName(code: string | null | undefined) {
+  if (!code) return "Unknown";
+  try {
+    regionNames ??= new Intl.DisplayNames(["en"], { type: "region" });
+    return regionNames.of(code.toUpperCase()) ?? code;
+  } catch {
+    return code;
+  }
+}
+/** Full state name: "LA" in Nigeria → "Lagos"; elsewhere the code with the country ("CA, United States"). */
+export function stateName(region: string | null | undefined, country: string | null | undefined) {
+  if (!region) return country && country !== "NG" ? countryName(country) : "Unknown";
+  if (!country || country === "NG") return NG_STATES[region.toUpperCase()] ?? region;
+  return region + ", " + countryName(country);
+}
 const pctRows = (m: Map<string, number>, total: number, n = 6) =>
   [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => [k, Math.max(1, Math.round((100 * v) / Math.max(1, total)))] as [string, number]);
 const count = <T,>(list: T[], key: (x: T) => string) => list.reduce((m, x) => m.set(key(x), (m.get(key(x)) ?? 0) + 1), new Map<string, number>());
@@ -79,23 +103,25 @@ export async function trafficFor(range: "today" | "week" | "month") {
   const users = new Map((await db.user.findMany({ where: { id: { in: [...new Set(logs.map((l) => l.userId).filter((x): x is string => !!x))] } }, select: { id: true, username: true } })).map((u) => [u.id, u.username]));
   const fmtTime = (d: Date) => new Date(d.getTime() + 3_600_000).toISOString().slice(11, 16);
   const blocked = await getSetting<{ ips: string[] }>("blockedIps", { ips: [] });
+  const time = await timeOnSite(since);
   return {
     kpis: [
       { label: "Visits", value: Math.round(visits.length / days).toLocaleString("en-US"), sub: days > 1 ? "link visits a day" : "link visits" },
       { label: "Unique visitors", value: devices.size.toLocaleString("en-US"), sub: "by device" },
       { label: "Returning", value: devices.size ? Math.round((100 * returning) / devices.size) + "%" : "—", sub: "came back" },
       { label: "Messages sent", value: logs.filter((l) => l.kind === "message").length.toLocaleString("en-US"), sub: "from link pages" },
+      { label: "Time on site", value: time.avg, sub: "average visit · " + time.total + " in all" },
       { label: "Sign-ups", value: logs.filter((l) => l.kind === "signup").length.toLocaleString("en-US"), sub: "new accounts" },
     ],
     hours: hours.map((v, i) => ({ h: Math.round((100 * v) / maxH) + "%", t: i + ":00 · " + v + (v === 1 ? " visit" : " visits") })),
     heat: heat.map((row) => row.map((v) => (0.06 + (v / maxHeat) * 0.94).toFixed(2))),
     breakdowns: [
-      ["Top states", count(logs, (l) => l.region || "Unknown")],
+      ["Top states", count(logs, (l) => stateName(l.region, l.country))],
       ["Device type", count(logs, (l) => l.device)],
       ["Phone system", count(logs, (l) => l.os)],
       ["Browser", count(logs, (l) => l.browser)],
       ["Mobile network", count(logs, (l) => networkOf(l.ip))],
-      ["Countries", count(logs, (l) => COUNTRY[l.country ?? ""] ?? (l.country || "Unknown"))],
+      ["Countries", count(logs, (l) => countryName(l.country))],
       ["Top links visited", count(visits, (l) => l.path.replace(/^\/([^/]+)\/[^/]+\//, "/$1/…/"))],
     ].map(([title, m]) => ({ title: title as string, rows: pctRows(m as Map<string, number>, logs.length) })),
     rows: logs.slice(0, 60).map((l) => ({
@@ -104,17 +130,17 @@ export async function trafficFor(range: "today" | "week" | "month") {
       ip: l.ip,
       vid: "v_" + l.fingerprint.slice(0, 6),
       visits: perDevice.get(l.fingerprint) ?? 1,
-      state: l.region || "Unknown",
+      state: stateName(l.region, l.country),
       city: l.city || "Unknown",
-      country: COUNTRY[l.country ?? ""] ?? (l.country || "Unknown"),
+      country: countryName(l.country),
       net: networkOf(l.ip),
       device: l.device,
       os: l.os,
       browser: l.browser,
-      src: l.kind === "visit" ? "Link" : l.kind === "message" ? "Sent a message" : "Signed up",
+      src: (time.sourceByDevice.get(l.fingerprint) ?? "Direct") + " · " + (l.kind === "visit" ? "opened a link" : l.kind === "message" ? "sent a message" : "signed up"),
       landing: l.path,
-      pages: perDevice.get(l.fingerprint) ?? 1,
-      dur: "—",
+      pages: time.pagesByDevice.get(l.fingerprint) ?? perDevice.get(l.fingerprint) ?? 1,
+      dur: time.byDevice.has(l.fingerprint) ? duration(time.byDevice.get(l.fingerprint)!) : "—",
       acct: l.userId ? "@" + (users.get(l.userId) ?? "member") : "Visitor",
       trail: logs.filter((x) => x.fingerprint === l.fingerprint).slice(0, 4).reverse().map((x) => ({ page: x.kind === "visit" ? x.path : x.kind === "message" ? "sent a message" : "signed up", t: fmtTime(x.at) })),
     })),

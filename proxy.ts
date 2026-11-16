@@ -53,5 +53,6 @@ export const config = {
     "/wrap/:path*",
     "/crews/:path*",
     "/games/:path*",
+    "/desk/:path*",
   ],
 };

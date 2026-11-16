@@ -10,10 +10,11 @@ export const metadata: Metadata = { title: "Sekretly admin · Overview" };
 
 export default async function AdminPage() {
   await requireAdmin();
+  const dash = await loadDashboard();
   return (
     <>
       <LiveRefresh seconds={20} />
-      <Admin mode={await getMode()} dash={await loadDashboard()} />
+      <Admin mode={await getMode()} dash={dash} reviewCount={dash.reviewCount} />
     </>
   );
 }

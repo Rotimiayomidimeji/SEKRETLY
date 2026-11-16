@@ -93,6 +93,10 @@ export default class AdminReports extends React.Component<Record<string, any>, a
               Users
             </SkLink>
             {" "}
+            <SkLink href="/admin/rooms" className="nav-i">
+              Rooms
+            </SkLink>
+            {" "}
             <SkLink href="/admin/reports" className="nav-i" aria-current="page">
               Reports & warnings
               {v.hasOpen ? (
@@ -110,10 +114,6 @@ export default class AdminReports extends React.Component<Record<string, any>, a
             {" "}
             <SkLink href="/admin/ads" className="nav-i">
               Ads & AdSense
-            </SkLink>
-            {" "}
-            <SkLink href="/admin/ads/map" className="nav-i">
-              Ad placement map
             </SkLink>
             {" "}
             <SkLink href="/admin/account" className="nav-i" style={{ marginTop: "auto" }}>
@@ -165,9 +165,7 @@ export default class AdminReports extends React.Component<Record<string, any>, a
               <span>
                 Reports
               </span>
-              <b className="anav-badge">
-                4
-              </b>
+              {v.hasOpen ? (<b className="anav-badge">{v.openCount}</b>) : null}
             </SkLink>
             {" "}
             <details className="anav-more">
@@ -187,16 +185,16 @@ export default class AdminReports extends React.Component<Record<string, any>, a
                 {" "}
                 <div className="anav-grab" aria-hidden="true" />
                 {" "}
+                <SkLink href="/admin/rooms" className="anav-s">
+                  Rooms
+                </SkLink>
+                {" "}
                 <SkLink href="/admin/categories" className="anav-s">
                   Report categories
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/ads" className="anav-s">
                   Ads & AdSense
-                </SkLink>
-                {" "}
-                <SkLink href="/admin/ads/map" className="anav-s">
-                  Ad placement map
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/account" className="anav-s" style={{ color: "var(--muted)" }}>
@@ -257,6 +255,9 @@ export default class AdminReports extends React.Component<Record<string, any>, a
                 </SkLink>
                 <SkLink href="/admin/users" className="chip">
                   Users
+                </SkLink>
+                <SkLink href="/admin/rooms" className="chip">
+                  Rooms
                 </SkLink>
                 <SkLink href="/admin/reports" className="chip on">
                   Reports

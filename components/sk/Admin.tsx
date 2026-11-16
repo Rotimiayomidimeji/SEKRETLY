@@ -11,7 +11,7 @@ export default class Admin extends React.Component<Record<string, any>, any> {
   constructor(props) {
     super(props);
     var m = null; // light/dark arrives as props.mode from the sk-mode cookie
-    this.state = { mode: m || props.mode || 'dark', live: 37, tick: 0 };
+    this.state = { mode: m || props.mode || 'dark' };
   }
   componentDidMount() {
     var self = this;
@@ -26,7 +26,9 @@ export default class Admin extends React.Component<Record<string, any>, any> {
     return {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
-      live: D.live || 0, kpis: D.kpis || [], hours: D.hours || [], topCats: D.topCats || [], retention: D.retention || [], funnel: D.funnel || [], feed: D.feed || []
+      live: D.live || 0, kpis: D.kpis || [], hours: D.hours || [], topCats: D.topCats || [], retention: D.retention || [], funnel: D.funnel || [], feed: D.feed || [],
+      dateLabel: D.dateLabel || '', seriousTitle: D.seriousTitle || '', seriousText: D.seriousText || '', seriousC: D.seriousC || 'var(--ok)',
+      liveRows: D.liveRows || [], noLive: !(D.liveRows || []).length, noCats: !(D.topCats || []).length, noFeed: !(D.feed || []).length
     };
   }
 
@@ -67,11 +69,13 @@ export default class Admin extends React.Component<Record<string, any>, any> {
               Users
             </SkLink>
             {" "}
+            <SkLink href="/admin/rooms" className="nav-i">
+              Rooms
+            </SkLink>
+            {" "}
             <SkLink href="/admin/reports" className="nav-i">
               Reports & warnings
-              <span className="count">
-                4
-              </span>
+              {v.reviewCount ? (<span className="count">{v.reviewCount}</span>) : null}
             </SkLink>
             {" "}
             <SkLink href="/admin/categories" className="nav-i">
@@ -80,10 +84,6 @@ export default class Admin extends React.Component<Record<string, any>, any> {
             {" "}
             <SkLink href="/admin/ads" className="nav-i">
               Ads & AdSense
-            </SkLink>
-            {" "}
-            <SkLink href="/admin/ads/map" className="nav-i">
-              Ad placement map
             </SkLink>
             {" "}
             <SkLink href="/admin/account" className="nav-i" style={{ marginTop: "auto" }}>
@@ -135,9 +135,7 @@ export default class Admin extends React.Component<Record<string, any>, any> {
               <span>
                 Reports
               </span>
-              <b className="anav-badge">
-                4
-              </b>
+              {v.reviewCount ? (<b className="anav-badge">{v.reviewCount}</b>) : null}
             </SkLink>
             {" "}
             <details className="anav-more">
@@ -157,16 +155,16 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                 {" "}
                 <div className="anav-grab" aria-hidden="true" />
                 {" "}
+                <SkLink href="/admin/rooms" className="anav-s">
+                  Rooms
+                </SkLink>
+                {" "}
                 <SkLink href="/admin/categories" className="anav-s">
                   Report categories
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/ads" className="anav-s">
                   Ads & AdSense
-                </SkLink>
-                {" "}
-                <SkLink href="/admin/ads/map" className="anav-s">
-                  Ad placement map
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/account" className="anav-s" style={{ color: "var(--muted)" }}>
@@ -190,7 +188,7 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                     Overview
                   </h1>
                   <div className="muted" style={{ fontSize: "13px" }}>
-                    Sunday 19 October 2026 · sample data
+                    {v.dateLabel}
                   </div>
                 </div>
                 {" "}
@@ -232,6 +230,9 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                 </SkLink>
                 <SkLink href="/admin/users" className="chip">
                   Users
+                </SkLink>
+                <SkLink href="/admin/rooms" className="chip">
+                  Rooms
                 </SkLink>
                 <SkLink href="/admin/reports" className="chip">
                   Reports
@@ -314,13 +315,18 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                   {" "}
                   <div className="row">
                     <h2 className="grow" style={{ fontSize: "18px" }}>
-                      Reports today
+                      Reports this week
                     </h2>
                     <SkLink href="/admin/reports" className="pink" style={{ fontSize: "13px", fontWeight: "700" }}>
                       Review
                     </SkLink>
                   </div>
                   {" "}
+                  {v.noCats ? (
+                    <p className="muted" style={{ fontSize: "13.5px", marginTop: "14px" }}>
+                      No reports in the last 7 days.
+                    </p>
+                  ) : null}
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "14px" }}>
                     {" "}
                     {(v.topCats || []).map((c, i0) => (
@@ -346,15 +352,61 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                   </div>
                   {" "}
                   <div className="card" style={{ marginTop: "14px", padding: "12px", background: "var(--card2)", fontSize: "13px" }}>
-                    <b style={{ color: "var(--bad)" }}>
-                      4 serious reports
+                    <b style={{ color: v.seriousC }}>
+                      {v.seriousTitle}
                     </b>
-                    {" need a human: 2 threats, 1 underage concern, 1 self-harm."}
+                    {v.seriousText}
                   </div>
                   {" "}
                 </section>
                 {" "}
               </div>
+              {" "}
+              <section className="card" style={{ padding: "18px", marginTop: "12px" }}>
+                <div className="row">
+                  <h2 className="grow" style={{ fontSize: "18px" }}>
+                    On the site right now
+                  </h2>
+                  <span className="pill">
+                    <span className="live" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#5be0a0" }} />
+                    {v.live}{" live"}
+                  </span>
+                </div>
+                {v.noLive ? (
+                  <p className="muted" style={{ fontSize: "13.5px", marginTop: "12px" }}>
+                    Nobody has the site open right now. Anyone who opens any page shows up here within 20 seconds.
+                  </p>
+                ) : (
+                  <div style={{ overflowX: "auto", marginTop: "12px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", minWidth: "640px" }}>
+                      <thead>
+                        <tr className="muted" style={{ textAlign: "left", fontSize: "12px" }}>
+                          <th style={{ padding: "6px" }}>Who</th>
+                          <th style={{ padding: "6px" }}>On page</th>
+                          <th style={{ padding: "6px" }}>Where</th>
+                          <th style={{ padding: "6px" }}>Device</th>
+                          <th style={{ padding: "6px" }}>Network · IP</th>
+                          <th style={{ padding: "6px" }}>Came from</th>
+                          <th style={{ padding: "6px" }}>Time on site</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(v.liveRows || []).map((r, i0) => (
+                          <tr key={i0} style={{ borderTop: "1px solid var(--line)" }}>
+                            <td style={{ padding: "8px 6px", fontWeight: "700", color: r.member ? "var(--pink)" : "var(--muted)" }}>{r.who}</td>
+                            <td style={{ padding: "8px 6px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.page}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.place}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.device}</td>
+                            <td style={{ padding: "8px 6px", fontFamily: "ui-monospace, monospace", fontSize: "12px" }}>{r.net}{" · "}{r.ip}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.from}</td>
+                            <td style={{ padding: "8px 6px", fontWeight: "700" }}>{r.onFor}{r.pages > 1 ? " · " + r.pages + " pages" : ""}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
               {" "}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "12px" }}>
                 {" "}
@@ -440,6 +492,11 @@ export default class Admin extends React.Component<Record<string, any>, any> {
                     </span>
                   </div>
                   {" "}
+                  {v.noFeed ? (
+                    <p className="muted" style={{ fontSize: "13.5px", marginTop: "12px" }}>
+                      No link visits, messages or sign-ups yet.
+                    </p>
+                  ) : null}
                   <ul style={{ listStyle: "none", margin: "12px 0 0", padding: "0", display: "flex", flexDirection: "column", gap: "2px", maxHeight: "300px", overflow: "hidden" }}>
                     {" "}
                     {(v.feed || []).map((e, i0) => (

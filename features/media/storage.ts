@@ -13,26 +13,28 @@ import { get, put } from "@vercel/blob";
 // /api/media/<file>, like local ones); which one is found out once, or set with BLOB_ACCESS=public|private.
 // Either way the address is long and random, never guessable.
 
-export type MediaKind = "photo" | "video";
+export type MediaKind = "photo" | "video" | "audio";
 
 /** What we accept, recognised by the file's first bytes (not its name or the browser's word for it). */
 const TYPES: { kind: MediaKind; ext: string; mime: string; test: (b: Buffer) => boolean }[] = [
   { kind: "photo", ext: "jpg", mime: "image/jpeg", test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
   { kind: "photo", ext: "png", mime: "image/png", test: (b) => b.subarray(0, 4).toString("hex") === "89504e47" },
   { kind: "photo", ext: "webp", mime: "image/webp", test: (b) => b.subarray(0, 4).toString() === "RIFF" && b.subarray(8, 12).toString() === "WEBP" },
+  // room voice tips: disguised in the browser and saved as small mono WAV (lib/voice.ts)
+  { kind: "audio", ext: "wav", mime: "audio/wav", test: (b) => b.subarray(0, 4).toString() === "RIFF" && b.subarray(8, 12).toString() === "WAVE" },
   { kind: "photo", ext: "gif", mime: "image/gif", test: (b) => b.subarray(0, 4).toString() === "GIF8" },
   { kind: "video", ext: "webm", mime: "video/webm", test: (b) => b.subarray(0, 4).toString("hex") === "1a45dfa3" },
   { kind: "video", ext: "mov", mime: "video/quicktime", test: (b) => b.subarray(4, 8).toString() === "ftyp" && b.subarray(8, 10).toString() === "qt" },
   { kind: "video", ext: "mp4", mime: "video/mp4", test: (b) => b.subarray(4, 8).toString() === "ftyp" },
 ];
 
-export const MAX_BYTES: Record<MediaKind, number> = { photo: 8 * 1024 * 1024, video: 25 * 1024 * 1024 };
+export const MAX_BYTES: Record<MediaKind, number> = { photo: 8 * 1024 * 1024, video: 25 * 1024 * 1024, audio: 4.4 * 1024 * 1024 };
 
 export const sniff = (b: Buffer) => TYPES.find((t) => t.test(b)) ?? null;
 
 const LOCAL_DIR = path.join(process.cwd(), ".data", "media");
 const LOCAL_PREFIX = "/api/media/";
-const NAME = /^[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4)$/;
+const NAME = /^[\w-]{24}\.(jpg|png|webp|gif|webm|mov|mp4|wav)$/;
 
 let access: Promise<"public" | "private"> | null = null;
 
@@ -103,7 +105,7 @@ export const servedAddress = (url: string) => {
   }
 };
 
-export const kindOf = (url: string): MediaKind => (/\.(webm|mov|mp4)$/.test(url) ? "video" : "photo");
+export const kindOf = (url: string): MediaKind => (/\.wav$/.test(url) ? "audio" : /\.(webm|mov|mp4)$/.test(url) ? "video" : "photo");
 
 const mimeOf = (name: string) => TYPES.find((t) => name.endsWith("." + t.ext))!.mime;
 

@@ -8,7 +8,7 @@ import { passwordSchema, usernameSchema } from "@/features/auth/schemas";
 import { MESSAGE_TTL_MS, RATE_CATEGORIES, TOPIC_TITLE, isNapping } from "@/features/links/topics";
 import { notify } from "@/features/notifications/notify";
 import { ipBlocked, logVisit } from "@/features/admin/traffic";
-import { isOurMedia } from "@/features/media/storage";
+import { isOurMedia, kindOf } from "@/features/media/storage";
 import { classify, cleanHint } from "@/features/safety/kind";
 import { deviceKey, senderHint, standingWith, userKey } from "@/features/safety/standing";
 import { createSession, getCurrentUser } from "@/lib/auth/session";
@@ -41,6 +41,8 @@ const sendSchema = z.object({
       hint: z.string().max(80).optional(),
       /** a photo or video already uploaded through /api/upload */
       mediaUrl: z.string().max(300).optional(),
+      /** a room voice tip: its length, 48 loudness levels for the waveform, and the disguise picked */
+      voice: z.object({ sec: z.number().min(1).max(260), peaks: z.array(z.number().int().min(0).max(100)).length(48), disguise: z.string().max(20) }).optional(),
     })
     .default({}),
   /** set when the sender adds to a message from its receipt */
@@ -69,7 +71,7 @@ async function buildMessage(topic: LinkTopic, linkId: string, p: z.infer<typeof 
     }
     case "CONFESS":
       if (text.length < 2 && !p.mediaUrl) return { error: "Write your confession." };
-      return { text: text.slice(0, 2000), data: undefined };
+      return { text: text.slice(0, 2000), data: p.voice && p.mediaUrl ? { voice: { sec: Math.round(p.voice.sec), peaks: p.voice.peaks, disguise: p.voice.disguise } } : undefined };
     case "RATE": {
       // the owner's own questions: one score each; the message keeps the average as its score
       const qs = await db.quizQuestion.findMany({ where: { linkId }, orderBy: { position: "asc" } });
@@ -136,6 +138,17 @@ async function deliver(
   // media only where the topic takes it, and only files this app stored
   const media = input.payload.mediaUrl;
   if (media && (!["CONFESS", "AMA", "CUSTOM", "DROP"].includes(link.topic) || !isOurMedia(media))) return { ok: false, error: "That attachment can’t be sent." };
+  // a room's tip line: closed rooms take nothing; voice tips need an account and fit the host's limit
+  const room = await db.room.findUnique({ where: { linkId: link.id } });
+  if (room && room.status !== "LIVE") return { ok: false, error: room.status === "CLOSED" ? "The tip line is closed right now. Try again later." : "This room isn’t available." };
+  if (media && kindOf(media) === "audio") {
+    if (!room) return { ok: false, error: "Voice notes only go to rooms." };
+    if (!senderId) return { ok: false, error: "Voice notes need an account." };
+    if (!room.voiceAllowed || !room.voiceOn) return { ok: false, error: "This room isn’t taking voice notes right now." };
+    if (!input.payload.voice) return { ok: false, error: "That voice note didn’t record properly. Try again." };
+    // the recording stops at the limit; slow disguises (Deep) stretch it by up to a third
+    if (input.payload.voice.sec > room.maxVoiceSec * 1.35 + 2) return { ok: false, error: "Voice notes here can be up to " + Math.round(room.maxVoiceSec / 60) + " minutes." };
+  }
   const code = receiptCode();
   await db.$transaction([
     db.message.create({

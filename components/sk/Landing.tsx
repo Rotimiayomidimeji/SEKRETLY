@@ -22,7 +22,9 @@ export default class Landing extends React.Component<Record<string, any>, any> {
     try { this.motionOn(); } catch (e) {}
     var seen = null;
     try { seen = (window.localStorage.getItem('sk-consent') || (document.cookie.match(/(?:^|; )sk-consent=([^;]*)/) || [])[1] || null); } catch (e) {}
-    if (!seen || this.props.consent === 'show') this.setState({ consent: true });
+    // cookie choices: shown on request at once; otherwise after 25 seconds, so the first look at the page isn't covered
+    if (this.props.consent === 'show') this.setState({ consent: true });
+    else if (!seen) this.ckT = setTimeout(function () { self.setState({ consent: true }); }, 25000);
     // arriving from another page's "How it works" / "Games" link
     var j = null;
     try { j = window.localStorage.getItem('sk-jump'); window.localStorage.removeItem('sk-jump'); } catch (e) {}
@@ -35,6 +37,7 @@ export default class Landing extends React.Component<Record<string, any>, any> {
   }
   componentWillUnmount() {
     clearTimeout(this.jt);
+    clearTimeout(this.ckT);
     try { window.removeEventListener('storage', this.onStore); } catch (e) {}
     try { window.removeEventListener('scroll', this.onScroll, true); document.removeEventListener('pointermove', this.onPtr); if (this.io) this.io.disconnect(); } catch (e) {}
   }
@@ -510,11 +513,11 @@ export default class Landing extends React.Component<Record<string, any>, any> {
                   {" "}
                   <div className="lh-float">
                     {" "}
-                    <img className="lh-img lh-img--dark" src="/sk/hero-dark.png" alt="Sekretly anonymous character holding the interaction phone" />
+                    <img className="lh-img lh-img--dark" src="/sk/hero-dark.webp" fetchPriority="high" decoding="async" alt="Sekretly anonymous character holding the interaction phone" />
                     {" "}
-                    <img className="lh-img lh-ghost lh-ghost--a" src="/sk/hero-dark.png" alt="" aria-hidden="true" />
+                    <img className="lh-img lh-ghost lh-ghost--a" src="/sk/hero-dark.webp" decoding="async" alt="" aria-hidden="true" />
                     {" "}
-                    <img className="lh-img lh-ghost lh-ghost--b" src="/sk/hero-dark.png" alt="" aria-hidden="true" />
+                    <img className="lh-img lh-ghost lh-ghost--b" src="/sk/hero-dark.webp" decoding="async" alt="" aria-hidden="true" />
                     {" "}
                   </div>
                   {" "}
@@ -524,7 +527,7 @@ export default class Landing extends React.Component<Record<string, any>, any> {
                   {" "}
                   <div className="lh-float">
                     {" "}
-                    <img className="lh-img lh-img--light" src="/sk/hero-light.png" alt="Sekretly hoodie mascot winking, finger to lips, reaching out beside a phone showing Chat. Play. Keep it Secret." />
+                    <img className="lh-img lh-img--light" src="/sk/hero-light.webp" decoding="async" alt="Sekretly hoodie mascot winking, finger to lips, reaching out beside a phone showing Chat. Play. Keep it Secret." />
                     {" "}
                   </div>
                   {" "}

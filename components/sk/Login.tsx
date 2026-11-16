@@ -32,7 +32,7 @@ export default class Login extends React.Component<Record<string, any>, any> {
       onPass: function (e) { self.setState({ pass: e.target.value }); },
       ok: correct, notOk: !correct,
       err: s.tries > 0 && !correct,
-      errMsg: locked ? 'Too many tries. Wait 15 minutes, or reset your password.' : 'That username and password do not match. ' + (s.left == null ? 5 - s.tries : s.left) + (s.left === 1 ? ' try left.' : ' tries left.'),
+      errMsg: s.suspended ? 'This account is suspended for breaking the community rules, so you can’t log in. If you think this is a mistake, contact us from the Contact page.' : locked ? 'Too many tries. Wait 15 minutes, or reset your password.' : 'That username and password do not match. ' + (s.left == null ? 5 - s.tries : s.left) + (s.left === 1 ? ' try left.' : ' tries left.'),
       locked: locked,
       busyCls: s.busy ? 'sk-busy' : '', busyStr: s.busy ? 'true' : 'false', btnLabel: locked ? 'Locked for 15 minutes' : s.busy ? 'Logging in…' : 'Log in',
       shakeCls: s.shake % 2 ? 'shake' : '',
@@ -41,7 +41,7 @@ export default class Login extends React.Component<Record<string, any>, any> {
         self.setState({ busy: true });
         self.props.login({ username: s.user, password: s.pass, next: self.props.next || '' }).then(function (r) {
           if (!r) return;
-          self.setState({ busy: false, tries: self.state.tries + 1, shake: self.state.shake + 1, left: r.left, locked: !!r.locked });
+          self.setState({ busy: false, tries: self.state.tries + 1, shake: self.state.shake + 1, left: r.left, locked: !!r.locked, suspended: !!r.suspended });
         });
       }
     };

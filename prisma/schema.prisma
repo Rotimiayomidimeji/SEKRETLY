@@ -109,6 +109,8 @@ model User {
   gameListing      Boolean            @default(true)
   pushSubs         PushSubscription[]
   sessions         Session[]
+  /// The room this account hosts, if the admin made it a room host
+  room             Room?
   codes            EmailCode[]
   links            Link[]
   received         Message[]          @relation("received")
@@ -151,6 +153,8 @@ model Link {
   questions      QuizQuestion[]
   messages       Message[]
   days           LinkDay[]
+  /// Set when this is a room's hidden confession link (its tips land in the host's inbox like any link)
+  room           Room?
 
   @@unique([ownerId, theme, slug])
   @@index([ownerId, status])
@@ -409,6 +413,36 @@ model VisitLog {
   @@index([ip])
 }
 
+/// One browser tab's time on the site: the page pings every 20s while it is visible (components/layout/Presence.tsx).
+/// "Live now" on the admin pages = pinged in the last 60 seconds. Kept 30 days, like VisitLog.
+model Presence {
+  /// Random id the tab keeps in sessionStorage
+  id          String   @id
+  fingerprint String
+  userId      String?
+  ip          String
+  city        String?
+  region      String?
+  country     String?
+  device      String
+  os          String
+  browser     String
+  /// Where they came from (another site's domain, or "Direct")
+  referrer    String   @default("Direct")
+  firstPath   String
+  path        String
+  pages       Int      @default(1)
+  /// Seconds the tab was actually open and visible
+  seconds     Int      @default(0)
+  startedAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  @@index([lastSeenAt])
+  @@index([fingerprint])
+  @@index([userId])
+  @@index([ip])
+}
+
 /// A game table: made by a host (Create game), joined by code or link, played live by everyone in it.
 model GameRoom {
   id         String       @id @default(cuid())
@@ -503,4 +537,93 @@ model RateLimit {
   key     String   @id
   count   Int
   resetAt DateTime
+}
+
+enum RoomStatus {
+  LIVE
+  CLOSED
+  SUSPENDED
+}
+
+/// A big channel's own gossip paper (sekretly.app/<handle>). Made by the admin, run by its host.
+/// Tips arrive through the room's own confession link (linkId), so sending, safety and the inbox are the normal ones.
+model Room {
+  id           String     @id @default(cuid())
+  /// sekretly.app/<handle>: lowercase letters, numbers, . and _
+  handle       String     @unique
+  /// The masthead
+  name         String
+  tagline      String?
+  /// The room's ink colour
+  accent       String     @default("#e0115f")
+  /// The room's look: press | neon | stack | chat | pop (same features, different design and flow)
+  theme        String     @default("press")
+  /// The channel's logo (an image uploaded through /api/upload); the initials show until there is one
+  logoUrl      String?
+  hostId       String     @unique
+  linkId       String     @unique
+  /// LIVE: tip line open · CLOSED: presses stopped (reading only) · SUSPENDED: by the admin, the room is unavailable
+  status       RoomStatus @default(LIVE)
+  /// Admin switches (the host can't turn these on himself)
+  takesAllowed Boolean    @default(true)
+  voiceAllowed Boolean    @default(true)
+  /// Host switches
+  takesOn      Boolean    @default(true)
+  voiceOn      Boolean    @default(true)
+  maxVoiceSec  Int        @default(180)
+  /// Set when the host replaced the one-time password the admin handed out
+  hostReadyAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  host         User       @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  link         Link       @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  posts        RoomPost[]
+}
+
+/// Something the host printed in his room: a tip (text or voice) with his optional take, or his own letter.
+model RoomPost {
+  id           String      @id @default(cuid())
+  roomId       String
+  /// The clipping number readers see (#2431)
+  number       Int
+  /// letter | text | voice
+  kind         String
+  text         String      @default("")
+  /// clip | head (big headline type)
+  style        String      @default("clip")
+  audioUrl     String?
+  audioSec     Int?
+  /// 48 loudness levels (0–100) for drawing the waveform without downloading the audio
+  peaks        Json?
+  /// The disguise the sender picked (Deep, Helium, …)
+  voice        String?
+  take         String?
+  takeAudioUrl String?
+  takeAudioSec Int?
+  pinned       Boolean     @default(false)
+  /// The tip it was printed from
+  messageId    String?     @unique
+  /// Stamp counts: Felt that, Dead, Wild, Same
+  s0           Int         @default(0)
+  s1           Int         @default(0)
+  s2           Int         @default(0)
+  s3           Int         @default(0)
+  reports      Int         @default(0)
+  deletedAt    DateTime?
+  createdAt    DateTime    @default(now())
+  room         Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  stamps       RoomStamp[]
+
+  @@index([roomId, deletedAt, createdAt])
+}
+
+/// One reader's stamp on a post ("u:<id>" or "f:<fingerprint>"), so each stamp counts once per person.
+model RoomStamp {
+  postId    String
+  who       String
+  stamp     Int
+  createdAt DateTime @default(now())
+  post      RoomPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, who, stamp])
 }

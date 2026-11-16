@@ -137,7 +137,11 @@ body{margin:0;background:#0c0811}
 .lh-float{position:absolute;inset:0}
 .lh-layer--dark .lh-float{bottom:-18px;animation:lhHover 7s ease-in-out infinite}
 .lh-img--dark{animation:lhJitter 6.5s steps(1,end) infinite}
-.lh-ghost{mix-blend-mode:screen;opacity:0;pointer-events:none}
+.lh-ghost{mix-blend-mode:screen;opacity:0;pointer-events:none;filter:none}
+/* speed: the hero art moves on its own layer, and phones skip the two glitch copies (each was a full-size
+   image re-blended every frame), which was the scroll lag on the home page */
+.lh-float{will-change:transform}
+@media (max-width:760px),(prefers-reduced-motion:reduce){.lh-ghost{display:none}.lh-img--dark{animation:none;filter:drop-shadow(0 24px 32px rgba(0,0,0,.45))}}
 .lh-ghost--a{animation:lhGlitchA 6.5s steps(1,end) infinite}
 .lh-ghost--b{animation:lhGlitchB 6.5s steps(1,end) infinite}
 .lh-layer--light .lh-float{inset:auto auto -5% 4%;height:104%;aspect-ratio:1122/932;animation:lhBounce 5.4s ease-in-out infinite}

@@ -33,8 +33,11 @@ async function checkTarget(t: Target) {
   const user = await getCurrentUser();
   const fingerprint = await requestFingerprint();
   const linkId = String(t.linkId ?? ""), chatId = String(t.chatId ?? "").replace(/^c:/, "");
+  let room: { voiceAllowed: boolean; voiceOn: boolean; status: string; isHost: boolean } | null = null;
   if (linkId) {
-    const link = await db.link.findUnique({ where: { id: linkId }, include: { owner: true } });
+    const link = await db.link.findUnique({ where: { id: linkId }, include: { owner: true, room: { select: { voiceAllowed: true, voiceOn: true, status: true } } } });
+    // the room's host records his own takes through the same link
+    room = link?.room ? { ...link.room, isHost: !!user && user.id === link.ownerId } : null;
     if (!link || link.status !== "LIVE" || !MEDIA_TOPICS.has(link.topic)) return { error: "This link doesn’t take photos or videos." };
     if (!user && !link.owner.allowVisitors) return { error: "Make a free account to send." };
     const keys = user ? [userKey(user.id), deviceKey(fingerprint)] : [deviceKey(fingerprint)];
@@ -44,7 +47,7 @@ async function checkTarget(t: Target) {
     const chat = await db.chat.findFirst({ where: { id: chatId, OR: [{ ownerId: user.id }, { guestId: user.id }] } });
     if (!chat) return { error: "This chat is gone.", status: 404 };
   } else return { error: "Nowhere to send this." };
-  return { who: user ? user.id : fingerprint };
+  return { who: user ? user.id : fingerprint, signedIn: !!user, room };
 }
 
 const overLimit = async (who: string) => !(await hitRateLimit("upload:" + who, 20, 3_600_000)).allowed;
@@ -65,7 +68,13 @@ export async function POST(request: Request) {
   const bytes = Buffer.from(await file.arrayBuffer());
   const type = sniff(bytes);
   if (!type) return fail("Send a photo (JPG, PNG, WebP, GIF) or a video (MP4, MOV, WebM).", 415);
-  if (bytes.length > MAX_BYTES[type.kind]) return fail(type.kind === "photo" ? "Photos can be up to 8 MB." : "Videos can be up to 25 MB.", 413);
+  // voice tips: rooms only, members only, and only where the admin and the host both allow them
+  if (type.kind === "audio") {
+    if (!target.room) return fail("Voice notes only go to rooms.", 415);
+    if (!target.signedIn) return fail("Voice notes need an account. Sign up, it takes ten seconds.", 401);
+    if (!target.room.isHost && (target.room.status !== "LIVE" || !target.room.voiceAllowed || !target.room.voiceOn)) return fail("This room isn’t taking voice notes right now.", 403);
+  }
+  if (bytes.length > MAX_BYTES[type.kind]) return fail(type.kind === "photo" ? "Photos can be up to 8 MB." : type.kind === "audio" ? "That voice note is too long." : "Videos can be up to 25 MB.", 413);
 
   let url: string;
   try {

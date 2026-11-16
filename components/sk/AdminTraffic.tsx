@@ -11,33 +11,7 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
   constructor(props) {
     super(props);
     var m = null; // light/dark arrives as props.mode from the sk-mode cookie
-    this.state = { mode: m || props.mode || 'dark', range: 'today', filter: 'all', q: '', showIp: false, sel: null, live: 41, extra: 0, blockedIps: Object.assign({}, ((props.traffic || {}).today || {}).blockedIps) };
-  }
-  pool() {
-    var states = [['Lagos', 'Ikeja'], ['Lagos', 'Lekki'], ['FCT', 'Abuja'], ['Oyo', 'Ibadan'], ['Rivers', 'Port Harcourt'], ['Enugu', 'Enugu'], ['Kano', 'Kano'], ['Kaduna', 'Zaria'], ['Ogun', 'Abeokuta'], ['Edo', 'Benin City'], ['Anambra', 'Awka'], ['Osun', 'Ile-Ife']];
-    var nets = [['MTN', '102.89'], ['Airtel', '105.112'], ['Glo', '197.211'], ['MTN', '197.210'], ['9mobile', '41.190'], ['Wi-Fi · Spectranet', '41.217']];
-    var devs = [['Mobile', 'Android', 'Chrome'], ['Mobile', 'iOS', 'Safari'], ['Mobile', 'Android', 'Opera Mini'], ['Mobile', 'Android', 'Instagram app'], ['Desktop', 'Windows', 'Chrome'], ['Mobile', 'iOS', 'WhatsApp app'], ['Tablet', 'Android', 'Chrome'], ['Desktop', 'macOS', 'Safari']];
-    var srcs = ['WhatsApp', 'Instagram', 'Snapchat', 'Direct', 'WhatsApp', 'Google', 'TikTok', 'WhatsApp'];
-    var lands = ['/peach/k7x2m9/sunset/describe-3', '/tolu/a81kd2/midnight/rate-me', '/', '/maya/q2n8x1/ocean/ama', '/g/MANGO7', '/peach/k7x2m9/sunset/describe-3', '/about', '/ada/z9p1mm/neon/confess'];
-    var accts = ['Visitor', 'Visitor', '@tobi_x', 'Visitor', '@kola', 'Visitor', 'Visitor', '@maya', 'Visitor', '@ada'];
-    var out = [];
-    for (var i = 0; i < 26; i++) {
-      var st = states[(i * 5) % states.length], n = nets[(i * 7) % nets.length], d = devs[(i * 3) % devs.length];
-      var mins = i * 3 + (i % 4);
-      out.push({
-        id: 'v' + i,
-        time: (21 - Math.floor(mins / 60)) + ':' + ('0' + (59 - mins % 60)).slice(-2),
-        ip: n[1] + '.' + ((i * 37) % 250 + 3) + '.' + ((i * 91) % 250 + 2),
-        vid: 'v_' + ((i * 2654435761) >>> 0).toString(16).slice(0, 6),
-        visits: 1 + (i * 7) % 9,
-        state: st[0], city: st[1], country: i % 13 === 12 ? 'Ghana' : 'Nigeria',
-        net: n[0], device: d[0], os: d[1], browser: d[2],
-        src: srcs[i % srcs.length], landing: lands[(i * 3) % lands.length],
-        pages: 1 + (i * 5) % 7, dur: Math.floor(((i * 47) % 540) / 60) + 'm ' + ('0' + ((i * 47) % 60)).slice(-2) + 's',
-        acct: accts[i % accts.length]
-      });
-    }
-    return out;
+    this.state = { mode: m || props.mode || 'dark', range: 'today', filter: 'all', q: '', showIp: false, sel: null, blockedIps: Object.assign({}, ((props.traffic || {}).today || {}).blockedIps) };
   }
   componentDidMount() {
     var self = this;
@@ -65,12 +39,13 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
     days.forEach(function (d, di) { heat.push({ cls: 'hl', label: d, o: 1, t: d }); for (var hi = 0; hi < 24; hi++) heat.push({ cls: 'hc', label: '', o: (D.heat[di] || [])[hi] || '0.06', t: d + ' ' + hi + ':00' }); });
     var bd = function (b) { var max = (b.rows[0] || ['', 1])[1]; return { title: b.title, rows: b.rows.map(function (r) { return { label: r[0], v: r[1] + '%', w: Math.round(r[1] / max * 100) + '%' }; }) }; };
     var sel = s.sel ? all.filter(function (r) { return r.id === s.sel; })[0] : null;
-    var hintTime = sel ? (parseInt(sel.time, 10) >= 21 || sel.time === 'just now' ? 'late at night' : 'in the evening') : '';
+    var hr = sel ? parseInt(sel.time, 10) : 0; var hintTime = sel ? (hr < 5 || hr >= 22 ? 'late at night' : hr < 12 ? 'in the morning' : hr < 17 ? 'in the afternoon' : 'in the evening') : '';
     return {
       mode: dark ? 'dark' : 'light', isDark: dark, isLight: !dark, modeWord: dark ? 'Light' : 'Dark',
       toggleMode: function () { var n = dark ? 'light' : 'dark'; saveMode(n); self.setState({ mode: n }); },
       ranges: [['today', 'Today'], ['week', '7 days'], ['month', '30 days']].map(function (r) { return { label: r[1], on: s.range === r[0] ? 'true' : 'false', pick: function () { self.setState({ range: r[0] }); } }; }),
       rangeLabel: { today: 'Today, Lagos time', week: 'Average day, last 7 days', month: 'Average day, last 30 days' }[s.range],
+      liveList: (this.props.liveRows || []).map(function (r) { return Object.assign({}, r, { ip: mask(r.ip) + (s.blockedIps[r.ip] ? " ⛔" : "") }); }), noLive: !(this.props.liveRows || []).length,
       live: this.props.live || 0, kpis: D.kpis, hours: D.hours, breakdowns: D.breakdowns.map(bd),
       heatHead: D.hours.map(function (h, i) { return i % 3 === 0 ? String(i) : ''; }),
       heat: heat,
@@ -139,11 +114,13 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
               Users
             </SkLink>
             {" "}
+            <SkLink href="/admin/rooms" className="nav-i">
+              Rooms
+            </SkLink>
+            {" "}
             <SkLink href="/admin/reports" className="nav-i">
               Reports & warnings
-              <span className="count">
-                4
-              </span>
+              {v.reviewCount ? (<span className="count">{v.reviewCount}</span>) : null}
             </SkLink>
             {" "}
             <SkLink href="/admin/categories" className="nav-i">
@@ -152,10 +129,6 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
             {" "}
             <SkLink href="/admin/ads" className="nav-i">
               Ads & AdSense
-            </SkLink>
-            {" "}
-            <SkLink href="/admin/ads/map" className="nav-i">
-              Ad placement map
             </SkLink>
             {" "}
             <SkLink href="/admin/account" className="nav-i" style={{ marginTop: "auto" }}>
@@ -207,9 +180,7 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
               <span>
                 Reports
               </span>
-              <b className="anav-badge">
-                4
-              </b>
+              {v.reviewCount ? (<b className="anav-badge">{v.reviewCount}</b>) : null}
             </SkLink>
             {" "}
             <details className="anav-more">
@@ -229,16 +200,16 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
                 {" "}
                 <div className="anav-grab" aria-hidden="true" />
                 {" "}
+                <SkLink href="/admin/rooms" className="anav-s">
+                  Rooms
+                </SkLink>
+                {" "}
                 <SkLink href="/admin/categories" className="anav-s">
                   Report categories
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/ads" className="anav-s">
                   Ads & AdSense
-                </SkLink>
-                {" "}
-                <SkLink href="/admin/ads/map" className="anav-s">
-                  Ad placement map
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/account" className="anav-s" style={{ color: "var(--muted)" }}>
@@ -310,6 +281,9 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
                 <SkLink href="/admin/users" className="chip">
                   Users
                 </SkLink>
+                <SkLink href="/admin/rooms" className="chip">
+                  Rooms
+                </SkLink>
                 <SkLink href="/admin/reports" className="chip">
                   Reports
                 </SkLink>
@@ -333,7 +307,7 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
                     {v.live}
                   </div>
                   <div className="muted" style={{ fontSize: "12px" }}>
-                    on the site this minute
+                    with a page open right now
                   </div>
                 </div>
                 {" "}
@@ -356,6 +330,40 @@ export default class AdminTraffic extends React.Component<Record<string, any>, a
                 ))}
                 {" "}
               </div>
+              {" "}
+              <section className="card" style={{ padding: "18px", marginTop: "12px" }}>
+                <h2 style={{ fontSize: "18px" }}>
+                  Live now: who is on the site
+                </h2>
+                {v.noLive ? (
+                  <p className="muted" style={{ fontSize: "13.5px", marginTop: "10px" }}>
+                    Nobody has the site open right now. Anyone who opens any page shows up here within 20 seconds.
+                  </p>
+                ) : (
+                  <div style={{ overflowX: "auto", marginTop: "10px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", minWidth: "680px" }}>
+                      <thead>
+                        <tr className="muted" style={{ textAlign: "left", fontSize: "12px" }}>
+                          <th style={{ padding: "6px" }}>Who</th><th style={{ padding: "6px" }}>On page</th><th style={{ padding: "6px" }}>Where</th><th style={{ padding: "6px" }}>Device</th><th style={{ padding: "6px" }}>Network · IP</th><th style={{ padding: "6px" }}>Came from</th><th style={{ padding: "6px" }}>Time on site</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(v.liveList || []).map((r, i0) => (
+                          <tr key={i0} style={{ borderTop: "1px solid var(--line)" }}>
+                            <td style={{ padding: "8px 6px", fontWeight: "700", color: r.member ? "var(--pink)" : "var(--muted)" }}>{r.who}</td>
+                            <td style={{ padding: "8px 6px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.page}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.place}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.device}</td>
+                            <td style={{ padding: "8px 6px", fontFamily: "ui-monospace, monospace", fontSize: "12px" }}>{r.net}{" · "}{r.ip}</td>
+                            <td style={{ padding: "8px 6px" }}>{r.from}</td>
+                            <td style={{ padding: "8px 6px", fontWeight: "700" }}>{r.onFor}{r.pages > 1 ? " · " + r.pages + " pages" : ""}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
               {" "}
               <section className="card" style={{ padding: "18px", marginTop: "12px" }}>
                 {" "}

@@ -31,7 +31,7 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
       var blockedBy = u.pairs.filter(function (p) { return p[1] >= 4; }).length;
       var status = s.over[u.name] || (blockedBy >= 3 ? 'Review' : (warns > 0 ? 'Warned' : 'Good'));
       var st = { Good: ['rgba(13,127,75,.18)', 'var(--ok)'], Warned: ['rgba(255,176,32,.18)', 'var(--warn)'], Review: ['rgba(196,33,58,.18)', 'var(--bad)'], Suspended: ['#c4213a', '#ffffff'], Deleted: ['var(--card2)', 'var(--muted)'] }[status];
-      return { name: u.name, av: A[u.av][0], bg: A[u.av][1], joined: u.joined, state: u.state, device: u.device, links: u.links, sent: u.sent, warns: warns, blockedBy: blockedBy, status: status, stBg: st[0], stInk: st[1], warnC: warns ? 'var(--warn)' : 'var(--muted)', raw: u, ips: u.ips, open: function () { self.setState({ sel: u.name }); } };
+      return { name: u.name, av: A[u.av][0], bg: A[u.av][1], joined: u.joined, state: u.state, device: u.device, links: u.links, sent: u.sent, warns: warns, blockedBy: blockedBy, status: status, stBg: st[0], stInk: st[1], warnC: warns ? 'var(--warn)' : 'var(--muted)', raw: u, ips: u.ips, online: !!u.online, open: function () { self.setState({ sel: u.name }); } };
     };
     var q = s.q.trim().toLowerCase().replace('@', '');
     var rows = U.map(deco).filter(function (u) {
@@ -53,13 +53,16 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
       sel: sel || { name: '', av: '', bg: '', joined: '', state: '', device: '', links: 0, sent: 0, warns: 0, blockedBy: 0, status: '', stBg: '', stInk: '', ips: '' },
       selPairs: sel ? sel.raw.pairs.map(function (p) { return { to: p[0], label: p[1] >= 4 ? 'Blocked by them' : p[1] + ' of 3 warnings', cats: p[2], steps: [1, 2, 3, 4].map(function (i) { return { c: i <= p[1] ? (i === 4 ? '#c4213a' : '#ffb020') : line }; }) }; }) : [],
       noPairs: !!sel && sel.raw.pairs.length === 0,
+      selOnline: !!sel && !!sel.raw.online, selLastSeen: sel ? sel.raw.lastSeen : '', selTime: sel ? sel.raw.timeOnSite : '',
+      selIps: sel ? sel.raw.ipList || [] : [], selNoIps: !!sel && !(sel.raw.ipList || []).length,
+      headLine: (function () { var st = self.props.stats || {}; var n = st.total || 0; return n.toLocaleString('en-US') + (n === 1 ? ' account' : ' accounts') + ' · ' + (st.online || 0) + ' online now · ' + (st.active7 || 0) + ' active this week · ' + (st.suspended || 0) + ' suspended'; })(),
       closeSel: function () { self.setState({ sel: null }); },
       stop: function (e) { e.stopPropagation(); },
       act: function () { if (!sel) return; var o = Object.assign({}, s.warned); o[sel.name] = true; self.setState({ warned: o }); self.props.warnUser(sel.name); },
       actDone: !!sel && !!(s.warned || {})[sel.name], actLabel: sel && (s.warned || {})[sel.name] ? 'Warning sent ✓' : 'Send admin warning',
       clear: function () { if (!sel) return; var o = Object.assign({}, s.cleared); o[sel.name] = true; self.setState({ cleared: o }); self.props.clearWarnings(sel.name); },
       clearDone: !!sel && !!(s.cleared || {})[sel.name], clearLabel: sel && (s.cleared || {})[sel.name] ? 'Warnings cleared ✓' : 'Clear all warnings',
-      suspendLabel: sel && sel.status === 'Suspended' ? 'Lift suspension' : 'Suspend 7 days',
+      suspendLabel: sel && sel.status === 'Suspended' ? 'Lift suspension' : 'Suspend account',
       delLabel: sel && sel.status === 'Deleted' ? 'Deleted' : s.delAsk === (sel && sel.name) ? 'Tap again to delete' : 'Delete account',
       delAccount: function () { if (!sel || sel.status === 'Deleted') return; if (s.delAsk !== sel.name) { self.setState({ delAsk: sel.name }); return; } var o = Object.assign({}, s.over); o[sel.name] = 'Deleted'; self.setState({ over: o, delAsk: null }); self.props.deleteUser(sel.name); },
       suspend: function () { if (!sel) return; var o = Object.assign({}, s.over); o[sel.name] = sel.status === 'Suspended' ? '' : 'Suspended'; self.setState({ over: o }); self.props.setSuspended(sel.name, sel.status !== 'Suspended'); }
@@ -103,11 +106,13 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
               Users
             </SkLink>
             {" "}
+            <SkLink href="/admin/rooms" className="nav-i">
+              Rooms
+            </SkLink>
+            {" "}
             <SkLink href="/admin/reports" className="nav-i">
               Reports & warnings
-              <span className="count">
-                4
-              </span>
+              {v.reviewCount ? (<span className="count">{v.reviewCount}</span>) : null}
             </SkLink>
             {" "}
             <SkLink href="/admin/categories" className="nav-i">
@@ -116,10 +121,6 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
             {" "}
             <SkLink href="/admin/ads" className="nav-i">
               Ads & AdSense
-            </SkLink>
-            {" "}
-            <SkLink href="/admin/ads/map" className="nav-i">
-              Ad placement map
             </SkLink>
             {" "}
             <SkLink href="/admin/account" className="nav-i" style={{ marginTop: "auto" }}>
@@ -171,9 +172,7 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
               <span>
                 Reports
               </span>
-              <b className="anav-badge">
-                4
-              </b>
+              {v.reviewCount ? (<b className="anav-badge">{v.reviewCount}</b>) : null}
             </SkLink>
             {" "}
             <details className="anav-more">
@@ -193,16 +192,16 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                 {" "}
                 <div className="anav-grab" aria-hidden="true" />
                 {" "}
+                <SkLink href="/admin/rooms" className="anav-s">
+                  Rooms
+                </SkLink>
+                {" "}
                 <SkLink href="/admin/categories" className="anav-s">
                   Report categories
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/ads" className="anav-s">
                   Ads & AdSense
-                </SkLink>
-                {" "}
-                <SkLink href="/admin/ads/map" className="anav-s">
-                  Ad placement map
                 </SkLink>
                 {" "}
                 <SkLink href="/admin/account" className="anav-s" style={{ color: "var(--muted)" }}>
@@ -226,7 +225,7 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                     Users
                   </h1>
                   <div className="muted" style={{ fontSize: "13px" }}>
-                    1,284 accounts · sample data
+                    {v.headLine}
                   </div>
                 </div>
                 {" "}
@@ -263,6 +262,9 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                 </SkLink>
                 <SkLink href="/admin/users" className="chip on">
                   Users
+                </SkLink>
+                <SkLink href="/admin/rooms" className="chip">
+                  Rooms
                 </SkLink>
                 <SkLink href="/admin/reports" className="chip">
                   Reports
@@ -346,6 +348,7 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                               <b>
                                 @{u.name}
                               </b>
+                              {u.online ? (<span title="Online now" style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#5be0a0", flex: "none" }} />) : null}
                             </span>
                           </td>
                           <td className="muted">
@@ -412,6 +415,9 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                   <div className="muted" style={{ fontSize: "13px" }}>
                     {"Joined "}{v.sel.joined}{" · "}{v.sel.state}{" · "}{v.sel.device}
                   </div>
+                  <div style={{ fontSize: "13px", marginTop: "2px", fontWeight: "700", color: v.selOnline ? "var(--ok)" : "var(--muted)" }}>
+                    {v.selOnline ? "● Online now" : "Last seen " + v.selLastSeen}{" · "}{v.selTime}{" on the site"}
+                  </div>
                 </div>
                 {" "}
                 <span className="pill" style={{ background: v.sel.stBg, color: v.sel.stInk }}>
@@ -459,6 +465,28 @@ export default class AdminUsers extends React.Component<Record<string, any>, any
                 </div>
                 {" "}
               </div>
+              {" "}
+              <h3 style={{ fontSize: "15px", marginTop: "16px" }}>
+                Network addresses (IP)
+              </h3>
+              <p className="muted" style={{ fontSize: "12.5px", marginTop: "2px" }}>
+                Every address this account used in the last 30 days, newest first. Block one from Traffic if it is abusing the site.
+              </p>
+              {v.selNoIps ? (
+                <p className="muted" style={{ fontSize: "13px", marginTop: "8px" }}>
+                  No visits recorded yet.
+                </p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
+                  {(v.selIps || []).map((a, i0) => (
+                    <div key={i0} className="card row" style={{ padding: "8px 12px", fontSize: "13px", gap: "10px" }}>
+                      <b className="grow" style={{ fontFamily: "ui-monospace, monospace" }}>{a.ip}</b>
+                      <span className="muted">{a.net}</span>
+                      <span className="muted">{a.when}{" ago"}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               {" "}
               <h3 style={{ fontSize: "15px", marginTop: "16px" }}>
                 Warnings by receiver
