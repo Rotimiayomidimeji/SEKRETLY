@@ -30,6 +30,7 @@ export default class Login extends React.Component<Record<string, any>, any> {
       user: s.user, pass: s.pass,
       onUser: function (e) { self.setState({ user: e.target.value }); },
       onPass: function (e) { self.setState({ pass: e.target.value }); },
+      showPass: !!s.showPass, toggleShow: function () { self.setState({ showPass: !s.showPass }); },
       ok: correct, notOk: !correct,
       err: s.tries > 0 && !correct,
       errMsg: s.suspended ? 'This account is suspended for breaking the community rules, so you can’t log in. If you think this is a mistake, contact us from the Contact page.' : locked ? 'Too many tries. Wait 15 minutes, or reset your password.' : 'That username and password do not match. ' + (s.left == null ? 5 - s.tries : s.left) + (s.left === 1 ? ' try left.' : ' tries left.'),
@@ -133,7 +134,16 @@ export default class Login extends React.Component<Record<string, any>, any> {
                 {" "}
               </div>
               {" "}
-              <input id="li-pass" className="field" type="password" value={v.pass ?? ""} onChange={v.onPass} autoComplete="current-password" placeholder="Your password" />
+              <div style={{ position: "relative" }}>
+                <input id="li-pass" className="field" type={v.showPass ? "text" : "password"} value={v.pass ?? ""} onChange={v.onPass} autoComplete="current-password" placeholder="Your password" style={{ paddingRight: "56px" }} />
+                <button type="button" onClick={v.toggleShow} aria-label={v.showPass ? "Hide password" : "Show password"} aria-pressed={!!v.showPass} style={{ position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)", width: "44px", height: "44px", border: "0", background: "transparent", color: "var(--muted)", display: "grid", placeItems: "center", padding: "0" }}>
+                  {v.showPass ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3l18 18" /><path d="M10.6 5.1A10 10 0 0 1 22 12a14 14 0 0 1-3 3.6M6.5 6.6A14 14 0 0 0 2 12s3.5 7 10 7a9.6 9.6 0 0 0 4.4-1" /></svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                  )}
+                </button>
+              </div>
               {" "}
             </div>
             {" "}
